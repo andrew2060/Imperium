@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.regions.collections;
 
+import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
@@ -85,6 +86,11 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     @Override
     public boolean addAll(Collection<? extends Region> c) {
         return contents.addAll(c);
+    }
+
+    @Override
+    protected Area getQuadrant(int quad) {
+        throw new UnsupportedOperationException("Terminal Areas do not have quadrants!");
     }
 
     @Override

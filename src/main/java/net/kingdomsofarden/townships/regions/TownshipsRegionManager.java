@@ -1,5 +1,7 @@
 package net.kingdomsofarden.townships.regions;
 
+import com.google.common.base.Optional;
+import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.regions.collections.QuadrantBoundCollection;
@@ -70,7 +72,7 @@ public class TownshipsRegionManager implements RegionManager {
             return maps.get(world).add(region);
         } else {
             int[] borders = get2dBorders(region.getLocation().getWorld());
-            maps.put(world, new QuadrantBoundCollection(borders[0], borders[1], borders[2], borders[3]));
+            maps.put(world, new QuadrantBoundCollection(-1, null, borders[0], borders[1], borders[2], borders[3]));
             return maps.get(world).add(region);
         }
     }
@@ -154,5 +156,10 @@ public class TownshipsRegionManager implements RegionManager {
         } else {
             return new LinkedList<Region>();
         }
+    }
+
+    @Override
+    public Optional<Area> getBoundingArea(Location loc) {
+        return null; //TODO
     }
 }

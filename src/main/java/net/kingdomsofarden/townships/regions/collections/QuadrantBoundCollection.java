@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.regions.collections;
 
+import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
@@ -13,7 +14,9 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     private int xDivisor;
     private int zDivisor;
 
-    public QuadrantBoundCollection(int xLeft, int xRight, int zLower, int zUpper) {
+    public QuadrantBoundCollection(int quadrant, RegionBoundCollection parent, int xLeft, int xRight, int zLower, int zUpper) {
+        this.parent = parent;
+        this.quadrant = quadrant;
         this.subRegions = new RegionBoundCollection[4]; // [][] {{0 | 1} | {2 | 3}}
         this.minX = xLeft;
         this.maxX = xRight;
@@ -21,6 +24,12 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         this.maxZ = zUpper;
         this.xDivisor = Math.floorDiv((xRight - xLeft), 2);
         this.zDivisor = Math.floorDiv((xRight - xLeft), 2);
+    }
+
+
+    @Override
+    protected Area getQuadrant(int quad) {
+        return subRegions[quad];
     }
 
     @Override
@@ -67,11 +76,12 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return (upperLeft || upperRight || lowerLeft || lowerRight);
     }
 
+
     // TODO: Alternative algorithms?
     @Override
     protected void constructContainedRegions(Set<Region> regions) {
         for (RegionBoundCollection c : subRegions) {
-            regions.addAll(c.getContainedRegions());
+            regions.addAll(c.getContents());
         }
         return;
     }
@@ -123,7 +133,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
             if (w <= 100 || h <= 100) { //TODO nicer partitioning
                 subRegions[i] = new TerminalBoundCollection(xLeft, xRight, zLower, zUpper);
             } else {
-                subRegions[i] = new QuadrantBoundCollection(xLeft, xRight, zLower, zUpper);
+                subRegions[i] = new QuadrantBoundCollection(i, this, xLeft, xRight, zLower, zUpper);
             }
         }
     }
@@ -131,7 +141,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override
     public int size() {
-        return getContainedRegions().size();
+        return getContents().size();
     }
 
     @Override
@@ -156,17 +166,17 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override
     public Iterator<Region> iterator() {
-        return getContainedRegions().iterator();
+        return getContents().iterator();
     }
 
     @Override
     public Object[] toArray() {
-        return getContainedRegions().toArray();
+        return getContents().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getContainedRegions().toArray(a);
+        return getContents().toArray(a);
     }
 
     @Override
@@ -222,7 +232,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean ret = false;
-        for (Region r : getContainedRegions()) {
+        for (Region r : getContents()) {
             if (!c.contains(r) && remove(r)) {
                 ret = true;
             }
