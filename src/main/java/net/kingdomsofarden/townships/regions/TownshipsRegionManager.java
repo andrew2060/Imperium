@@ -1,15 +1,18 @@
 package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
+import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.regions.collections.QuadrantBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
+import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,9 +20,20 @@ import java.util.UUID;
 
 public class TownshipsRegionManager implements RegionManager {
 
+    private TownshipsPlugin plugin;
     private Map<UUID, RegionBoundCollection> maps; // One per world
     private Map<UUID, Region> uidToRegion;
     private Map<String, UUID> nameToUid;
+    private RegionTaskManager taskManager;
+
+    public TownshipsRegionManager(TownshipsPlugin plugin) {
+        this.plugin = plugin;
+        this.maps = new HashMap<UUID, RegionBoundCollection>();
+        this.uidToRegion = new HashMap<UUID, Region>();
+        this.nameToUid = new HashMap<String, UUID>();
+        this.taskManager = new RegionTaskManager(Constants.TICK_REGIONS_PER_SERVER_TICKS);
+        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, taskManager, 0, 1);
+    }
 
     @Override
     public int size() {
