@@ -36,11 +36,7 @@ public class PlayerListener implements Listener {
             zFrom = from.getZ() % Constants.MIN_DIV_Z;
             zTo = to.getZ() % Constants.MIN_DIV_Z;
             if (xFrom != xTo || zFrom != zTo) {
-                if (a == null) {
-                    c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
-                } else {
-                    c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
-                }
+                c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
             }
         }
     }
