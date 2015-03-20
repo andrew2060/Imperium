@@ -19,7 +19,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     public void onEnable() {
         // Initialize
         Townships.setInstance(this);
-        regionManager = new TownshipsRegionManager();
+        regionManager = new TownshipsRegionManager(this);
 
         // Register Events
         playerListener = new PlayerListener(this);

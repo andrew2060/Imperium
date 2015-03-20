@@ -32,7 +32,6 @@ public class TownshipsRegionManager implements RegionManager {
         this.uidToRegion = new HashMap<UUID, Region>();
         this.nameToUid = new HashMap<String, UUID>();
         this.taskManager = new RegionTaskManager(Constants.TICK_REGIONS_PER_SERVER_TICKS);
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, taskManager, 0, 1);
     }
 
     @Override
@@ -92,7 +91,7 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     private int[] get2dBorders(World world) {
-        return new int[4]; //TODO Load from Configs
+        return new int[] {-10000, 10000, -10000, 10000}; //TODO Load from Configs
     }
 
     @Override
