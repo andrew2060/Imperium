@@ -42,23 +42,7 @@ public class PlayerListener implements Listener {
                 if (a == null) {
                     c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
                 } else {
-                    int xIdx;
-                    int zIdx;
-                    if (xFrom < xTo) {
-                        xIdx = 0;
-                    } else if (xFrom == xTo) {
-                        xIdx = 1;
-                    } else {
-                        xIdx = 2;
-                    }
-                    if (zFrom < zTo) {
-                        zIdx = 2;
-                    } else if (zFrom == zTo) {
-                        zIdx = 1;
-                    } else {
-                        zIdx = 0;
-                    }
-                    c.setCurrentArea(a.getNeighbor(DIRECTIONS[xIdx][zIdx]).orNull());
+                    c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
                 }
             }
         }

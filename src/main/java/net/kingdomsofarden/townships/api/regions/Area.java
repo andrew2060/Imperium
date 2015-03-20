@@ -1,6 +1,5 @@
 package net.kingdomsofarden.townships.api.regions;
 
-import com.google.common.base.Optional;
 import org.bukkit.Location;
 
 import java.util.Collection;
@@ -23,15 +22,6 @@ public interface Area extends Collection<Region> {
     Collection<Region> getContents();
 
     /**
-     * @param direction The direction to get the neighbor for (0-7 clockwise from the left in 45 degree increments)
-     * @return An Optional representation of the Area unit of the neighbor, will be null if one does not exist
-     * (i.e. there is no Area that contains Regions within it directly neighboring this area). The guarantee is made
-     * that the returned value (if it exists) will be of the same level as that of the originating Area: i.e. if the
-     * request originated from a terminal area, the returned value would also be a terminal area
-     */
-    Optional<Area> getNeighbor(int direction);
-
-    /**
      * @param x The x coordinate to check
      * @param y The y coordinate to check
      * @param z The z coordinate to check
@@ -46,4 +36,9 @@ public interface Area extends Collection<Region> {
      * @return True if within the bounds represented by this collection
      */
     boolean isInBounds(Location loc);
+
+    /**
+     * @return The bounds of this area, 0 indicating minimum X, 1 indicating maximum X, 2 indicating minimum Z, 3 indicating maximum Z
+     */
+    int[] getBounds();
 }

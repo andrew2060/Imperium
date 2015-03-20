@@ -30,11 +30,6 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
 
     @Override
-    protected Area getQuadrant(int quad) {
-        return subRegions[quad];
-    }
-
-    @Override
     public Collection<Region> getBoundingRegions(int x, int y, int z) {
         boolean upperHalf = z > zDivisor;
         boolean leftHalf = x <= xDivisor;

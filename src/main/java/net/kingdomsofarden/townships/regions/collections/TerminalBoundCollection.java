@@ -90,11 +90,6 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    protected Area getQuadrant(int quad) {
-        throw new UnsupportedOperationException("Terminal Areas do not have quadrants!");
-    }
-
-    @Override
     protected void constructContainedRegions(Set<Region> regions) {
         regions.addAll(contents);
     }

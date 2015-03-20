@@ -75,6 +75,7 @@ public class PlayerListenerTest {
                         for (int xMod = -1; x < 2; x++) {
                             for (int zMod = -1; z < 2; z++) {
                                 Location from = dest.clone().add(xMod, 0, zMod);
+                                System.out.println("Testing " + getCoords(from) + " to " + getCoords(dest));
                                 PlayerMoveEvent mockEvent = mock(PlayerMoveEvent.class);
                                 when(mockEvent.getPlayer()).thenReturn(mockPlayer);
                                 when(mockEvent.getFrom()).thenReturn(from);
@@ -82,7 +83,7 @@ public class PlayerListenerTest {
                                 Area correctTo = rMan.getBoundingArea(dest).orNull();
                                 listener.onPlayerMove(mockEvent);
                                 Area generatedTo = citizen.getCurrentArea();
-                                assert (correctTo == null && generatedTo == null) || (correctTo != null && correctTo.equals(generatedTo));
+                                assertMatching(correctTo, generatedTo);
                             }
                         }
                     }
@@ -90,6 +91,27 @@ public class PlayerListenerTest {
             }
         }
         System.out.println("Player Movement Assertion Test Successful");
+    }
+
+    private String getCoords(Location dest) {
+        return "(" + dest.getX() + ',' + dest.getZ() + ')';
+    }
+
+    private void assertMatching(Area correct, Area generated) {
+        assert (correct == null && generated == null) || (correct != null && generated != null) :
+                "Expected: " + (correct == null ? "null Actual: " + printBounds(generated.getBounds())
+                        : printBounds(correct.getBounds()) + " Actual: null");
+
+        if (correct != null) {
+            for (int i = 0; i < 4; i++) {
+                assert correct.getBounds()[i] == generated.getBounds()[i] : "Mismatch for bound "
+                        + i + ": Expected: " + correct.getBounds()[i] + " Actual: " + generated.getBounds()[i];
+            }
+        }
+    }
+
+    private String printBounds(int[] bounds) {
+        return new StringBuilder().append(bounds[0]).append(',').append(bounds[1]).append(',').append(bounds[2]).append(',').append(bounds[3]).toString();
     }
 
 }
