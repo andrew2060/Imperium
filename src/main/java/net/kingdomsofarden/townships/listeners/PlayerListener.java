@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class PlayerListener implements Listener {
 
@@ -25,9 +24,7 @@ public class PlayerListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         Area a = c.getCurrentArea();
-        if (event instanceof PlayerTeleportEvent) { // Always Recalculate This
-            c.setCurrentArea(plugin.getRegions().getBoundingArea(event.getTo()).orNull());
-        } else if (a == null || !a.isInBounds(event.getTo())) {
+        if (a == null || !a.isInBounds(event.getTo())) {
             Location to = event.getTo();
             Location from = event.getFrom();
             double xFrom;

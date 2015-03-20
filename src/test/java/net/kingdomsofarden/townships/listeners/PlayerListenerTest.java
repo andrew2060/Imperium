@@ -34,6 +34,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class PlayerListenerTest {
     @Test
     public void testOnPlayerMove() {
+        System.out.println("Beginning Player Movement Listener Updates Test");
         // Set up mocking
         TownshipsPlugin mockPlugin = mock(TownshipsPlugin.class);
         Player mockPlayer = mock(Player.class);
@@ -75,7 +76,6 @@ public class PlayerListenerTest {
                         for (int xMod = -1; x < 2; x++) {
                             for (int zMod = -1; z < 2; z++) {
                                 Location from = dest.clone().add(xMod, 0, zMod);
-                                System.out.println("Testing " + getCoords(from) + " to " + getCoords(dest));
                                 PlayerMoveEvent mockEvent = mock(PlayerMoveEvent.class);
                                 when(mockEvent.getPlayer()).thenReturn(mockPlayer);
                                 when(mockEvent.getFrom()).thenReturn(from);
