@@ -22,8 +22,8 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         this.maxX = xRight;
         this.minZ = zLower;
         this.maxZ = zUpper;
-        this.xDivisor = Math.floorDiv((xRight - xLeft), 2);
-        this.zDivisor = Math.floorDiv((xRight - xLeft), 2);
+        this.xDivisor = Math.floorDiv((xRight + xLeft), 2);
+        this.zDivisor = Math.floorDiv((zUpper + zLower), 2);
     }
 
 
