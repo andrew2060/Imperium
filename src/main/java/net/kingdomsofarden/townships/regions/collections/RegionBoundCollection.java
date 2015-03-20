@@ -397,4 +397,6 @@ public abstract class RegionBoundCollection implements Area {
     protected abstract Area getQuadrant(int quad);
 
     protected abstract void constructContainedRegions(Set<Region> regions);
+
+    public abstract Optional<Area> getBoundingArea(int x, int z);
 }

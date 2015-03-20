@@ -173,6 +173,7 @@ public class TownshipsRegionManager implements RegionManager {
 
     @Override
     public Optional<Area> getBoundingArea(Location loc) {
-        return null; //TODO
+        RegionBoundCollection col = maps.get(loc.getWorld().getUID());
+        return col != null ? col.getBoundingArea(loc.getBlockX(), loc.getBlockZ()) : Optional.<Area>absent();
     }
 }

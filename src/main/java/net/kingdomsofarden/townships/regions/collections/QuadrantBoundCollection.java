@@ -1,10 +1,12 @@
 package net.kingdomsofarden.townships.regions.collections;
 
+import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -38,15 +40,15 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         boolean leftHalf = x <= xDivisor;
         if (leftHalf) {
             if (upperHalf) {
-                return subRegions[0].getBoundingRegions(x, y, z);
+                return subRegions[0] != null ? subRegions[0].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
             } else {
-                return subRegions[2].getBoundingRegions(x, y, z);
+                return subRegions[2] != null ? subRegions[2].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
             }
         } else {
             if (upperHalf) {
-                return subRegions[1].getBoundingRegions(x, y, z);
+                return subRegions[1] != null ? subRegions[1].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
             } else {
-                return subRegions[3].getBoundingRegions(x, y, z);
+                return subRegions[3] != null ? subRegions[3].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
             }
         }
     }
@@ -84,6 +86,25 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
             regions.addAll(c.getContents());
         }
         return;
+    }
+
+    @Override
+    public Optional<Area> getBoundingArea(int x, int z) {
+        boolean upperHalf = z > zDivisor;
+        boolean leftHalf = x <= xDivisor;
+        if (leftHalf) {
+            if (upperHalf) {
+                return subRegions[0] != null ? subRegions[0].getBoundingArea(x, z) : Optional.<Area>absent();
+            } else {
+                return subRegions[2] != null ? subRegions[2].getBoundingArea(x, z) : Optional.<Area>absent();
+            }
+        } else {
+            if (upperHalf) {
+                return subRegions[1] != null ? subRegions[1].getBoundingArea(x, z) : Optional.<Area>absent();
+            } else {
+                return subRegions[3] != null ? subRegions[3].getBoundingArea(x, z) : Optional.<Area>absent();
+            }
+        }
     }
 
     private void checkIndexAndCreate(int i) {

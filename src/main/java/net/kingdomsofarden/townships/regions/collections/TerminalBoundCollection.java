@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.regions.collections;
 
+import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
@@ -96,6 +97,11 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     @Override
     protected void constructContainedRegions(Set<Region> regions) {
         regions.addAll(contents);
+    }
+
+    @Override
+    public Optional<Area> getBoundingArea(int x, int z) {
+        return Optional.of((Area)this); // Not sure why this cast is needed but compiler complains
     }
 
     @Override
