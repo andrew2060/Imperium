@@ -7,12 +7,11 @@ import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.listeners.PlayerListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
 
-    private RegionManager regionManager;
+    private TownshipsRegionManager regionManager;
     private PlayerListener playerListener;
 
     @Override
@@ -24,11 +23,14 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Register Events
         playerListener = new PlayerListener(this);
         Bukkit.getPluginManager().registerEvents(playerListener, this);
+
+        // Start tasks
+        Bukkit.getScheduler().runTaskTimer(this, regionManager.getTaskManager(), 0, 1);
     }
 
     @Override
     public void onDisable() {
-        HandlerList.unregisterAll(this);
+        Bukkit.getScheduler().cancelTasks(this);
     }
 
     @Override

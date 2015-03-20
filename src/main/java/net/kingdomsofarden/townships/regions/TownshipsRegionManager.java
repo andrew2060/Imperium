@@ -176,4 +176,8 @@ public class TownshipsRegionManager implements RegionManager {
         RegionBoundCollection col = maps.get(loc.getWorld().getUID());
         return col != null ? col.getBoundingArea(loc.getBlockX(), loc.getBlockZ()) : Optional.<Area>absent();
     }
+
+    public RegionTaskManager getTaskManager() {
+        return taskManager;
+    }
 }
