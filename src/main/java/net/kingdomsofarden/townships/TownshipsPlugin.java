@@ -25,7 +25,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         Bukkit.getPluginManager().registerEvents(playerListener, this);
 
         // Start tasks
-        Bukkit.getScheduler().runTaskTimer(this, regionManager.getTaskManager(), 0, 1);
+        Bukkit.getScheduler().runTaskTimer(this, regionManager.getEffectTaskManager(), 0, 1);
     }
 
     @Override

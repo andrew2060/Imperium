@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.api.regions;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
+import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 import org.bukkit.Location;
 
@@ -43,6 +44,8 @@ public interface Region {
      */
     BoundingBox getBounds();
 
-
-
+    /**
+     * @return A collection of effects currently active for this region
+     */
+    Collection<Effect> getEffects();
 }
