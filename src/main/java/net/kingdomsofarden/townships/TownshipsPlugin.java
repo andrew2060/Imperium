@@ -2,8 +2,8 @@ package net.kingdomsofarden.townships;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
-import net.kingdomsofarden.townships.api.characters.CitizenManager;
-import net.kingdomsofarden.townships.api.regions.RegionManager;
+import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
+import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
 import net.kingdomsofarden.townships.listeners.PlayerListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import org.bukkit.Bukkit;
@@ -12,6 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
 
     private TownshipsRegionManager regionManager;
+    private TownshipsEffectManager effectManager;
+
     private PlayerListener playerListener;
 
     @Override
@@ -19,13 +21,14 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Initialize
         Townships.setInstance(this);
         regionManager = new TownshipsRegionManager(this);
+        effectManager = new TownshipsEffectManager(this);
 
         // Register Events
         playerListener = new PlayerListener(this);
         Bukkit.getPluginManager().registerEvents(playerListener, this);
 
         // Start tasks
-        Bukkit.getScheduler().runTaskTimer(this, regionManager.getEffectTaskManager(), 0, 1);
+        Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);
     }
 
     @Override
@@ -34,12 +37,17 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     }
 
     @Override
-    public RegionManager getRegions() {
+    public TownshipsRegionManager getRegions() {
         return regionManager;
     }
 
     @Override
-    public CitizenManager getCitizens() {
+    public TownshipsCitizenManager getCitizens() {
         return null; //TODO
+    }
+
+    @Override
+    public TownshipsEffectManager getEffectManager() {
+        return effectManager;
     }
 }

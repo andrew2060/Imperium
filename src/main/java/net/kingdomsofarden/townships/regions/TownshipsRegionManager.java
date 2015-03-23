@@ -7,10 +7,8 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
-import net.kingdomsofarden.townships.effects.EffectTaskManager;
 import net.kingdomsofarden.townships.regions.collections.QuadrantBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
-import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -27,14 +25,12 @@ public class TownshipsRegionManager implements RegionManager {
     private Map<UUID, RegionBoundCollection> maps; // One per world
     private Map<UUID, Region> uidToRegion;
     private Map<String, UUID> nameToUid;
-    private EffectTaskManager taskManager;
 
     public TownshipsRegionManager(TownshipsPlugin plugin) {
         this.plugin = plugin;
         this.maps = new HashMap<UUID, RegionBoundCollection>();
         this.uidToRegion = new HashMap<UUID, Region>();
         this.nameToUid = new HashMap<String, UUID>();
-        this.taskManager = new EffectTaskManager(Constants.EFFECT_SPREAD_DELAY);
     }
 
     @Override
@@ -80,7 +76,7 @@ public class TownshipsRegionManager implements RegionManager {
     public boolean add(Region region) {
         for (Effect effect : region.getEffects()) {
             if (effect instanceof TickableEffect) {
-                taskManager.schedule((TickableEffect) effect, region);
+                plugin.getEffectManager().getEffectTaskManager().schedule((TickableEffect) effect, region);
             }
         }
         UUID id = region.getUid();
@@ -117,7 +113,7 @@ public class TownshipsRegionManager implements RegionManager {
         }
         for (Effect effect : r.getEffects()) {
             if (effect instanceof TickableEffect) {
-                taskManager.schedule((TickableEffect) effect, r);
+                plugin.getEffectManager().getEffectTaskManager().unschedule((TickableEffect) effect);
             }
         }
         UUID id = r.getUid();
@@ -190,7 +186,4 @@ public class TownshipsRegionManager implements RegionManager {
         return col != null ? col.getBoundingArea(loc.getBlockX(), loc.getBlockZ()) : Optional.<Area>absent();
     }
 
-    public EffectTaskManager getEffectTaskManager() {
-        return taskManager;
-    }
 }
