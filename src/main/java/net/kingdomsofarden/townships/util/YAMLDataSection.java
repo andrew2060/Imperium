@@ -26,7 +26,7 @@ public class YAMLDataSection implements StoredDataSection {
 
     @Override
     public <T> Optional<T> get(String path) {
-        return null;
+        return Optional.fromNullable((T)backing.get(path));
     }
 
     @Override
@@ -42,5 +42,15 @@ public class YAMLDataSection implements StoredDataSection {
     @Override
     public Set<String> getKeys(boolean deep) {
         return backing.getKeys(deep);
+    }
+
+    @Override
+    public void set(String path, Object object) {
+        backing.set(path, object);
+    }
+
+    @Override
+    public void set(String path, Object obj, Serializer serializer) {
+        backing.set(path, serializer.serialize(obj));
     }
 }

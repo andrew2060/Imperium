@@ -44,4 +44,19 @@ public interface StoredDataSection {
      * @return The keys present for the given storage section, or an empty set if not present
      */
     Set<String> getKeys(boolean deep);
+
+    /**
+     * Sets the value at path to object, using the object's built in toString method
+     * @param path The path to store at
+     * @param object The object to store
+     */
+    void set(String path, Object object);
+
+    /**
+     * Sets the value at path to object, using the parameter serializer
+     * @param path The path to store at
+     * @param object The object to store
+     * @param serializer The serializer to serialiaze the object with
+     */
+    void set(String path, Object object, Serializer serializer);
 }
