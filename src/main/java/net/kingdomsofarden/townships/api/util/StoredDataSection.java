@@ -12,6 +12,11 @@ public interface StoredDataSection {
     static final String PATH_SEPARATOR = ".";
 
     /**
+     * @return The memory section that backs
+     */
+    Object getBackingImplementation();
+
+    /**
      * @return The current path represented by the String
      */
     String getCurrentPath();

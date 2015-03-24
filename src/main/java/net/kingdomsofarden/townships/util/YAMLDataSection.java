@@ -15,6 +15,11 @@ public class YAMLDataSection implements StoredDataSection {
     }
 
     @Override
+    public Object getBackingImplementation() {
+        return backing;
+    }
+
+    @Override
     public String getCurrentPath() {
         return backing.getCurrentPath();
     }
