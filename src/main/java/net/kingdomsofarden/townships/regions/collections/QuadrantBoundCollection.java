@@ -1,12 +1,14 @@
 package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
+import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -46,6 +48,15 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
                 return subRegions[3] != null ? subRegions[3].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
             }
         }
+    }
+
+    @Override
+    public Collection<Citizen> getCitizensInArea() {
+        HashSet s = new HashSet<Citizen>();
+        for (RegionBoundCollection col : subRegions) {
+            Collections.addAll(s, col.getCitizensInArea());
+        }
+        return s;
     }
 
     @Override

@@ -17,6 +17,12 @@ public class TownshipsCitizen implements Citizen {
 
     @Override
     public void setCurrentArea(Area area) {
+        if (currTerminalArea != null) {
+            currTerminalArea.getCitizensInArea().remove(this);
+        }
         currTerminalArea = area;
+        if (area != null) {
+            currTerminalArea.getCitizensInArea().add(this);
+        }
     }
 }

@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
-import net.kingdomsofarden.townships.listeners.PlayerListener;
+import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +14,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     private TownshipsRegionManager regionManager;
     private TownshipsEffectManager effectManager;
 
-    private PlayerListener playerListener;
+    private RegionalUpdateListener regionalUpdateListener;
 
     @Override
     public void onEnable() {
@@ -24,8 +24,8 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         effectManager = new TownshipsEffectManager(this);
 
         // Register Events
-        playerListener = new PlayerListener(this);
-        Bukkit.getPluginManager().registerEvents(playerListener, this);
+        regionalUpdateListener = new RegionalUpdateListener(this);
+        Bukkit.getPluginManager().registerEvents(regionalUpdateListener, this);
 
         // Start tasks
         Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);

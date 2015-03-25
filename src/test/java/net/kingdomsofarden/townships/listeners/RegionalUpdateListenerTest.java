@@ -8,6 +8,7 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.characters.TownshipsCitizen;
+import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import net.kingdomsofarden.townships.util.AxisAlignedBoundingBox;
@@ -31,7 +32,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(PlayerMoveEvent.class)
-public class PlayerListenerTest {
+public class RegionalUpdateListenerTest {
     @Test
     public void testOnPlayerMove() {
         System.out.println("Beginning Player Movement Listener Updates Test");
@@ -41,12 +42,12 @@ public class PlayerListenerTest {
         UUID pId = UUID.randomUUID();
         when(mockPlayer.getUniqueId()).thenReturn(pId);
         RegionManager rMan = new TownshipsRegionManager(mockPlugin);
-        when(mockPlugin.getRegions()).thenReturn(rMan);
+        when(mockPlugin.getRegions()).thenReturn((TownshipsRegionManager) rMan);
         CitizenManager cMan = mock(CitizenManager.class);
-        when(mockPlugin.getCitizens()).thenReturn(cMan);
+        when(mockPlugin.getCitizens()).thenReturn((TownshipsCitizenManager) cMan);
         Citizen citizen = new TownshipsCitizen();
         when(cMan.getCitizen(Mockito.<UUID>any())).thenReturn(citizen);
-        PlayerListener listener = new PlayerListener(mockPlugin);
+        RegionalUpdateListener listener = new RegionalUpdateListener(mockPlugin);
         World mockWorld = mock(World.class);
         UUID wId = UUID.randomUUID();
         when(mockWorld.getUID()).thenReturn(wId);

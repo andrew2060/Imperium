@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.api.regions;
 
+import net.kingdomsofarden.townships.api.characters.Citizen;
 import org.bukkit.Location;
 
 import java.util.Collection;
@@ -41,4 +42,9 @@ public interface Area extends Collection<Region> {
      * @return The bounds of this area, 0 indicating minimum X, 1 indicating maximum X, 2 indicating minimum Z, 3 indicating maximum Z
      */
     int[] getBounds();
+
+    /**
+     * @return A collection of citizens currently within the bounds represented by the area
+     */
+    Collection<Citizen> getCitizensInArea();
 }

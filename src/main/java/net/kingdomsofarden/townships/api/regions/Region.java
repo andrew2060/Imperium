@@ -35,6 +35,11 @@ public interface Region {
     Collection<Citizen> getCitizens();
 
     /**
+     * @return A collection of citizens currently within the bounds of this region
+     */
+    Collection<Citizen> getCitizensInBounds();
+
+    /**
      * @return The center point of the given region
      */
     Location getLocation();

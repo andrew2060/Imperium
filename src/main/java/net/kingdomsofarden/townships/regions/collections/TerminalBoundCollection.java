@@ -1,11 +1,13 @@
 package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
+import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -17,6 +19,7 @@ import java.util.Set;
 public class TerminalBoundCollection extends RegionBoundCollection {
 
     private Set<Region> contents; // TODO: use heap/binary tree instead for most efficient searching for a specific region?
+    private Collection<Citizen> currCitizens;
 
     public TerminalBoundCollection(int xLeft, int xRight, int zLower, int zUpper) {
         this.contents = new LinkedHashSet<Region>();
@@ -24,6 +27,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         this.maxX = xRight;
         this.minZ = zLower;
         this.maxZ = zUpper;
+        this.currCitizens = new HashSet<Citizen>();
     }
 
     @Override
@@ -113,4 +117,10 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     public void clear() {
         contents.clear();
     }
+
+    @Override
+    public Collection<Citizen> getCitizensInArea() {
+        return currCitizens;
+    }
+
 }

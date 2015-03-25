@@ -2,6 +2,8 @@ package net.kingdomsofarden.townships.api.characters;
 
 import net.kingdomsofarden.townships.api.regions.Area;
 
+import java.util.UUID;
+
 public interface Citizen {
     /**
      * @return The smallest bounded area within which the Citizen currently is located
@@ -13,4 +15,6 @@ public interface Citizen {
      * @param area The Area to assign to the Citizen
      */
     void setCurrentArea(Area area);
+
+    UUID getUid();
 }

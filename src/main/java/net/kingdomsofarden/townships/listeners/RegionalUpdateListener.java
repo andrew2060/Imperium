@@ -8,16 +8,42 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
-public class PlayerListener implements Listener {
-
-    private static final int[][] DIRECTIONS = new int[][] {new int[] {1,2,3}, new int[] {0,-1,4}, new int[] {7,6,5}};
+public class RegionalUpdateListener implements Listener {
 
     private final ITownshipsPlugin plugin;
 
-    public PlayerListener(ITownshipsPlugin plugin) {
+    public RegionalUpdateListener(ITownshipsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
+        c.setCurrentArea(plugin.getRegions().getBoundingArea(event.getPlayer().getLocation()).orNull());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
+        c.setCurrentArea(null);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Citizen c = plugin.getCitizens().getCitizen(event.getEntity().getUniqueId());
+        c.setCurrentArea(null);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled =  true)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
+        c.setCurrentArea(plugin.getRegions().getBoundingArea(event.getRespawnLocation()).orNull());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

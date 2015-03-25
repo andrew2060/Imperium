@@ -4,12 +4,16 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
+import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
@@ -26,9 +30,12 @@ public class TownshipsRegion implements Region {
     private BoundingBox bounds;
     private Location center;
 
+    private Collection<Area> containingAreas;
+
     public TownshipsRegion(ConfigurationSection config) {
         //TODO
     }
+
 
     @Override
     public UUID getUid() {
@@ -48,6 +55,20 @@ public class TownshipsRegion implements Region {
     @Override
     public Collection<Citizen> getCitizens() {
         return citizens;
+    }
+
+    @Override
+    public Collection<Citizen> getCitizensInBounds() {
+        HashSet<Citizen> contents = new HashSet<Citizen>();
+        for (Area a : containingAreas) {
+            for (Citizen c : a.getCitizensInArea()) {
+                Player p = Bukkit.getPlayer(c.getUid());
+                if (p != null && bounds.isInBounds(p.getLocation())) {
+                    contents.add(c);
+                }
+            }
+        }
+        return contents;
     }
 
     @Override
