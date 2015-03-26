@@ -15,6 +15,12 @@ import java.util.UUID;
 public interface Region {
 
     /**
+     * @return The tier of the region, in general lower tiers refers to smaller regions while higher tiers refer to
+     * regions that contain lower tiered regions
+     */
+    int getTier();
+
+    /**
      * @return A unique identifier for this region
      */
     UUID getUid();
@@ -53,4 +59,18 @@ public interface Region {
      * @return A collection of effects currently active for this region
      */
     Collection<Effect> getEffects();
+
+    /**
+     * @param name The name of the effect, non-case sensitive
+     * @return Whether the effect is active on the given region
+     */
+    boolean hasEffect(String name);
+
+    /**
+     * @param <T> The explicit class type of the effect to retrieve
+     * @param name The name of the effect non-case sensitive
+     * @return The effect retrieved
+     * @throws IllegalStateException if no such effect exists
+     */
+    <T extends Effect> Effect getEffect(String name) throws IllegalStateException ;
 }

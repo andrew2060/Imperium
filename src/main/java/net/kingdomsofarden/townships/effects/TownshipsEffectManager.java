@@ -3,14 +3,15 @@ package net.kingdomsofarden.townships.effects;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.EffectManager;
+import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.util.Constants;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -51,17 +52,21 @@ public class TownshipsEffectManager implements EffectManager {
 
 
     @Override
-    public Effect loadEffect(String name, ConfigurationSection config) {
+    public Effect loadEffect(String name, Region loader, StoredDataSection config) {
         if (effects.containsKey(name.toLowerCase())) {
             try {
-                Class clazz = effects.get(name.toLowerCase());
-                Method m = clazz.getDeclaredMethod("createFromConfiguration", TownshipsPlugin.class, StoredDataSection.class);
-                return (Effect) m.invoke(null, plugin, config);
+                Class<? extends Effect> clazz = effects.get(name.toLowerCase());
+                Constructor<? extends Effect> c = clazz.getConstructor(new Class[]{});
+                Effect e = c.newInstance(new Object[] {});
+                e.onLoad(plugin, loader, config);
+                return e;
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
                 e.printStackTrace();
             }
             return null;
@@ -103,13 +108,6 @@ public class TownshipsEffectManager implements EffectManager {
                 if (mainClass != null) {
                     addFile(f);
                     Class<? extends Effect> clazz = (Class<? extends Effect>) Class.forName(mainClass);
-                    try {
-                        clazz.getMethod("createFromConfiguration", TownshipsPlugin.class, StoredDataSection.class);
-                    } catch (NoSuchMethodException e) {
-                        plugin.getLogger().log(Level.SEVERE, "Could not load " + mainClass + " all effects must " +
-                                "implement the static method createFromConfiguration(TownshipsPlugin, StoredDataSection)");
-                        continue;
-                    }
                     // Make empty copy to get name
                     try {
                         Effect e = (Effect) clazz.getConstructor(new Class[]{}).newInstance(new Object[]{});
