@@ -38,9 +38,9 @@ public class BlockProtectionListener implements Listener {
             if (Constants.ACCESS_TYPES.contains(b.getType())) {
                 Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-                boolean allow = false;
                 HashSet<RoleGroup> effectiveRoles = new HashSet<RoleGroup>();
                 for (Region region : boundingRegions) {
+                    effectiveRoles.addAll(region.getRoles(c));
                     if (region.hasEffect("protection")) {
                         EffectProtection effect = region.getEffect("protection");
                         if (effect.isPermitted(AccessType.ACCESS, c, effectiveRoles)) {
@@ -54,9 +54,9 @@ public class BlockProtectionListener implements Listener {
                     || (Constants.PROTECT_FIRE && event.getItem() != null && event.getItem().getType().equals(Material.FLINT_AND_STEEL))) {
                 Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-                boolean allow = false;
                 HashSet<RoleGroup> effectiveRoles = new HashSet<RoleGroup>();
                 for (Region region : boundingRegions) {
+                    effectiveRoles.addAll(region.getRoles(c));
                     if (region.hasEffect("protection")) {
                         EffectProtection effect = region.getEffect("protection");
                         if (effect.isPermitted(AccessType.INTERACT, c, effectiveRoles)) {
@@ -74,9 +74,9 @@ public class BlockProtectionListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-        boolean allow = false;
         HashSet<RoleGroup> effectiveRoles = new HashSet<RoleGroup>();
         for (Region region : boundingRegions) {
+            effectiveRoles.addAll(region.getRoles(c));
             if (region.hasEffect("protection")) {
                 EffectProtection effect = region.getEffect("protection");
                 if (effect.isPermitted(AccessType.ACCESS, c, effectiveRoles)) {
@@ -92,9 +92,9 @@ public class BlockProtectionListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-        boolean allow = false;
         HashSet<RoleGroup> effectiveRoles = new HashSet<RoleGroup>();
         for (Region region : boundingRegions) {
+            effectiveRoles.addAll(region.getRoles(c));
             if (region.hasEffect("protection")) {
                 EffectProtection effect = region.getEffect("protection");
                 if (effect.isPermitted(AccessType.ACCESS, c, effectiveRoles)) {

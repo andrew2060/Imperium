@@ -1,15 +1,17 @@
 package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.HashMultimap;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
+import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -23,8 +25,8 @@ public class TownshipsRegion implements Region {
     private String name;
     private int tier;
 
-    private Collection<Citizen> owners;
-    private Collection<Citizen> citizens;
+    private HashMultimap<UUID, RoleGroup> rolesByCitizenUid;
+    private HashMultimap<RoleGroup, UUID> citizenUidsByRole;
 
     private Map<String, Effect> effects;
     private Collection<TickableEffect> tickableEffects;
@@ -34,7 +36,22 @@ public class TownshipsRegion implements Region {
 
     private Collection<Area> containingAreas;
 
-    public TownshipsRegion(ConfigurationSection config) {
+    public TownshipsRegion(StoredDataSection config) {
+        rolesByCitizenUid = HashMultimap.create();
+        citizenUidsByRole = HashMultimap.create();
+        StoredDataSection groupAssignments = config.getSection("roles");
+        for (String roleName : groupAssignments.getKeys(false)) {
+            RoleGroup group = RoleGroup.valueOf(roleName);
+            for (String uid : groupAssignments.<String>getList(roleName)) {
+                try {
+                    UUID id = UUID.fromString(uid);
+                    rolesByCitizenUid.put(id, group);
+                    citizenUidsByRole.put(group, id);
+                } catch (IllegalArgumentException e) {
+                    // TODO debug message
+                }
+            }
+        }
         //TODO
     }
 
@@ -55,13 +72,8 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public Collection<Citizen> getOwners() {
-        return owners;
-    }
-
-    @Override
-    public Collection<Citizen> getCitizens() {
-        return citizens;
+    public Collection<UUID> getRole(RoleGroup group) {
+        return citizenUidsByRole.get(group);
     }
 
     @Override
@@ -105,5 +117,10 @@ public class TownshipsRegion implements Region {
             throw new IllegalStateException("An attempt to retrieve the effect " + name + " was made when it did not exist on a region");
         }
         return ret;
+    }
+
+    @Override
+    public Collection<RoleGroup> getRoles(Citizen citizen) {
+        return rolesByCitizenUid.get(citizen.getUid());
     }
 }

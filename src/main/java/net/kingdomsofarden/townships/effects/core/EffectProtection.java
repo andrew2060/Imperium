@@ -1,6 +1,5 @@
 package net.kingdomsofarden.townships.effects.core;
 
-import com.google.common.collect.HashMultimap;
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
@@ -16,7 +15,6 @@ import java.util.UUID;
 public class EffectProtection implements Effect {
 
     private Region region;
-    private HashMultimap<UUID, RoleGroup> userGroups;
     private HashMap<UUID, AccessType> userAccess;
     private HashMap<RoleGroup, AccessType> groups;
 
@@ -28,7 +26,6 @@ public class EffectProtection implements Effect {
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
-        this.userGroups = HashMultimap.create();
         this.userAccess = new HashMap<UUID, AccessType>();
         this.groups = new HashMap<RoleGroup, AccessType>();
         this.region = region;
@@ -78,18 +75,6 @@ public class EffectProtection implements Effect {
                 // TODO debug message
             }
         }
-        StoredDataSection groupAssignments = data.getSection("roles");
-        for (String roleName : groupAssignments.getKeys(false)) {
-            RoleGroup group = RoleGroup.valueOf(roleName);
-            for (String uid : groupAssignments.<String>getList(roleName)) {
-                try {
-                    UUID id = UUID.fromString(uid);
-                    userGroups.put(id, group);
-                } catch (IllegalArgumentException e) {
-                    // TODO debug message
-                }
-            }
-        }
     }
 
 
@@ -108,8 +93,6 @@ public class EffectProtection implements Effect {
 
     public boolean isPermitted(AccessType type, Citizen citizen, Set<RoleGroup> effective) {
         UUID uid = citizen.getUid();
-        // Check for group assignments
-        effective.addAll(userGroups.get(uid));
         // Check if group access is sufficient
         for (RoleGroup group : effective) {
             if (groups.containsKey(group) && groups.get(group).isHigherThanOrSame(type)) {

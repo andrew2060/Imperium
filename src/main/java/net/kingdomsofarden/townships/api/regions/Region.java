@@ -33,9 +33,10 @@ public interface Region {
 
     /**
      * @param group The group to get
-     * @return A collection of citizens that hold the given role within a region
+     * @return A collection of the UUID of citizens that hold the given role within a region. Note that this collection
+     * is not comprehensive as role is also inherited from higher tiered regions that have this region within its borders
      */
-    Collection<Citizen> getRole(RoleGroup group);
+    Collection<UUID> getRole(RoleGroup group);
 
     /**
      * @return A collection of citizens currently within the bounds of this region
@@ -70,4 +71,10 @@ public interface Region {
      * @throws IllegalStateException if no such effect exists
      */
     <T extends Effect> T getEffect(String name) throws IllegalStateException ;
+
+    /**
+     * @param citizen The citizen to check
+     * @return A collection of roles held by a given citizen
+     */
+    Collection<RoleGroup> getRoles(Citizen citizen);
 }

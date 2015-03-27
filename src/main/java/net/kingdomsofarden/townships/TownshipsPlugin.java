@@ -4,6 +4,8 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
+import net.kingdomsofarden.townships.listeners.BlockProtectionListener;
+import net.kingdomsofarden.townships.listeners.ExplosiveProtectionListener;
 import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import org.bukkit.Bukkit;
@@ -26,6 +28,8 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Register Events
         regionalUpdateListener = new RegionalUpdateListener(this);
         Bukkit.getPluginManager().registerEvents(regionalUpdateListener, this);
+        Bukkit.getPluginManager().registerEvents(new ExplosiveProtectionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockProtectionListener(this), this);
 
         // Start tasks
         Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);
