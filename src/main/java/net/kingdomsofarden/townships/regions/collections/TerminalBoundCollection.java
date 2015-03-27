@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.regions.TownshipsRegion;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -51,6 +52,8 @@ public class TerminalBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean add(BoundingBox bound) {
+        TownshipsRegion r = (TownshipsRegion) bound.getRegion();
+        r.getBoundingAreas().add(this);
         return contents.add(bound.getRegion());
     }
 
@@ -86,7 +89,18 @@ public class TerminalBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean remove(Object o) {
-        return contents.remove(o);
+        if(contents.remove(o)) {
+            if (o instanceof Region) {
+                TownshipsRegion r = (TownshipsRegion) o;
+                r.getBoundingAreas().add(this);
+            } else if (o instanceof BoundingBox) {
+                TownshipsRegion r = (TownshipsRegion) ((BoundingBox) o).getRegion();
+                r.getBoundingAreas().add(this);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

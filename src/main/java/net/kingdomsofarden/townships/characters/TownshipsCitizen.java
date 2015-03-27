@@ -36,6 +36,6 @@ public class TownshipsCitizen implements Citizen {
 
     @Override
     public UUID getUid() {
-        return null;
+        return uuid;
     }
 }

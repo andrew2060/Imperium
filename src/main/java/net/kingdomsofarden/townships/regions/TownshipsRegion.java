@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +38,7 @@ public class TownshipsRegion implements Region {
     private Collection<Area> containingAreas;
 
     public TownshipsRegion(StoredDataSection config) {
+        containingAreas = new LinkedList<Area>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
         StoredDataSection groupAssignments = config.getSection("roles");
@@ -122,5 +124,9 @@ public class TownshipsRegion implements Region {
     @Override
     public Collection<RoleGroup> getRoles(Citizen citizen) {
         return rolesByCitizenUid.get(citizen.getUid());
+    }
+
+    public Collection<Area> getBoundingAreas() {
+        return containingAreas;
     }
 }
