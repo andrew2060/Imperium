@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.api;
 
+import net.kingdomsofarden.townships.api.characters.CitizenManager;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 
 /**
@@ -16,10 +17,17 @@ public final class Townships {
     }
 
     /**
+     * @return The active {@link CitizenManager}, which is also a collection and can be interacted with as such
+     */
+    public static CitizenManager getCitizens() {
+        return i.getCitizens();
+    }
+
+    /**
      * Updates the currently running instance
      * @param instance The instance of the plugin
      */
     public static void setInstance(ITownshipsPlugin instance) {
-        Townships.i = i;
+        Townships.i = instance;
     }
 }

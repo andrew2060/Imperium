@@ -7,11 +7,12 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A terminal (i.e. no longer divisive) subset of the bound collection
@@ -32,7 +33,12 @@ public class TerminalBoundCollection extends RegionBoundCollection {
 
     @Override
     public Collection<Region> getBoundingRegions(int x, int y, int z) {
-        Collection<Region> ret = new LinkedList<Region>();
+        Collection<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
+            @Override
+            public int compare(Region o1, Region o2) {
+                return o2.getTier() - o1.getTier();
+            }
+        });
         for (Region r : contents) {
             if (r.getBounds().isInBounds(x, y, z)) {
                 ret.add(r);

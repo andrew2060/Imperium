@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.api.util;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -39,10 +40,27 @@ public interface StoredDataSection {
      * Gets the object stored at the given path using the parameter serializer
      * @param path The path to the data, separated by the {@link #PATH_SEPARATOR}
      * @param <T> The type of the data to retrieve
-     * @param deserializer The serializer to use to deserialize the object from a string key
+     * @param deserializer The serializer to use to deserialize the object from a string
      * @return The data stored at the given path, if present, as deserialized by the parameter serializer
      */
     <T> Optional<T> get(String path, Serializer<T> deserializer);
+
+    /**
+     * Gets the list stored at the given path via direct typecasting of elements for most cases
+     * @param path The path to retrieve the list from
+     * @param <T> The type of a list
+     * @return A List of the elements, or an empty list if none exist
+     */
+    <T> List<T> getList(String path);
+
+    /**
+     * Gets the list stored at the given path  using the parameter serializer
+     * @param path The path to retrieve the list from
+     * @param deserializer The serializer to use to deserialize the elements from a string
+     * @param <T> The type of a list
+     * @return A List of the elements, or an empty list if none exist
+     */
+    <T> List<T> getList(String path, Serializer<T> deserializer);
 
     /**
      * @param deep Whether to get the keys of children as well

@@ -1,10 +1,11 @@
 package net.kingdomsofarden.townships.api.effects;
 
-import org.bukkit.configuration.ConfigurationSection;
+import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 /**
  * Manages loading, scheduling, and creation of new effect instances
  */
 public interface EffectManager {
-    Effect loadEffect(String name, ConfigurationSection config); //TODO: abstractify configuration (for easier sponge porting)
+    Effect loadEffect(String name, Region region, StoredDataSection config);
 }

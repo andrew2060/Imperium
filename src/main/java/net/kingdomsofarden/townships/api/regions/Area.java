@@ -27,7 +27,7 @@ public interface Area extends Collection<Region> {
      * @param y The y coordinate to check
      * @param z The z coordinate to check
      * @return A collection of regions within this region bound collection that contain the parameter
-     * x/y/z coordinates in their bounding box, sorted in ascending tier order
+     * x/y/z coordinates in their bounding box, sorted in descending tier order
      */
     Collection<Region> getBoundingRegions(int x, int y, int z);
 

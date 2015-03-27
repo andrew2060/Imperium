@@ -14,17 +14,19 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
 
     private UUID regionUid;
     private String name;
+    private int tier;
 
     private Collection<Citizen> owners;
     private Collection<Citizen> citizens;
 
-    private Collection<Effect> effects;
+    private Map<String, Effect> effects;
     private Collection<TickableEffect> tickableEffects;
 
     private BoundingBox bounds;
@@ -36,6 +38,11 @@ public class TownshipsRegion implements Region {
         //TODO
     }
 
+
+    @Override
+    public int getTier() {
+        return tier;
+    }
 
     @Override
     public UUID getUid() {
@@ -83,6 +90,20 @@ public class TownshipsRegion implements Region {
 
     @Override
     public Collection<Effect> getEffects() {
-        return effects;
+        return effects.values();
+    }
+
+    @Override
+    public boolean hasEffect(String name) {
+        return effects.containsKey(name.toLowerCase());
+    }
+
+    @Override
+    public <T extends Effect> T getEffect(String name) throws IllegalStateException {
+        T ret = (T) effects.get(name.toLowerCase());
+        if (ret == null) {
+            throw new IllegalStateException("An attempt to retrieve the effect " + name + " was made when it did not exist on a region");
+        }
+        return ret;
     }
 }

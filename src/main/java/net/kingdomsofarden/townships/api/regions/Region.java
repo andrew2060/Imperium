@@ -3,6 +3,7 @@ package net.kingdomsofarden.townships.api.regions;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
+import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 import org.bukkit.Location;
 
@@ -31,14 +32,10 @@ public interface Region {
     Optional<String> getName();
 
     /**
-     * @return The owners of a given region (i.e. those with administrative rights over it)
+     * @param group The group to get
+     * @return A collection of citizens that hold the given role within a region
      */
-    Collection<Citizen> getOwners();
-
-    /**
-     * @return The citizens of a given region (includes owners)
-     */
-    Collection<Citizen> getCitizens();
+    Collection<Citizen> getRole(RoleGroup group);
 
     /**
      * @return A collection of citizens currently within the bounds of this region
@@ -72,5 +69,5 @@ public interface Region {
      * @return The effect retrieved
      * @throws IllegalStateException if no such effect exists
      */
-    <T extends Effect> Effect getEffect(String name) throws IllegalStateException ;
+    <T extends Effect> T getEffect(String name) throws IllegalStateException ;
 }
