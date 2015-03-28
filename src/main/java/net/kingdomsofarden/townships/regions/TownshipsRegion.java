@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
+import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
@@ -9,15 +10,20 @@ import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
+import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
+import net.kingdomsofarden.townships.util.AxisAlignedBoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
@@ -30,21 +36,66 @@ public class TownshipsRegion implements Region {
     private HashMultimap<RoleGroup, UUID> citizenUidsByRole;
 
     private Map<String, Effect> effects;
-    private Collection<TickableEffect> tickableEffects;
 
     private BoundingBox bounds;
     private Location center;
 
     private Collection<Area> containingAreas;
 
-    public TownshipsRegion(StoredDataSection config) {
+    public TownshipsRegion(UUID rId, StoredDataSection config) {
+        regionUid = rId;
         containingAreas = new LinkedList<Area>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
-        StoredDataSection groupAssignments = config.getSection("roles");
-        for (String roleName : groupAssignments.getKeys(false)) {
+        name = config.<String>get("name").orNull();
+        Serializer<Integer> intSerializer = new Serializer<Integer>() {
+            @Override
+            public String serialize(Integer obj) {
+                return obj + "";
+            }
+
+            @Override
+            public Integer deserialize(String input) {
+                return (int) Double.valueOf(input).doubleValue();
+            }
+        };
+        tier = config.get("tier", intSerializer).or(-1);
+        center = config.get("location", new Serializer<Location>() {
+            @Override
+            public String serialize(Location obj) {
+                StringBuilder sB = new StringBuilder();
+                boolean first = true;
+                for (Entry<String, Object> e : obj.serialize().entrySet()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sB.append("::");
+                    }
+                    sB.append(e.getKey());
+                    sB.append(":");
+                    sB.append(e.getValue());
+                }
+                return sB.toString();
+            }
+
+            @Override
+            public Location deserialize(String input) {
+                Map<String, Object> deserialized = new HashMap<String, Object>();
+                for (String entry : input.split("::")) {
+                    String[] kv = entry.split(":");
+                    deserialized.put(kv[0], kv[1]);
+                }
+                return Location.deserialize(deserialized);
+            }
+        }).get();
+        int lenX = config.get("half-width-x", intSerializer).or(1);
+        int lenY = config.get("half-height", intSerializer).or(1);
+        int lenZ = config.get("half-width-z", intSerializer).or(1);
+        bounds = new AxisAlignedBoundingBox(this, lenX, lenY, lenZ);
+        StoredDataSection roleSection = config.getSection("roles");
+        for (String roleName : roleSection.getKeys(false)) {
             RoleGroup group = RoleGroup.valueOf(roleName);
-            for (String uid : groupAssignments.<String>getList(roleName)) {
+            for (String uid : roleSection.<String>getList(roleName)) {
                 try {
                     UUID id = UUID.fromString(uid);
                     rolesByCitizenUid.put(id, group);
@@ -54,8 +105,17 @@ public class TownshipsRegion implements Region {
                 }
             }
         }
-        //TODO
+        effects = new HashMap<String, Effect>();
+        StoredDataSection effectSection = config.getSection("effects");
+        for (String eName : effectSection.getKeys(false)) {
+            Effect e = Townships.getEffectManager().loadEffect(eName, this, effectSection.getSection(eName));
+            if (e instanceof TickableEffect) {
+                ((TownshipsEffectManager)Townships.getEffectManager()).getEffectTaskManager().schedule((TickableEffect) e, this); // TODO abstractify this
+            }
+            effects.put(eName.toLowerCase(), e);
+        }
     }
+
 
 
     @Override
@@ -124,6 +184,11 @@ public class TownshipsRegion implements Region {
     @Override
     public Collection<RoleGroup> getRoles(Citizen citizen) {
         return rolesByCitizenUid.get(citizen.getUid());
+    }
+
+    @Override
+    public void saveConfigs(StoredDataSection data) {
+
     }
 
     public Collection<Area> getBoundingAreas() {

@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.Location;
 
 import java.util.Collection;
@@ -77,4 +78,10 @@ public interface Region {
      * @return A collection of roles held by a given citizen
      */
     Collection<RoleGroup> getRoles(Citizen citizen);
+
+    /**
+     * Populates the parameter data section with this region's configuration
+     * @param data The data section to save to
+     */
+    void saveConfigs(StoredDataSection data);
 }
