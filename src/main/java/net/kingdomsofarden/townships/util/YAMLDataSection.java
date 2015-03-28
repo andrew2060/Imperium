@@ -5,6 +5,8 @@ import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class YAMLDataSection implements StoredDataSection {
@@ -42,6 +44,24 @@ public class YAMLDataSection implements StoredDataSection {
         } else {
             return Optional.absent();
         }
+    }
+
+    @Override
+    public <T> List<T> getList(String path) {
+        List<T> ret = new LinkedList<T>();
+        for (Object o : backing.getList(path)) {
+            ret.add((T)o);
+        }
+        return ret;
+    }
+
+    @Override
+    public <T> List<T> getList(String path, Serializer<T> deserializer) {
+        List<T> ret = new LinkedList<T>();
+        for (String o : backing.getStringList(path)) {
+            ret.add(deserializer.deserialize(o));
+        }
+        return ret;
     }
 
     @Override
