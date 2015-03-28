@@ -43,7 +43,7 @@ public class RegionalUpdateListenerTest {
         when(mockPlayer.getUniqueId()).thenReturn(pId);
         RegionManager rMan = new TownshipsRegionManager(mockPlugin);
         when(mockPlugin.getRegions()).thenReturn((TownshipsRegionManager) rMan);
-        CitizenManager cMan = mock(CitizenManager.class);
+        CitizenManager cMan = mock(TownshipsCitizenManager.class);
         when(mockPlugin.getCitizens()).thenReturn((TownshipsCitizenManager) cMan);
         Citizen citizen = new TownshipsCitizen();
         when(cMan.getCitizen(Mockito.<UUID>any())).thenReturn(citizen);
