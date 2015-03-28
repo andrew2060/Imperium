@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.characters.CitizenManager;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -16,6 +17,7 @@ public class TownshipsCitizenManager implements CitizenManager {
 
     public TownshipsCitizenManager(TownshipsPlugin plugin) {
         this.plugin = plugin;
+        this.citizenMap = new HashMap<UUID, TownshipsCitizen>();
     }
 
     @Override
