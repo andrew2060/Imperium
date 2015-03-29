@@ -57,10 +57,10 @@ public class RegionalUpdateListener implements Listener {
             double xTo;
             double zFrom;
             double zTo;
-            xFrom = from.getX() % Constants.MIN_DIV_X;
-            xTo = to.getX() % Constants.MIN_DIV_X;
-            zFrom = from.getZ() % Constants.MIN_DIV_Z;
-            zTo = to.getZ() % Constants.MIN_DIV_Z;
+            xFrom = from.getX()/Constants.MIN_DIV_X;
+            xTo = to.getX()/Constants.MIN_DIV_X;
+            zFrom = from.getZ()/Constants.MIN_DIV_Z;
+            zTo = to.getZ()/Constants.MIN_DIV_Z;
             if (xFrom != xTo || zFrom != zTo) {
                 c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
             }
