@@ -34,7 +34,9 @@ public class TownshipsConfiguration extends YAMLDataSection implements Configura
     }
 
     private void loadConstants() {
-        Constants.EFFECT_SPREAD_DELAY = config.getInt("effects.tick-max-delay");
+        Constants.EFFECT_SPREAD_DELAY = config.getInt("performance.effect-tick-max-delay");
+        Constants.MIN_DIV_X = config.getInt("performance.min-division-x", 96);
+        Constants.MIN_DIV_Z = config.getInt("performance.min-division-z", 96);
         Constants.INTERACT_TYPES = new HashSet<Material>();
         for (String mat : config.getStringList("protection.protect-interact")) {
             Constants.INTERACT_TYPES.add(Material.valueOf(mat.toUpperCase()));

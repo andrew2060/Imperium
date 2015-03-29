@@ -1,8 +1,10 @@
-effects:
-  tick-max-delay: 5 #The maximum number of ticks an effect can be delayed for ticking for performance metrics
+performance: # Performance related settings, change with caution
+  min-division-x: 96
+  min-division-z: 96
+  effect-tick-max-delay: 5 # The maximum number of ticks an effect can be delayed for ticking for performance
 protection:
   protect-flint-and-steel: false  
-  protect-interact: #Affected by the INTERACT protection
+  protect-interact: # Affected by the INTERACT protection
   - ACACIA_DOOR
   - ACACIA_FENCE_GATE
   - BIRCH_DOOR
@@ -29,7 +31,7 @@ protection:
   - WALL_SIGN
   - WOOD_BUTTON
   - WOODEN_DOOR
-  protect-access: #Protected by the ACCESS Protection
+  protect-access: # Protected by the ACCESS Protection
   - ANVIL
   - BREWING_STAND
   - CHEST

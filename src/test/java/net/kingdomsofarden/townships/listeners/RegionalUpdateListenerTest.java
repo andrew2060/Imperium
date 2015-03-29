@@ -12,6 +12,7 @@ import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import net.kingdomsofarden.townships.util.AxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -51,6 +52,8 @@ public class RegionalUpdateListenerTest {
         World mockWorld = mock(World.class);
         UUID wId = UUID.randomUUID();
         when(mockWorld.getUID()).thenReturn(wId);
+        Constants.MIN_DIV_X = 96;
+        Constants.MIN_DIV_Z = 96;
         // Generate Test Data
         Random rand = new Random();
         for (int x = -9; x <= 9; x++) {
@@ -58,7 +61,7 @@ public class RegionalUpdateListenerTest {
                 int regions = rand.nextInt(10) + 1;
                 for (int i = 0; i < regions; i++) {
                     Region r = mock(TownshipsRegion.class);
-                    Location genCenter = new Location(mockWorld, x * 100 + rand.nextInt(180) - 89, 0, z * 100 + rand.nextInt(180) - 89);
+                    Location genCenter = new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0, z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);
                     when(r.getLocation()).thenReturn(genCenter);
                     AxisAlignedBoundingBox bounds = new AxisAlignedBoundingBox(r, rand.nextInt(10) + 1, 5, rand.nextInt(10) + 1);
                     when(r.getBounds()).thenReturn(bounds);
@@ -73,7 +76,7 @@ public class RegionalUpdateListenerTest {
             for (int multZ = -9; multZ < 10; multZ++) {
                 for (int x = -1; x < 2; x++) {
                     for (int z = -1; z < 2; z++) {
-                        Location dest = new Location(mockWorld, 100 * x * multX, 0, 100 * z * multZ);
+                        Location dest = new Location(mockWorld, Constants.MIN_DIV_X * x * multX, 0, Constants.MIN_DIV_Z * z * multZ);
                         for (int xMod = -1; x < 2; x++) {
                             for (int zMod = -1; z < 2; z++) {
                                 Location from = dest.clone().add(xMod, 0, zMod);
