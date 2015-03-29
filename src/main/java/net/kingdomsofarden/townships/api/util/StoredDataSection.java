@@ -1,7 +1,5 @@
 package net.kingdomsofarden.townships.api.util;
 
-import com.google.common.base.Optional;
-
 import java.util.List;
 import java.util.Set;
 
@@ -29,29 +27,29 @@ public interface StoredDataSection {
     StoredDataSection getSection(String path);
 
     /**
-     * Gets the object stored at the given path via direct typecasting for most cases
-     * @param path The path to the data, separated by the {@link #PATH_SEPARATOR}
-     * @param <T> The type of the data to retrieve
-     * @return The data stored at the given path, if present
+     * Gets the string value stored at a given path
+     * @param path The path to the data separated by the {@link #PATH_SEPARATOR}
+     * @param def The default value to return should there not be a value at that path
+     * @return The retrieved value
      */
-    <T> Optional<T> get(String path);
+    String get(String path, String def);
 
     /**
      * Gets the object stored at the given path using the parameter serializer
      * @param path The path to the data, separated by the {@link #PATH_SEPARATOR}
      * @param <T> The type of the data to retrieve
      * @param deserializer The serializer to use to deserialize the object from a string
+     * @param def the default value to return, should there not be a value at that path
      * @return The data stored at the given path, if present, as deserialized by the parameter serializer
      */
-    <T> Optional<T> get(String path, Serializer<T> deserializer);
+    <T> T get(String path, Serializer<T> deserializer, T def);
 
     /**
      * Gets the list stored at the given path via direct typecasting of elements for most cases
      * @param path The path to retrieve the list from
-     * @param <T> The type of a list
      * @return A List of the elements, or an empty list if none exist
      */
-    <T> List<T> getList(String path);
+    List<String> getList(String path);
 
     /**
      * Gets the list stored at the given path  using the parameter serializer

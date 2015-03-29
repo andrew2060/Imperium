@@ -1,6 +1,5 @@
 package net.kingdomsofarden.townships.util;
 
-import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public class YAMLDataSection implements StoredDataSection {
-    private ConfigurationSection backing;
+    protected ConfigurationSection backing;
 
     public YAMLDataSection(ConfigurationSection section) {
         this.backing = section;
@@ -32,25 +31,25 @@ public class YAMLDataSection implements StoredDataSection {
     }
 
     @Override
-    public <T> Optional<T> get(String path) {
-        return Optional.fromNullable((T)backing.get(path));
-    }
-
-    @Override
-    public <T> Optional<T> get(String path, Serializer<T> deserializer) {
-        String get = backing.getString(path);
-        if (get != null) {
-            return Optional.fromNullable(deserializer.deserialize(get));
-        } else {
-            return Optional.absent();
+    public String get(String path, String def) {
+        String ret = backing.getString(path);
+        if (ret == null) {
+            ret = def;
         }
+        return ret;
     }
 
     @Override
-    public <T> List<T> getList(String path) {
-        List<T> ret = new LinkedList<T>();
+    public <T> T get(String path, Serializer<T> deserializer, T def) {
+        String get = backing.getString(path);
+        return get == null ? def : deserializer.deserialize(get);
+    }
+
+    @Override
+    public List<String> getList(String path) {
+        List<String> ret = new LinkedList<String>();
         for (Object o : backing.getList(path)) {
-            ret.add((T)o);
+            ret.add((String)o);
         }
         return ret;
     }

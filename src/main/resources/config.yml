@@ -1,0 +1,47 @@
+effects:
+  tick-max-delay: 5 #The maximum number of ticks an effect can be delayed for ticking for performance metrics
+protection:
+  protect-flint-and-steel: false  
+  protect-interact: #Affected by the INTERACT protection
+  - ACACIA_DOOR
+  - ACACIA_FENCE_GATE
+  - BIRCH_DOOR
+  - BIRCH_FENCE_GATE
+  - DARK_OAK_DOOR
+  - DARK_OAK_FENCE_GATE
+  - DRAGON_EGG
+  - DIODE_BLOCK_OFF
+  - DIODE_BLOCK_ON
+  - FENCE_GATE
+  - JUNGLE_DOOR
+  - JUNGLE_FENCE_GATE
+  - LEVER
+  - NOTE_BLOCK
+  - PAINTING
+  - REDSTONE_COMPARATOR_OFF
+  - REDSTONE_COMPARATOR_ON
+  - SIGN
+  - SIGN_POST
+  - SPRUCE_DOOR
+  - SPRUCE_FENCE_GATE
+  - STONE_BUTTON
+  - TRAP_DOOR
+  - WALL_SIGN
+  - WOOD_BUTTON
+  - WOODEN_DOOR
+  protect-access: #Protected by the ACCESS Protection
+  - ANVIL
+  - BREWING_STAND
+  - CHEST
+  - DISPENSER
+  - DROPPER
+  - ENCHANTMENT_TABLE
+  - ENDER_CHEST
+  - ENDER_PORTAL_FRAME
+  - FURNACE
+  - BURNING_FURNACE
+  - HOPPER
+  - ITEM_FRAME
+  - JUKEBOX
+  - TRAPPED_CHEST
+  - WORKBENCH

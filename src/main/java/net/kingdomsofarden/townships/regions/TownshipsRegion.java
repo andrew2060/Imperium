@@ -47,7 +47,7 @@ public class TownshipsRegion implements Region {
         containingAreas = new LinkedList<Area>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
-        name = config.<String>get("name").orNull();
+        name = config.get("name", null);
         Serializer<Integer> intSerializer = new Serializer<Integer>() {
             @Override
             public String serialize(Integer obj) {
@@ -59,7 +59,7 @@ public class TownshipsRegion implements Region {
                 return (int) Double.valueOf(input).doubleValue();
             }
         };
-        tier = config.get("tier", intSerializer).or(-1);
+        tier = config.get("tier", intSerializer, -1);
         center = config.get("location", new Serializer<Location>() {
             @Override
             public String serialize(Location obj) {
@@ -87,10 +87,13 @@ public class TownshipsRegion implements Region {
                 }
                 return Location.deserialize(deserialized);
             }
-        }).get();
-        int lenX = config.get("half-width-x", intSerializer).or(1);
-        int lenY = config.get("half-height", intSerializer).or(1);
-        int lenZ = config.get("half-width-z", intSerializer).or(1);
+        }, null);
+        if (center == null) {
+            throw new IllegalStateException("Problem loading location of region " + regionUid + ": null");
+        }
+        int lenX = config.get("half-width-x", intSerializer, 1);
+        int lenY = config.get("half-height", intSerializer, 1);
+        int lenZ = config.get("half-width-z", intSerializer, 1);
         bounds = new AxisAlignedBoundingBox(this, lenX, lenY, lenZ);
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
