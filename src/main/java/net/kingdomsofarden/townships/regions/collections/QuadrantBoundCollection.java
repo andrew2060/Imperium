@@ -89,7 +89,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     @Override
     protected void constructContainedRegions(Set<Region> regions) {
         for (RegionBoundCollection c : subRegions) {
-            regions.addAll(c.getContents());
+            c.constructContainedRegions(regions);
         }
         return;
     }

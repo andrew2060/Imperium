@@ -7,10 +7,9 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
-import net.kingdomsofarden.townships.regions.collections.QuadrantBoundCollection;
+import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,14 +87,9 @@ public class TownshipsRegionManager implements RegionManager {
         if (maps.containsKey(world)) {
             return maps.get(world).add(region);
         } else {
-            int[] borders = get2dBorders(region.getLocation().getWorld());
-            maps.put(world, new QuadrantBoundCollection(-1, null, borders[0], borders[1], borders[2], borders[3]));
+            maps.put(world, new AxisBoundCollection(true));
             return maps.get(world).add(region);
         }
-    }
-
-    private int[] get2dBorders(World world) {
-        return new int[] {-10000, 10000, -10000, 10000}; //TODO Load from Configs
     }
 
     @Override
