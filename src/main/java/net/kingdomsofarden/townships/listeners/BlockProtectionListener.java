@@ -9,6 +9,7 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.effects.core.EffectProtection;
 import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
+import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -54,7 +55,7 @@ public class BlockProtectionListener implements Listener {
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
                 if (!hasAccess(boundingRegions, c, AccessType.ACCESS)) {
                     event.setCancelled(true);
-                    event.getPlayer().sendMessage(I18N.NO_PERMISSION_AREA_ACCESS);
+                    Messaging.sendFormattedMessage(event.getPlayer(), I18N.NO_PERMISSION_AREA_ACCESS);
                 }
             } else if (Constants.INTERACT_TYPES.contains(b.getType())
                     || (Constants.PROTECT_FIRE && event.getItem() != null && event.getItem().getType().equals(Material.FLINT_AND_STEEL))) {
@@ -62,7 +63,7 @@ public class BlockProtectionListener implements Listener {
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
                 if (!hasAccess(boundingRegions, c, AccessType.INTERACT)) {
                     event.setCancelled(true);
-                    event.getPlayer().sendMessage(I18N.NO_PERMISSION_AREA_INTERACT);
+                    Messaging.sendFormattedMessage(event.getPlayer(), I18N.NO_PERMISSION_AREA_INTERACT);
                 }
             }
         }
@@ -74,7 +75,7 @@ public class BlockProtectionListener implements Listener {
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         if (!hasAccess(boundingRegions, c, AccessType.CONSTRUCT)) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(I18N.NO_PERMISSION_AREA_CONSTRUCT);
+            Messaging.sendFormattedMessage(event.getPlayer(), I18N.NO_PERMISSION_AREA_CONSTRUCT);
         }
     }
 
@@ -84,7 +85,7 @@ public class BlockProtectionListener implements Listener {
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         if (!hasAccess(boundingRegions, c, AccessType.CONSTRUCT)) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(I18N.NO_PERMISSION_AREA_CONSTRUCT);
+            Messaging.sendFormattedMessage(event.getPlayer(), I18N.NO_PERMISSION_AREA_CONSTRUCT);
         }
     }
 }

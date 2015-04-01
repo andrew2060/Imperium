@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.api;
 
 import net.kingdomsofarden.townships.api.characters.CitizenManager;
+import net.kingdomsofarden.townships.api.configuration.Configuration;
 import net.kingdomsofarden.townships.api.effects.EffectManager;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 
@@ -35,4 +36,6 @@ public final class Townships {
     public static EffectManager getEffectManager() {
         return i.getEffectManager();
     }
+
+    public static Configuration getConfiguration() { return i.getConfiguration(); }
 }

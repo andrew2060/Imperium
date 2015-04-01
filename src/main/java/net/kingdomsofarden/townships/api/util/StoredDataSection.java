@@ -13,7 +13,7 @@ public interface StoredDataSection {
     /**
      * @return The memory section that backs
      */
-    Object getBackingImplementation();
+    <T extends Object> T getBackingImplementation();
 
     /**
      * @return The current path represented by the String
