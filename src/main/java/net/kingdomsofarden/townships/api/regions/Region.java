@@ -4,9 +4,8 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.util.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
-import org.bukkit.Location;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -45,14 +44,9 @@ public interface Region {
     Collection<Citizen> getCitizensInBounds();
 
     /**
-     * @return The center point of the given region
+     * @return The {@link net.kingdomsofarden.townships.api.util.RegionBoundingBox} representing this region's area
      */
-    Location getLocation();
-
-    /**
-     * @return The {@link net.kingdomsofarden.townships.api.util.BoundingBox} representing this region's area
-     */
-    BoundingBox getBounds();
+    RegionBoundingBox getBounds();
 
     /**
      * @return A collection of effects currently active for this region

@@ -65,13 +65,13 @@ public class CommandCreateRegion implements Command {
         };
         // Check selection size
         StoredDataSection data = dataOptional.get();
-        int widthX = data.get("half-width-x", intSerializer, -1);
-        int widthZ = data.get("half-width-z", intSerializer, -1);
-        int height = data.get("half-height", intSerializer, -1);
-        if (widthX < 0 || widthZ < 0 || height < 0) {
-            Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
-            return true;
-        }
+        // Selection bounds check
+        int maxX = data.get("max-width-x", intSerializer, -1);
+        int maxZ = data.get("max-width-z", intSerializer, -1);
+        int maxHeight = data.get("max-height", intSerializer, -1);
+        int minX = data.get("min-width-x", intSerializer, -1);
+        int minZ = data.get("min-width-z", intSerializer, -1);
+        int minHeight = data.get("min-height", intSerializer, -1);
         Selection selection;
         try {
             selection = SelectionManager.selections.get(((Player) sender).getUniqueId());
@@ -84,37 +84,48 @@ public class CommandCreateRegion implements Command {
             Messaging.sendFormattedMessage(sender, I18N.SELECTION_REQUIRED);
             return true;
         }
-        if (selection.getMaxX() - selection.getMinX() > widthX * 2 + 1
-                || selection.getMaxY() - selection.getMinY() > height * 2 + 1
-                || selection.getMaxZ() - selection.getMinZ() > widthZ * 2 + 1) {
-            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_LARGE, widthX * 2 + 1, height * 2 + 1, widthZ * 2 + 1);
+        if ((maxX != -1 && selection.getMaxX() - selection.getMinX() > maxX)
+                || (maxHeight != -1 && selection.getMaxY() - selection.getMinY() > maxHeight)
+                || (maxZ != -1 && selection.getMaxZ() - selection.getMinZ() > maxZ)) {
+            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_LARGE, maxX, maxHeight , maxZ);
             return true;
         }
-        final Map<Material, Integer> reqs = new HashMap<Material, Integer>();
-        StoredDataSection reqSection = data.getSection("block-requirements");
-        for (String matName : reqSection.getKeys(false)) {
+        if ((minX != -1 && selection.getMaxX() - selection.getMinX() < minX)
+                || (minHeight != -1 && selection.getMaxY() - selection.getMinY() < minHeight)
+                || (minZ != -1 && selection.getMaxZ() - selection.getMinZ() < minZ)) {
+            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_SMALL, maxX, maxHeight , maxZ);
+            return true;
+        }
+        // Requirements checking
+        StoredDataSection requirements = data.getSection("requirements");
+        final Map<Material, Integer> blockReq = new HashMap<Material, Integer>();
+        StoredDataSection blockReqSection = requirements.getSection("block-requirements");
+        for (String matName : blockReqSection.getKeys(false)) {
             Material mat = Material.valueOf(matName.toUpperCase());
             if (mat == null) {
                 // Error in console TODO
                 Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
                 return true;
             }
-            reqs.put(mat, reqSection.get(matName, intSerializer, 0));
+            int amt = blockReqSection.get(matName, intSerializer, 0);
+            if (amt > 0) {
+                blockReq.put(mat, amt);
+            }
         }
-        if (!reqs.isEmpty()) { // Scan selection
+        if (!blockReq.isEmpty()) { // Scan selection
             World world = selection.getWorld();          // TODO find better way to do this, or async it
             locationLoop:
             for (int x = selection.getMinX(); x <= selection.getMaxX(); x++) {
                 for (int z = selection.getMinZ(); z <= selection.getMaxZ(); z++) {
                     for (int y = selection.getMinY(); y <= selection.getMaxY(); y++) {
                         Material type = new Location(world, x, y, z).getBlock().getType();
-                        if (reqs.containsKey(type)) {
-                            int cnt = reqs.get(type) - 1;
+                        if (blockReq.containsKey(type)) {
+                            int cnt = blockReq.get(type) - 1;
                             if (cnt != 0) {
-                                reqs.put(type, cnt);
+                                blockReq.put(type, cnt);
                             } else {
-                                reqs.remove(type);
-                                if (reqs.isEmpty()) {
+                                blockReq.remove(type);
+                                if (blockReq.isEmpty()) {
                                     break locationLoop;
                                 }
                             }
@@ -122,10 +133,36 @@ public class CommandCreateRegion implements Command {
                     }
                 }
             }
-            if (!reqs.isEmpty()) {
+            if (!blockReq.isEmpty()) {
                 Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_BLOCKS);
+                return true;
             }
         }
+        // Check region dependency requirements
+        Map<String, Integer> regionTypeReq;
+        Map<Integer, Integer> regionTierReq;
+        try {
+            regionTypeReq = new HashMap<String, Integer>();
+            regionTierReq = new HashMap<Integer, Integer>();
+            StoredDataSection regionReqSection = requirements.getSection("region-types");
+            for (String type : regionReqSection.getKeys(false)) {
+                int amt = regionReqSection.get(type, intSerializer, 0);
+                if (amt > 0) {
+                    regionTypeReq.put(type.toLowerCase(), amt);
+                }
+            }
+            StoredDataSection tierReqSection = requirements.getSection("region-tiers");
+            for (String tierNum : tierReqSection.getKeys(false)) {
+                int tier = Integer.parseInt(tierNum);
+                int arg = regionReqSection.get(tierNum, intSerializer, 0);
+                regionTierReq.put(tier, arg);
+            }
+        } catch (Exception e) {
+            Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
+            e.printStackTrace(); // TODO print to debug instead
+            return true;
+        }
+
         return false;
     }
 

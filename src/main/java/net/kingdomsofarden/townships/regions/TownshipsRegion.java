@@ -9,11 +9,11 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.util.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
-import net.kingdomsofarden.townships.util.AxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.util.RegionAxisAlignedBoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -37,8 +37,10 @@ public class TownshipsRegion implements Region {
 
     private Map<String, Effect> effects;
 
-    private BoundingBox bounds;
-    private Location center;
+    private RegionBoundingBox bounds;
+
+    private Location pos1;
+    private Location pos2;
 
     private Collection<Area> containingAreas;
 
@@ -60,7 +62,7 @@ public class TownshipsRegion implements Region {
             }
         };
         tier = config.get("tier", intSerializer, -1);
-        center = config.get("location", new Serializer<Location>() {
+        pos1 = config.get("position-1", new Serializer<Location>() {
             @Override
             public String serialize(Location obj) {
                 StringBuilder sB = new StringBuilder();
@@ -88,13 +90,16 @@ public class TownshipsRegion implements Region {
                 return Location.deserialize(deserialized);
             }
         }, null);
-        if (center == null) {
+        if (pos1 == null || pos2 == null) {
             throw new IllegalStateException("Problem loading location of region " + regionUid + ": null");
+        }
+        if (pos1.getWorld() != pos2.getWorld()) {
+            throw new IllegalStateException("Mismatched worlds");
         }
         int lenX = config.get("half-width-x", intSerializer, 1);
         int lenY = config.get("half-height", intSerializer, 1);
         int lenZ = config.get("half-width-z", intSerializer, 1);
-        bounds = new AxisAlignedBoundingBox(this, lenX, lenY, lenZ);
+        bounds = new RegionAxisAlignedBoundingBox(this, pos1, pos2);
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
             RoleGroup group = RoleGroup.valueOf(roleName);
@@ -156,12 +161,7 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public Location getLocation() {
-        return center;
-    }
-
-    @Override
-    public BoundingBox getBounds() {
+    public RegionBoundingBox getBounds() {
         return bounds;
     }
 

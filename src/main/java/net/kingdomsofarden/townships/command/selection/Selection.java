@@ -1,6 +1,5 @@
 package net.kingdomsofarden.townships.command.selection;
 
-import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -8,11 +7,6 @@ import org.bukkit.World;
 public class Selection implements BoundingBox {
 
     private Location loc1, loc2;
-
-    @Override
-    public Region getRegion() {
-        throw new UnsupportedOperationException("Selections cannot have a region");
-    }
 
     public boolean isValid() {
         return loc1 != null && loc2 != null;

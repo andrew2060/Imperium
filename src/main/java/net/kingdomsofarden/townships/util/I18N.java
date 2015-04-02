@@ -25,5 +25,8 @@ public class I18N {
     public static final String SELECTION_REQUIRED = "You must have a valid active selection prior to running this command";
     public static final String SELECTION_TOO_LARGE = "The size of your selection is larger than the maximum allowable size of " +
             "x=$0, y=$1, z=$2";
+    public static final String SELECTION_TOO_SMALL = "The size of your selection is smaller than the minimal allowable size of " +
+            "x=$0, y=$1, z=$2";
     public static final String INSUFFICIENT_REQUIREMENT_BLOCKS = "One or more block requirements for this region are not met";
+
 }

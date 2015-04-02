@@ -179,6 +179,11 @@ public class AxisBoundCollection extends RegionBoundCollection {
     }
 
     @Override
+    public BoundingBox getBoundingBox() {
+        return null;
+    }
+
+    @Override
     public Collection<Region> getBoundingRegions(int x, int y, int z) {
         RegionBoundCollection ret = get(x, z);
         if (ret == null) {

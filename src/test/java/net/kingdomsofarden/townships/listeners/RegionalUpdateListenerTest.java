@@ -11,7 +11,7 @@ import net.kingdomsofarden.townships.characters.TownshipsCitizen;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
-import net.kingdomsofarden.townships.util.AxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.util.RegionAxisAlignedBoundingBox;
 import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -62,8 +62,7 @@ public class RegionalUpdateListenerTest {
                 for (int i = 0; i < regions; i++) {
                     Region r = mock(TownshipsRegion.class);
                     Location genCenter = new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0, z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);
-                    when(r.getLocation()).thenReturn(genCenter);
-                    AxisAlignedBoundingBox bounds = new AxisAlignedBoundingBox(r, rand.nextInt(10) + 1, 5, rand.nextInt(10) + 1);
+                    RegionAxisAlignedBoundingBox bounds = new RegionAxisAlignedBoundingBox(r, rand.nextInt(10) + 1, 5, rand.nextInt(10) + 1);
                     when(r.getBounds()).thenReturn(bounds);
                     when(r.getName()).thenReturn(Optional.<String>absent());
                     when(r.getUid()).thenReturn(UUID.randomUUID());

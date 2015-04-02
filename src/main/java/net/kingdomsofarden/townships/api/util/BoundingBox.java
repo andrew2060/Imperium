@@ -1,13 +1,8 @@
 package net.kingdomsofarden.townships.api.util;
 
-import net.kingdomsofarden.townships.api.regions.Region;
 import org.bukkit.Location;
 
 public interface BoundingBox {
-    /**
-     * @return The {@link Region} represented by this bounding box
-     */
-    Region getRegion();
 
     /**
      * @param loc The location to check

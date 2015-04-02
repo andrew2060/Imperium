@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.api.regions;
 
 import net.kingdomsofarden.townships.api.characters.Citizen;
+import net.kingdomsofarden.townships.api.util.BoundingBox;
 import org.bukkit.Location;
 
 import java.util.Collection;
@@ -14,6 +15,11 @@ import java.util.Collection;
  * contain other smaller Areas)</p>
  */
 public interface Area extends Collection<Region> {
+
+    /**
+     * @return A BoundingBox representation of the
+     */
+    BoundingBox getBoundingBox();
 
     /**
      * <b>Warning: </b> for the default implementation, this will be relatively slow for non-terminal Areas

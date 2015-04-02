@@ -1,21 +1,20 @@
 package net.kingdomsofarden.townships.util;
 
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.util.RegionBoundingBox;
 import org.bukkit.Location;
 
-import java.util.UUID;
+public class RegionAxisAlignedBoundingBox extends AxisAlignedBoundingBox implements RegionBoundingBox {
+    private final Region region;
 
-public class AxisAlignedBoundingBox implements BoundingBox {
-    protected int maxX;
-    protected int maxY;
-    protected int maxZ;
-    protected int minX;
-    protected int minY;
-    protected int minZ;
-    protected UUID world;
+    public RegionAxisAlignedBoundingBox(Region r, Location loc1, Location loc2) {
+        super(loc1, loc2);
+        this.region = r;
+    }
 
-    public AxisAlignedBoundingBox(Location loc1, Location loc2) {
-
+    @Override
+    public Region getRegion() {
+        return region;
     }
 
     @Override
