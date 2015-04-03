@@ -34,5 +34,8 @@ public class I18N {
     public static final String REGION_COLLISION_GENERAL = "This selection contains one or more preexisting regions that are not compatible with the requested region type";
 
     public static final String REGION_SUCCESSFULLY_CREATED = "The region was successfully created with id $0";
-    
+
+    public static final String SELECTION_ENABLED = "Selection mode enabled";
+    public static final String SELECTION_DISABLED = "Selection mode disabled";
+    public static final String SELECTION_SET = "Selection Point $0 set to x:$1 y:$2 z:$3";
 }
