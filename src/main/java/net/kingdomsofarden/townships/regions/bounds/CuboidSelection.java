@@ -117,6 +117,14 @@ public class CuboidSelection implements CuboidBoundingBox {
         return Math.max(loc1.getBlockZ(), loc2.getBlockZ());
     }
 
+    public Location getLoc1() {
+        return loc1;
+    }
+
+    public Location getLoc2() {
+        return loc2;
+    }
+
     public void setLoc1(Location loc1) {
         this.loc1 = loc1;
         if (loc2 != null && !loc1.getWorld().equals(loc2.getWorld())) {

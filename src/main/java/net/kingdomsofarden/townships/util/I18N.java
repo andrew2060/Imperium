@@ -28,5 +28,11 @@ public class I18N {
     public static final String SELECTION_TOO_SMALL = "The size of your selection is smaller than the minimal allowable size of " +
             "x=$0, y=$1, z=$2";
     public static final String INSUFFICIENT_REQUIREMENT_BLOCKS = "One or more block requirements for this region are not met";
+    public static final String INSUFFICIENT_REQUIREMENT_REGION_TYPE = "One or more region types required for this region are not met";
+    public static final String INSUFFICIENT_REQUIREMENT_REGION_TIER = "This selection does not contain sufficient numbers of a certain tier of regions";
+    public static final String REGION_COLLISION_MUTEX_FAIL = "This selection contains one or more preexisting regions when none are allowed for the requested region type";
+    public static final String REGION_COLLISION_GENERAL = "This selection contains one or more preexisting regions that are not compatible with the requested region type";
 
+    public static final String REGION_SUCCESSFULLY_CREATED = "The region was successfully created with id $0";
+    
 }

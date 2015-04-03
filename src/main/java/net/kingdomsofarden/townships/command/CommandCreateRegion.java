@@ -3,10 +3,12 @@ package net.kingdomsofarden.townships.command;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
-import net.kingdomsofarden.townships.command.selection.Selection;
 import net.kingdomsofarden.townships.command.selection.SelectionManager;
+import net.kingdomsofarden.townships.regions.TownshipsRegion;
+import net.kingdomsofarden.townships.regions.bounds.CuboidSelection;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Location;
@@ -15,8 +17,12 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class CommandCreateRegion implements Command {
@@ -33,7 +39,7 @@ public class CommandCreateRegion implements Command {
 
     @Override
     public int getMaxArguments() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class CommandCreateRegion implements Command {
         int minX = data.get("min-width-x", intSerializer, -1);
         int minZ = data.get("min-width-z", intSerializer, -1);
         int minHeight = data.get("min-height", intSerializer, -1);
-        Selection selection;
+        CuboidSelection selection;
         try {
             selection = SelectionManager.selections.get(((Player) sender).getUniqueId());
         } catch (ExecutionException e) {
@@ -141,9 +147,14 @@ public class CommandCreateRegion implements Command {
         // Check region dependency requirements
         Map<String, Integer> regionTypeReq;
         Map<Integer, Integer> regionTierReq;
+        Set<Integer> excludeTiers;
+        Set<String> excludeTypes;
+        boolean excludeAll;
         try {
             regionTypeReq = new HashMap<String, Integer>();
             regionTierReq = new HashMap<Integer, Integer>();
+            excludeTiers = new HashSet<Integer>();
+            excludeTypes = new HashSet<String>();
             StoredDataSection regionReqSection = requirements.getSection("region-types");
             for (String type : regionReqSection.getKeys(false)) {
                 int amt = regionReqSection.get(type, intSerializer, 0);
@@ -157,17 +168,75 @@ public class CommandCreateRegion implements Command {
                 int arg = regionReqSection.get(tierNum, intSerializer, 0);
                 regionTierReq.put(tier, arg);
             }
+            StoredDataSection excludeSection = requirements.getSection("exclude");
+            excludeAll = Boolean.valueOf(excludeSection.get("all", "false"));
+            if (!excludeAll) {
+                for (String tierNum : excludeSection.getList("tiers")) {
+                    int tier = Integer.parseInt(tierNum);
+                    excludeTiers.add(tier);
+                }
+                for (String type : excludeSection.getList("types")) {
+                    excludeTypes.add(type.toLowerCase());
+                }
+            }
         } catch (Exception e) {
             Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
             e.printStackTrace(); // TODO print to debug instead
             return true;
         }
-
-        return false;
+        Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
+        if (excludeAll && !(intersections.isEmpty())) {
+            Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_MUTEX_FAIL);
+            return true;
+        }
+        for (Region region : intersections) {
+            int tier = region.getTier();
+            String type = region.getType().toLowerCase();
+            if (excludeTiers.contains(tier) || excludeTypes.contains(type)) {
+                Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_GENERAL);
+                return true;
+            }
+            if (regionTypeReq.containsKey(type)) {
+                int amt = regionTypeReq.get(type) - 1;
+                if (amt > 0) {
+                    regionTypeReq.put(type.toLowerCase(), amt);
+                } else {
+                    regionTypeReq.remove(type);
+                }
+            }
+            if (regionTierReq.containsKey(tier)) {
+                int amt = regionTierReq.get(tier) - 1;
+                if (amt > 0) {
+                    regionTierReq.put(tier, amt);
+                } else {
+                    regionTierReq.remove(tier);
+                }
+            }
+        }
+        if (!regionTypeReq.isEmpty()) {
+            Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_REGION_TYPE);
+            return true;
+        }
+        if (!regionTierReq.isEmpty()) {
+            Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_REGION_TIER);
+            return true;
+        }
+        // TODO check other requirements (money, funding, ownership)
+        UUID createdId = UUID.randomUUID();
+        if (args.length == 2) {
+            data.set("name", args[1]);
+        }
+        data.set("position-1", selection.getLoc1());
+        data.set("position-2", selection.getLoc2());
+        Region created = new TownshipsRegion(createdId, data);
+        Townships.getRegions().add(created);
+        Messaging.sendFormattedMessage(sender, I18N.REGION_SUCCESSFULLY_CREATED, created.getName().isPresent() ?
+                created.getName().get() : createdId);
+        return true;
     }
 
     @Override
     public String getUsage() {
-        return "/region create <type>";
+        return "/region create <type> [name]";
     }
 }

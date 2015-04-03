@@ -5,15 +5,14 @@ import com.google.common.collect.HashMultimap;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
-import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
-import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
 import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.util.LocationSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
@@ -43,6 +41,7 @@ public class TownshipsRegion implements Region {
     private Location pos2;
 
     private Collection<Area> containingAreas;
+    private String type;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         regionUid = rId;
@@ -50,6 +49,7 @@ public class TownshipsRegion implements Region {
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
         name = config.get("name", null);
+        type = config.get("type", "UNDEFINED");
         Serializer<Integer> intSerializer = new Serializer<Integer>() {
             @Override
             public String serialize(Integer obj) {
@@ -62,34 +62,7 @@ public class TownshipsRegion implements Region {
             }
         };
         tier = config.get("tier", intSerializer, -1);
-        pos1 = config.get("position-1", new Serializer<Location>() {
-            @Override
-            public String serialize(Location obj) {
-                StringBuilder sB = new StringBuilder();
-                boolean first = true;
-                for (Entry<String, Object> e : obj.serialize().entrySet()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        sB.append("::");
-                    }
-                    sB.append(e.getKey());
-                    sB.append(":");
-                    sB.append(e.getValue());
-                }
-                return sB.toString();
-            }
-
-            @Override
-            public Location deserialize(String input) {
-                Map<String, Object> deserialized = new HashMap<String, Object>();
-                for (String entry : input.split("::")) {
-                    String[] kv = entry.split(":");
-                    deserialized.put(kv[0], kv[1]);
-                }
-                return Location.deserialize(deserialized);
-            }
-        }, null);
+        pos1 = config.get("position-1", new LocationSerializer(), null);
         if (pos1 == null || pos2 == null) {
             throw new IllegalStateException("Problem loading location of region " + regionUid + ": null");
         }
@@ -117,9 +90,6 @@ public class TownshipsRegion implements Region {
         StoredDataSection effectSection = config.getSection("effects");
         for (String eName : effectSection.getKeys(false)) {
             Effect e = Townships.getEffectManager().loadEffect(eName, this, effectSection.getSection(eName));
-            if (e instanceof TickableEffect) {
-                ((TownshipsEffectManager)Townships.getEffectManager()).getEffectTaskManager().schedule((TickableEffect) e, this); // TODO abstractify this
-            }
             effects.put(eName.toLowerCase(), e);
         }
     }
@@ -192,6 +162,11 @@ public class TownshipsRegion implements Region {
     @Override
     public void saveConfigs(StoredDataSection data) {
 
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 
     public Collection<Area> getBoundingAreas() {

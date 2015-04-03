@@ -78,4 +78,9 @@ public interface Region {
      * @param data The data section to save to
      */
     void saveConfigs(StoredDataSection data);
+
+    /**
+     * @return The type name of the region
+     */
+    String getType();
 }
