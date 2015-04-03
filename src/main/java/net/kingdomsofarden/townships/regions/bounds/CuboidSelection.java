@@ -1,12 +1,16 @@
-package net.kingdomsofarden.townships.command.selection;
+package net.kingdomsofarden.townships.regions.bounds;
 
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class Selection implements BoundingBox {
+import java.util.ArrayList;
+import java.util.Collection;
 
-    private Location loc1, loc2;
+public class CuboidSelection implements CuboidBoundingBox {
+
+    private Location loc1 = null, loc2 = null;
 
     public boolean isValid() {
         return loc1 != null && loc2 != null;
@@ -27,6 +31,42 @@ public class Selection implements BoundingBox {
         }
         return (getMinX() <= x) && (x <= getMaxX()) && (getMinY() <= y)
                 && (y <= getMaxY()) && (getMinZ() <= z) && (z <= getMaxZ());
+    }
+
+    @Override
+    public boolean intersects(BoundingBox box, boolean recurs) {
+        if (!box.getWorld().equals(getWorld())) {
+            return false;
+        }
+        for (Integer[] vertex : box.getVertices()) {
+            if (box.isInBounds(vertex[0], vertex[1], vertex[2])) {
+                return true;
+            }
+        }
+        if (recurs) {
+            return box.intersects(box, false);
+        }
+        return false;
+    }
+
+    @Override
+    public Collection<Integer[]> getVertices() {
+        ArrayList<Integer[]> vertices = new ArrayList<Integer[]>(8);
+        int minX = getMinX();
+        int maxX = getMaxX();
+        int minY = getMinY();
+        int maxY = getMaxY();
+        int minZ = getMinZ();
+        int maxZ = getMaxZ();
+        vertices.add(new Integer[] {minX, minY, minZ});
+        vertices.add(new Integer[] {minX, maxY, minZ});
+        vertices.add(new Integer[] {minX, minY, maxZ});
+        vertices.add(new Integer[] {minX, maxY, maxZ});
+        vertices.add(new Integer[] {maxX, minY, minZ});
+        vertices.add(new Integer[] {maxX, maxY, minZ});
+        vertices.add(new Integer[] {maxX, minY, maxZ});
+        vertices.add(new Integer[] {maxX, maxY, maxZ});
+        return vertices;
     }
 
     @Override

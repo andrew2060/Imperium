@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
-import net.kingdomsofarden.townships.api.util.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
@@ -44,7 +44,7 @@ public interface Region {
     Collection<Citizen> getCitizensInBounds();
 
     /**
-     * @return The {@link net.kingdomsofarden.townships.api.util.RegionBoundingBox} representing this region's area
+     * @return The {@link RegionBoundingBox} representing this region's area
      */
     RegionBoundingBox getBounds();
 

@@ -11,7 +11,7 @@ import net.kingdomsofarden.townships.characters.TownshipsCitizen;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
-import net.kingdomsofarden.townships.util.RegionAxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
 import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Location;
 import org.bukkit.World;

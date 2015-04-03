@@ -4,7 +4,11 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
+import org.bukkit.World;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,7 +33,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
     private RegionBoundCollection[] negativeAxis;
 
 
-    public AxisBoundCollection(boolean init) {
+    public AxisBoundCollection(World w, boolean init) {
         positiveAxis = new RegionBoundCollection[DEFAULT_CAPACITY];
         negativeAxis = new RegionBoundCollection[DEFAULT_CAPACITY];
         minX = minZ = Integer.MIN_VALUE;
@@ -38,10 +42,12 @@ public class AxisBoundCollection extends RegionBoundCollection {
             axis = AxisType.X;
         else
             axis = AxisType.Z;
+        world = w;
+        bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
     }
 
-    public AxisBoundCollection(int xIdx) {
-        this(false);
+    public AxisBoundCollection(World world, int xIdx) {
+        this(world, false);
         if (xIdx >>> 31 == 1) {
             maxX = xIdx * GRID_DIVISION;
             minX = (xIdx - 1) * GRID_DIVISION;
@@ -52,60 +58,66 @@ public class AxisBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    protected boolean add(BoundingBox bound) {
-        int leftBound;
-        int rightBound;
-        if (axis == AxisType.X) {
-            leftBound = bound.getMinX()/GRID_DIVISION;
-            rightBound = bound.getMaxX()/GRID_DIVISION;
-        } else {
-            leftBound = bound.getMinZ()/GRID_DIVISION;
-            rightBound = bound.getMaxZ()/GRID_DIVISION;
-        }
-        boolean crossSigns = leftBound >> 31 != rightBound >> 31;
-        boolean ret = false;
-        for (int i = leftBound; i != rightBound; i++) {
-            switch (Integer.signum(i)) {
-                case -1:
-                    if (add(bound, i * -1, true)) {
-                        ret = true;
-                    }
-                    break;
-                case 0:
-                    if (crossSigns) {
-                        if (add(bound, 0, true)) {
+    protected boolean add(RegionBoundingBox b) {
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            int leftBound;
+            int rightBound;
+            if (axis == AxisType.X) {
+                leftBound = bound.getMinX() / GRID_DIVISION;
+                rightBound = bound.getMaxX() / GRID_DIVISION;
+            } else {
+                leftBound = bound.getMinZ() / GRID_DIVISION;
+                rightBound = bound.getMaxZ() / GRID_DIVISION;
+            }
+            boolean crossSigns = leftBound >> 31 != rightBound >> 31;
+            boolean ret = false;
+            for (int i = leftBound; i != rightBound; i++) {
+                switch (Integer.signum(i)) {
+                    case -1:
+                        if (add(b, i * -1, true)) {
                             ret = true;
                         }
-                        if (add(bound, 0, false)) {
-                            ret = true;
-                        }
-                    } else {
-                        if (rightBound >>> 31 == 0) {
-                            if (add(bound, 0, false)) {
+                        break;
+                    case 0:
+                        if (crossSigns) {
+                            if (add(b, 0, true)) {
+                                ret = true;
+                            }
+                            if (add(b, 0, false)) {
                                 ret = true;
                             }
                         } else {
-                            if (add(bound, 0, true)) {
-                                ret = true;
+                            if (rightBound >>> 31 == 0) {
+                                if (add(b, 0, false)) {
+                                    ret = true;
+                                }
+                            } else {
+                                if (add(b, 0, true)) {
+                                    ret = true;
+                                }
                             }
                         }
-                    }
-                    break;
-                case 1:
-                    if (add(bound, i, false)) {
-                        ret = true;
-                    }
-                    break;
+                        break;
+                    case 1:
+                        if (add(b, i, false)) {
+                            ret = true;
+                        }
+                        break;
+                }
             }
+            return ret;
+        } else {
+            return false;  // TODO implementation using vertices?
         }
-        return ret;
+
     }
 
-    private boolean add(BoundingBox bound, int i, boolean negative) {
+    private boolean add(RegionBoundingBox bound, int i, boolean negative) {
         RegionBoundCollection[] coll = ensureCapacity(i, negative);
         if (coll[i] == null) {
             if (axis == AxisType.X) {
-                coll[i] = new AxisBoundCollection(negative ? -i : i);
+                coll[i] = new AxisBoundCollection(world, negative ? -i : i);
             } else {
                 int zMin;
                 int zMax;
@@ -116,7 +128,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
                     zMin = i * GRID_DIVISION;
                     zMax = (i + 1) * GRID_DIVISION;
                 }
-                coll[i] = new QuadrantBoundCollection(-1, this, minX, maxX, zMin, zMax);
+                coll[i] = new QuadrantBoundCollection(world, -1, this, minX, maxX, zMin, zMax);
             }
         }
         return coll[i].add(bound);
@@ -179,9 +191,56 @@ public class AxisBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public BoundingBox getBoundingBox() {
-        return null;
+    public void getIntersectingRegions(BoundingBox b, HashSet<Region> coll) {
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            int leftBound;
+            int rightBound;
+            if (axis == AxisType.X) {
+                leftBound = bound.getMinX() / GRID_DIVISION;
+                rightBound = bound.getMaxX() / GRID_DIVISION;
+            } else {
+                leftBound = bound.getMinZ() / GRID_DIVISION;
+                rightBound = bound.getMaxZ() / GRID_DIVISION;
+            }
+            boolean crossSigns = leftBound >> 31 != rightBound >> 31;
+            for (int i = leftBound; i != rightBound; i++) {
+                switch (Integer.signum(i)) {
+                    case -1:
+                        getIntersections(b, i * -1, true, coll);
+                        break;
+                    case 0:
+                        if (crossSigns) {
+                            getIntersections(b, 0, true, coll);
+                            getIntersections(b, 0, false, coll);
+                        } else {
+                            if (rightBound >>> 31 == 0) {
+                                getIntersections(b, 0, false, coll);
+                            } else {
+                                getIntersections(b, 0, true, coll);
+
+                            }
+                        }
+                        break;
+                    case 1:
+                        getIntersections(b, i, false, coll);
+                        break;
+                }
+            }
+        } else {
+            return; // TODO, non-cuboid (slower)
+        }
     }
+
+    private void getIntersections(BoundingBox b, int i, boolean negative, HashSet<Region> add) {
+        RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
+        if (coll[i] == null) {
+            return;
+        } else {
+            coll[i].getIntersectingRegions(b, add);
+        }
+    }
+
 
     @Override
     public Collection<Region> getBoundingRegions(int x, int y, int z) {
@@ -264,60 +323,65 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean remove(Object o) {
-        BoundingBox bound;
+        BoundingBox b;
         if (o instanceof Region) {
-            bound = ((Region) o).getBounds();
+            b = ((Region) o).getBounds();
         } else if (o instanceof BoundingBox) {
-            bound = (BoundingBox) o;
+            b = (BoundingBox) o;
         } else {
             return false;
         }
-        int leftBound;
-        int rightBound;
-        if (axis == AxisType.X) {
-            leftBound = bound.getMinX()/GRID_DIVISION;
-            rightBound = bound.getMaxX()/GRID_DIVISION;
-        } else {
-            leftBound = bound.getMinZ()/GRID_DIVISION;
-            rightBound = bound.getMaxZ()/GRID_DIVISION;
-        }
-        boolean crossSigns = leftBound >> 31 != rightBound >> 31;
-        boolean ret = false;
-        for (int i = leftBound; i != rightBound; i++) {
-            switch (Integer.signum(i)) {
-                case -1:
-                    if (remove(bound, i * -1, true)) {
-                        ret = true;
-                    }
-                    break;
-                case 0:
-                    if (crossSigns) {
-                        if (remove(bound, 0, true)) {
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            int leftBound;
+            int rightBound;
+            if (axis == AxisType.X) {
+                leftBound = bound.getMinX() / GRID_DIVISION;
+                rightBound = bound.getMaxX() / GRID_DIVISION;
+            } else {
+                leftBound = bound.getMinZ() / GRID_DIVISION;
+                rightBound = bound.getMaxZ() / GRID_DIVISION;
+            }
+            boolean crossSigns = leftBound >> 31 != rightBound >> 31;
+            boolean ret = false;
+            for (int i = leftBound; i != rightBound; i++) {
+                switch (Integer.signum(i)) {
+                    case -1:
+                        if (remove(bound, i * -1, true)) {
                             ret = true;
                         }
-                        if (remove(bound, 0, false)) {
-                            ret = true;
-                        }
-                    } else {
-                        if (rightBound >>> 31 == 0) {
+                        break;
+                    case 0:
+                        if (crossSigns) {
+                            if (remove(bound, 0, true)) {
+                                ret = true;
+                            }
                             if (remove(bound, 0, false)) {
                                 ret = true;
                             }
                         } else {
-                            if (remove(bound, 0, true)) {
-                                ret = true;
+                            if (rightBound >>> 31 == 0) {
+                                if (remove(bound, 0, false)) {
+                                    ret = true;
+                                }
+                            } else {
+                                if (remove(bound, 0, true)) {
+                                    ret = true;
+                                }
                             }
                         }
-                    }
-                    break;
-                case 1:
-                    if (remove(bound, i, false)) {
-                        ret = true;
-                    }
-                    break;
+                        break;
+                    case 1:
+                        if (remove(bound, i, false)) {
+                            ret = true;
+                        }
+                        break;
+                }
             }
+            return ret;
+        } else {
+            return false; // TODO non-cuboid implementations
         }
-        return ret;
     }
 
     private boolean remove(BoundingBox bound, int i, boolean negative) {

@@ -7,12 +7,15 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
 import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -83,12 +86,13 @@ public class TownshipsRegionManager implements RegionManager {
         if (region.getName().isPresent()) {
             nameToUid.put(region.getName().get().toLowerCase(), id);
         }
-        UUID world = region.getLocation().getWorld().getUID();
-        if (maps.containsKey(world)) {
-            return maps.get(world).add(region);
+        World world = region.getBounds().getWorld();
+        UUID wUid = world.getUID();
+        if (maps.containsKey(wUid)) {
+            return maps.get(wUid).add(region);
         } else {
-            maps.put(world, new AxisBoundCollection(true));
-            return maps.get(world).add(region);
+            maps.put(wUid, new AxisBoundCollection(world, true));
+            return maps.get(wUid).add(region);
         }
     }
 
@@ -115,7 +119,7 @@ public class TownshipsRegionManager implements RegionManager {
         if (r.getName().isPresent()) {
             nameToUid.remove(r.getName().get().toLowerCase());
         }
-        UUID world = r.getLocation().getWorld().getUID();
+        UUID world = r.getBounds().getWorld().getUID();
         return maps.containsKey(world) && maps.get(world).remove(r);
     }
 
@@ -178,6 +182,17 @@ public class TownshipsRegionManager implements RegionManager {
     public Optional<Area> getBoundingArea(Location loc) {
         RegionBoundCollection col = maps.get(loc.getWorld().getUID());
         return col != null ? col.getBoundingArea(loc.getBlockX(), loc.getBlockZ()) : Optional.<Area>absent();
+    }
+
+    @Override
+    public Collection<Region> getIntersectingRegions(BoundingBox bounds) {
+        UUID world = bounds.getWorld().getUID();
+        if (maps.containsKey(world)) {
+            HashSet<Region> ret = new HashSet<Region>();
+            maps.get(world).getIntersectingRegions(bounds, ret);
+            return ret;
+        }
+        return new HashSet<Region>();
     }
 
 }

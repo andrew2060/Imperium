@@ -3,8 +3,11 @@ package net.kingdomsofarden.townships.regions.collections;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,23 +20,32 @@ public abstract class RegionBoundCollection implements Area {
     protected int maxX;
     protected int minZ;
     protected int maxZ;
+    protected World world;
+    protected CuboidBoundingBox bounds;
+
 
     // Inheritance
     protected RegionBoundCollection parent;
     protected int quadrant;
+
+
 
     @Override
     public int[] getBounds() {
         return new int[] {minX, maxX, minZ, maxZ};
     }
 
+    @Override
+    public CuboidBoundingBox getBoundingBox() {
+        return bounds;
+    }
 
     @Override
     public boolean add(Region region) {
         return add(region.getBounds());
     }
 
-    protected abstract boolean add(BoundingBox bound);
+    protected abstract boolean add(RegionBoundingBox bound);
 
     @Override
     public boolean addAll(Collection<? extends Region> c) {
@@ -60,18 +72,7 @@ public abstract class RegionBoundCollection implements Area {
      * @return True if some portion of b falls within the area managed by this collection
      */
     protected boolean isInBounds(BoundingBox b) {
-        boolean xMinBound = checkBounds(b.getMinX(), minX, maxX);
-        boolean zMinBound = checkBounds(b.getMinZ(), minZ, maxZ);
-        boolean xMaxBound = checkBounds(b.getMaxX(), minX, maxX);
-        boolean zMaxBound = checkBounds(b.getMaxZ(), minZ, maxZ);
-        boolean encapsulatesX = b.getMinX() < minX && b.getMaxX() > maxX;
-        boolean encapsulatesZ = b.getMinZ() < minZ && b.getMaxZ() > maxZ;
-
-        return ((xMinBound || xMaxBound) && (zMinBound || zMaxBound)) // Standard case, one corners
-                // Completely contained
-                || (encapsulatesX && encapsulatesZ)
-                // Partially contained
-                || (((xMinBound || xMaxBound) && encapsulatesZ) || ((zMinBound || zMaxBound) && encapsulatesX)) ;
+        return getBoundingBox().intersects(b, true);
     }
 
     protected boolean checkBounds(double x, int l, int u) {
@@ -88,4 +89,6 @@ public abstract class RegionBoundCollection implements Area {
     protected abstract void constructContainedRegions(Set<Region> regions);
 
     public abstract Optional<Area> getBoundingArea(int x, int z);
+
+    public abstract void getIntersectingRegions(BoundingBox bounds, HashSet<Region> col);
 }

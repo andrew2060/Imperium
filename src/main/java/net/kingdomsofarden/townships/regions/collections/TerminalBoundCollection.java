@@ -4,8 +4,12 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
+import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
+import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -23,13 +27,20 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     private Set<Region> contents; // TODO: use heap/binary tree instead for most efficient searching for a specific region?
     private Collection<Citizen> currCitizens;
 
-    public TerminalBoundCollection(int xLeft, int xRight, int zLower, int zUpper) {
+    public TerminalBoundCollection(World world, int xLeft, int xRight, int zLower, int zUpper) {
         this.contents = new LinkedHashSet<Region>();
         this.minX = xLeft;
         this.maxX = xRight;
         this.minZ = zLower;
         this.maxZ = zUpper;
         this.currCitizens = new HashSet<Citizen>();
+        this.world = world;
+        this.bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
+    }
+
+    @Override
+    public CuboidBoundingBox getBoundingBox() {
+        return bounds;
     }
 
     @Override
@@ -51,7 +62,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     // Inherited Stuff
 
     @Override
-    public boolean add(BoundingBox bound) {
+    public boolean add(RegionBoundingBox bound) {
         TownshipsRegion r = (TownshipsRegion) bound.getRegion();
         r.getBoundingAreas().add(this);
         return contents.add(bound.getRegion());
@@ -93,8 +104,8 @@ public class TerminalBoundCollection extends RegionBoundCollection {
             if (o instanceof Region) {
                 TownshipsRegion r = (TownshipsRegion) o;
                 r.getBoundingAreas().add(this);
-            } else if (o instanceof BoundingBox) {
-                TownshipsRegion r = (TownshipsRegion) ((BoundingBox) o).getRegion();
+            } else if (o instanceof RegionBoundingBox) {
+                TownshipsRegion r = (TownshipsRegion) ((RegionBoundingBox) o).getRegion();
                 r.getBoundingAreas().add(this);
             }
             return true;
@@ -121,6 +132,15 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     @Override
     public Optional<Area> getBoundingArea(int x, int z) {
         return Optional.of((Area)this); // Not sure why this cast is needed but compiler complains
+    }
+
+    @Override
+    public void getIntersectingRegions(BoundingBox bounds, HashSet<Region> col) {
+        for (Region r : contents) {
+            if (bounds.intersects(r.getBounds(), true) && !bounds.equals(r.getBounds())) {
+                col.add(r);
+            }
+        }
     }
 
     @Override

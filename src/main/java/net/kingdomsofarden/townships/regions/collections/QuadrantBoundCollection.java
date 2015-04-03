@@ -4,7 +4,11 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.util.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
+import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +22,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     private int xDivisor;
     private int zDivisor;
 
-    public QuadrantBoundCollection(int quadrant, RegionBoundCollection parent, int xLeft, int xRight, int zLower, int zUpper) {
+    public QuadrantBoundCollection(World world, int quadrant, RegionBoundCollection parent, int xLeft, int xRight, int zLower, int zUpper) {
         this.parent = parent;
         this.quadrant = quadrant;
         this.subRegions = new RegionBoundCollection[4]; // [][] {{0 | 1} | {2 | 3}}
@@ -28,8 +32,15 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         this.maxZ = zUpper;
         this.xDivisor = Math.floorDiv((xRight + xLeft), 2);
         this.zDivisor = Math.floorDiv((zUpper + zLower), 2);
+        this.bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
+        this.world = world;
     }
 
+
+    @Override
+    public CuboidBoundingBox getBoundingBox() {
+        return bounds;
+    }
 
     @Override
     public Collection<Region> getBoundingRegions(int x, int y, int z) {
@@ -60,28 +71,33 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public boolean add(BoundingBox bound) {
-        boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
-        boolean upperRight = bound.getMaxZ() > zDivisor && bound.getMaxX() > xDivisor;
-        boolean lowerLeft = bound.getMinZ() <= zDivisor && bound.getMinX() <= xDivisor;
-        boolean lowerRight = bound.getMinZ() <= zDivisor && bound.getMaxX() > xDivisor;
-        if (upperLeft) {
-            checkIndexAndCreate(0);
-            upperLeft = subRegions[0].add(bound);
+    public boolean add(RegionBoundingBox b) {
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
+            boolean upperRight = bound.getMaxZ() > zDivisor && bound.getMaxX() > xDivisor;
+            boolean lowerLeft = bound.getMinZ() <= zDivisor && bound.getMinX() <= xDivisor;
+            boolean lowerRight = bound.getMinZ() <= zDivisor && bound.getMaxX() > xDivisor;
+            if (upperLeft) {
+                checkIndexAndCreate(0);
+                upperLeft = subRegions[0].add(b);
+            }
+            if (upperRight) {
+                checkIndexAndCreate(1);
+                upperRight = subRegions[1].add(b);
+            }
+            if (lowerLeft) {
+                checkIndexAndCreate(2);
+                lowerLeft = subRegions[2].add(b);
+            }
+            if (lowerRight) {
+                checkIndexAndCreate(3);
+                lowerRight = subRegions[3].add(b);
+            }
+            return (upperLeft || upperRight || lowerLeft || lowerRight);
+        } else {
+            return false; // TODO
         }
-        if (upperRight) {
-            checkIndexAndCreate(1);
-            upperRight = subRegions[1].add(bound);
-        }
-        if (lowerLeft) {
-            checkIndexAndCreate(2);
-            lowerLeft = subRegions[2].add(bound);
-        }
-        if (lowerRight) {
-            checkIndexAndCreate(3);
-            lowerRight = subRegions[3].add(bound);
-        }
-        return (upperLeft || upperRight || lowerLeft || lowerRight);
     }
 
 
@@ -110,6 +126,35 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
             } else {
                 return subRegions[3] != null ? subRegions[3].getBoundingArea(x, z) : Optional.<Area>absent();
             }
+        }
+    }
+
+    @Override
+    public void getIntersectingRegions(BoundingBox b, HashSet<Region> col) {
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
+            boolean upperRight = bound.getMaxZ() > zDivisor && bound.getMaxX() > xDivisor;
+            boolean lowerLeft = bound.getMinZ() <= zDivisor && bound.getMinX() <= xDivisor;
+            boolean lowerRight = bound.getMinZ() <= zDivisor && bound.getMaxX() > xDivisor;
+            if (upperLeft) {
+                if (subRegions[0] != null)
+                    subRegions[0].getIntersectingRegions(b, col);
+            }
+            if (upperRight) {
+                if (subRegions[1] != null)
+                    subRegions[1].getIntersectingRegions(b, col);
+            }
+            if (lowerLeft) {
+                if (subRegions[2] != null)
+                    subRegions[2].getIntersectingRegions(b, col);
+            }
+            if (lowerRight) {
+                if (subRegions[3] != null)
+                    subRegions[3].getIntersectingRegions(b, col);
+            }
+        } else {
+            return; // TODO, non cuboid
         }
     }
 
@@ -158,9 +203,9 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
                     throw new ArrayIndexOutOfBoundsException(i);
             }
             if (w <= 100 || h <= 100) { //TODO nicer partitioning
-                subRegions[i] = new TerminalBoundCollection(xLeft, xRight, zLower, zUpper);
+                subRegions[i] = new TerminalBoundCollection(world, xLeft, xRight, zLower, zUpper);
             } else {
-                subRegions[i] = new QuadrantBoundCollection(i, this, xLeft, xRight, zLower, zUpper);
+                subRegions[i] = new QuadrantBoundCollection(world, i, this, xLeft, xRight, zLower, zUpper);
             }
         }
     }
@@ -208,31 +253,36 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean remove(Object o) {
-        BoundingBox bound;
+        BoundingBox b;
         if (o instanceof Region) {
-            bound = ((Region) o).getBounds();
+            b = ((Region) o).getBounds();
         } else if (o instanceof BoundingBox) {
-            bound = (BoundingBox) o;
+            b = (BoundingBox) o;
         } else {
             return false;
         }
-        boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
-        boolean upperRight = bound.getMaxZ() > zDivisor && bound.getMaxX() > xDivisor;
-        boolean lowerLeft = bound.getMinZ() <= zDivisor && bound.getMinX() <= xDivisor;
-        boolean lowerRight = bound.getMinZ() <= zDivisor && bound.getMaxX() > xDivisor;
-        if (upperLeft) {
-            upperLeft = subRegions[0] != null && subRegions[0].remove(bound);
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
+            boolean upperRight = bound.getMaxZ() > zDivisor && bound.getMaxX() > xDivisor;
+            boolean lowerLeft = bound.getMinZ() <= zDivisor && bound.getMinX() <= xDivisor;
+            boolean lowerRight = bound.getMinZ() <= zDivisor && bound.getMaxX() > xDivisor;
+            if (upperLeft) {
+                upperLeft = subRegions[0] != null && subRegions[0].remove(bound);
+            }
+            if (upperRight) {
+                upperRight = subRegions[1] != null && subRegions[1].remove(bound);
+            }
+            if (lowerLeft) {
+                lowerLeft = subRegions[2] != null && subRegions[2].remove(bound);
+            }
+            if (lowerRight) {
+                lowerRight = subRegions[3] != null && subRegions[3].remove(bound);
+            }
+            return (upperLeft || upperRight || lowerLeft || lowerRight);
+        } else {
+            return false; //TODO
         }
-        if (upperRight) {
-            upperRight = subRegions[1] != null && subRegions[1].remove(bound);
-        }
-        if (lowerLeft) {
-            lowerLeft = subRegions[2] != null && subRegions[2].remove(bound);
-        }
-        if (lowerRight) {
-            lowerRight = subRegions[3] != null && subRegions[3].remove(bound);
-        }
-        return (upperLeft || upperRight || lowerLeft || lowerRight);
     }
 
     @Override

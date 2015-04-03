@@ -1,4 +1,4 @@
-package net.kingdomsofarden.townships.api.util;
+package net.kingdomsofarden.townships.api.regions.bounds;
 
 import net.kingdomsofarden.townships.api.regions.Region;
 
