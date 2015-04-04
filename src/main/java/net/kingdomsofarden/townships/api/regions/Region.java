@@ -83,4 +83,8 @@ public interface Region {
      * @return The type name of the region
      */
     String getType();
+
+    void addRole(Citizen citizen, RoleGroup group);
+
+    boolean removeRole(Citizen citizen, RoleGroup group);
 }

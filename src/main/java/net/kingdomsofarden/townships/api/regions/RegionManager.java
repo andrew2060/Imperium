@@ -25,4 +25,10 @@ public interface RegionManager extends Collection<Region> {
      * @return A collection of all regions that intersect this bounding box in some way
      */
     Collection<Region> getIntersectingRegions(BoundingBox bounds);
+
+    /**
+     * @param name The name of the region, non case-sensitive
+     * @return The matching region, if present
+     */
+    Optional<Region> get(String name);
 }

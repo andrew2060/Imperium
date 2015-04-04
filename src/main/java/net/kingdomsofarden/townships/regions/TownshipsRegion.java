@@ -63,15 +63,13 @@ public class TownshipsRegion implements Region {
         };
         tier = config.get("tier", intSerializer, -1);
         pos1 = config.get("position-1", new LocationSerializer(), null);
+        pos2 = config.get("position-2", new LocationSerializer(), null);
         if (pos1 == null || pos2 == null) {
             throw new IllegalStateException("Problem loading location of region " + regionUid + ": null");
         }
         if (pos1.getWorld() != pos2.getWorld()) {
             throw new IllegalStateException("Mismatched worlds");
         }
-        int lenX = config.get("half-width-x", intSerializer, 1);
-        int lenY = config.get("half-height", intSerializer, 1);
-        int lenZ = config.get("half-width-z", intSerializer, 1);
         bounds = new RegionAxisAlignedBoundingBox(this, pos1, pos2);
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
@@ -161,7 +159,7 @@ public class TownshipsRegion implements Region {
 
     @Override
     public void saveConfigs(StoredDataSection data) {
-
+        //TODO
     }
 
     @Override
@@ -171,5 +169,19 @@ public class TownshipsRegion implements Region {
 
     public Collection<Area> getBoundingAreas() {
         return containingAreas;
+    }
+
+    @Override
+    public void addRole(Citizen citizen, RoleGroup group) {
+        rolesByCitizenUid.put(citizen.getUid(), group);
+        citizenUidsByRole.put(group, citizen.getUid());
+    }
+
+    @Override
+    public boolean removeRole(Citizen citizen, RoleGroup group) {
+        boolean ret = rolesByCitizenUid.remove(citizen.getUid(), group);
+        boolean ret2 = citizenUidsByRole.remove(group, citizen.getUid());
+        return ret || ret2;
+
     }
 }

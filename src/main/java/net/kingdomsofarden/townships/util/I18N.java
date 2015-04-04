@@ -32,10 +32,13 @@ public class I18N {
     public static final String INSUFFICIENT_REQUIREMENT_REGION_TIER = "This selection does not contain sufficient numbers of a certain tier of regions";
     public static final String REGION_COLLISION_MUTEX_FAIL = "This selection contains one or more preexisting regions when none are allowed for the requested region type";
     public static final String REGION_COLLISION_GENERAL = "This selection contains one or more preexisting regions that are not compatible with the requested region type";
-
     public static final String REGION_SUCCESSFULLY_CREATED = "The region was successfully created with id $0";
-
     public static final String SELECTION_ENABLED = "Selection mode enabled";
     public static final String SELECTION_DISABLED = "Selection mode disabled";
     public static final String SELECTION_SET = "Selection Point $0 set to x:$1 y:$2 z:$3";
+    public static final String INVALID_USAGE = "Improper usage of command: correct usage is $0";
+    public static final String REGION_NOT_FOUND = "The requested region $0 was not found";
+    public static final String PLAYER_NOT_FOUND = "The requested player $0 was not found";
+    public static final String COMMAND_COMPLETED_SUCCESSFULLY = "The requested operation was completed";
+    public static final String ROLE_NOT_PRESENT = "The requested player $0 does not hold the $1 role in region $2";
 }
