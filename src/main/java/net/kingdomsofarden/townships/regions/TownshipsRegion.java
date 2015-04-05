@@ -101,8 +101,6 @@ public class TownshipsRegion implements Region {
         }
     }
 
-
-
     @Override
     public int getTier() {
         return tier;
@@ -198,13 +196,13 @@ public class TownshipsRegion implements Region {
         if (citizen.isRoot()) {
             return true;
         } else {
-            for (AccessType access : accessByCitizenUid.get(citizen.getUid())) {
+            for (AccessType access :accessByCitizenUid.get(citizen.getUid())) {
                 if (access.hasAccess(type)) {
                     return true;
                 }
             }
             for (RoleGroup group : effectiveGroups) {
-                for (AccessType access : accessByRole.get(group)) {
+                for (AccessType access :accessByRole.get(group)) {
                     if (access.hasAccess(type)) {
                         return true;
                     }

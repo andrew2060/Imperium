@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.events.RegionCreateEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -14,6 +15,7 @@ import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.regions.bounds.CuboidSelection;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -233,11 +235,12 @@ public class CommandCreateRegion implements Command {
                     regionTierReq.remove(tier);
                 }
             }
-            if (tier < regionTier) {
-                if (!selection.encompasses(region.getBounds())) {
-                    Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
-                    return true;
-                }
+            if (tier < regionTier && !selection.encompasses(region.getBounds())) {
+                Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
+                return true;
+            } else if (tier > regionTier && !region.getBounds().encompasses(selection)) {
+                Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
+                return true;
             }
         }
         if (!regionTypeReq.isEmpty()) {
@@ -248,17 +251,21 @@ public class CommandCreateRegion implements Command {
             Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_REGION_TIER);
             return true;
         }
-        // TODO check other requirements (money, funding, ownership)
+        // TODO check other requirements (money, funding)
         UUID createdId = UUID.randomUUID();
         if (args.length == 2) {
             data.set("name", args[1]);
         }
         data.set("position-1", selection.getLoc1());
         data.set("position-2", selection.getLoc2());
-        Region created = new TownshipsRegion(createdId, data);
-        Townships.getRegions().add(created);
-        Messaging.sendFormattedMessage(sender, I18N.REGION_SUCCESSFULLY_CREATED, created.getName().isPresent() ?
-                created.getName().get() : createdId);
+        Region created = new TownshipsRegion(createdId, data); // TODO grant administrative rights
+        RegionCreateEvent e = new RegionCreateEvent(c, created);
+        Bukkit.getPluginManager().callEvent(e);
+        if (!e.isCancelled()) {
+            Townships.getRegions().add(created);
+            Messaging.sendFormattedMessage(sender, I18N.REGION_SUCCESSFULLY_CREATED, created.getName().isPresent() ?
+                    created.getName().get() : createdId);
+        }
         return true;
     }
 

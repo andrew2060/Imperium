@@ -10,4 +10,6 @@ public interface Storage {
     Region loadRegion(UUID id);
 
     void saveRegion(Region r, boolean async);
+
+    void removeRegion(UUID id);
 }

@@ -44,4 +44,12 @@ public class YAMLStorage implements Storage {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void removeRegion(UUID id) {
+        File f = new File(regionSaves, id + ".yml");
+        if (f.exists()) {
+            f.delete();
+        }
+    }
 }

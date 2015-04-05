@@ -3,12 +3,14 @@ package net.kingdomsofarden.townships;
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.configuration.Configuration;
+import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
 import net.kingdomsofarden.townships.listeners.BlockProtectionListener;
 import net.kingdomsofarden.townships.listeners.ExplosiveProtectionListener;
 import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
+import net.kingdomsofarden.townships.storage.YAMLStorage;
 import net.kingdomsofarden.townships.util.TownshipsConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +23,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     private TownshipsConfiguration config;
 
     private RegionalUpdateListener regionalUpdateListener;
+    private YAMLStorage storage;
 
 
     @Override
@@ -29,8 +32,8 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         Townships.setInstance(this);
         regionManager = new TownshipsRegionManager(this);
         effectManager = new TownshipsEffectManager(this);
-
         config = new TownshipsConfiguration(this);
+        storage = new YAMLStorage(this);
 
         // Register Events
         regionalUpdateListener = new RegionalUpdateListener(this);
@@ -65,5 +68,10 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     @Override
     public Configuration getConfiguration() {
         return config;
+    }
+
+    @Override
+    public Storage getStorage() {
+        return storage;
     }
 }

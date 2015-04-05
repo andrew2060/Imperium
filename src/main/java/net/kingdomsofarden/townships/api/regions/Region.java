@@ -98,4 +98,5 @@ public interface Region {
      * @return true if the citizen has the given or compatible access type
      */
     boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups);
+
 }

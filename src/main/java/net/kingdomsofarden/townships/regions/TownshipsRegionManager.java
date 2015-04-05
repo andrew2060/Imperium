@@ -109,6 +109,9 @@ public class TownshipsRegionManager implements RegionManager {
         } else {
             return false;
         }
+        if (r == null) {
+            return false;
+        }
         for (Effect effect : r.getEffects()) {
             if (effect instanceof TickableEffect) {
                 plugin.getEffectManager().getEffectTaskManager().unschedule((TickableEffect) effect);
@@ -119,6 +122,7 @@ public class TownshipsRegionManager implements RegionManager {
         if (r.getName().isPresent()) {
             nameToUid.remove(r.getName().get().toLowerCase());
         }
+        plugin.getStorage().removeRegion(id);
         UUID world = r.getBounds().getWorld().getUID();
         return maps.containsKey(world) && maps.get(world).remove(r);
     }
@@ -212,6 +216,11 @@ public class TownshipsRegionManager implements RegionManager {
             return Optional.fromNullable(uidToRegion.get(id));
         else
             return Optional.absent();
+    }
+
+    @Override
+    public Optional<Region> get(UUID uuid) {
+        return Optional.fromNullable(uidToRegion.get(uuid));
     }
 
 }

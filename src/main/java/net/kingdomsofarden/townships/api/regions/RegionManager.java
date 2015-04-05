@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
 import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.UUID;
 
 
 public interface RegionManager extends Collection<Region> {
@@ -31,4 +32,11 @@ public interface RegionManager extends Collection<Region> {
      * @return The matching region, if present
      */
     Optional<Region> get(String name);
+
+    /**
+     * @param uuid The uid of the region
+     * @return The matching region, if present
+     */
+    Optional<Region> get(UUID uuid);
+
 }

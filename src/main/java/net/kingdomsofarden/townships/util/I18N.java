@@ -42,6 +42,6 @@ public class I18N {
     public static final String COMMAND_COMPLETED_SUCCESSFULLY = "The requested operation was completed";
     public static final String ROLE_NOT_PRESENT = "The requested player $0 does not hold the $1 role in region $2";
     public static final String NO_PERMISSION_AREA_GOVERN = "You lack the required access level to administrate this region";
-    public static final String NO_PERMISSION_AREA_ZONING = "You lack the required access level to create new regions in this area";
+    public static final String NO_PERMISSION_AREA_ZONING = "You lack the required access level to create/destroy regions in this area";
     public static final String LOWER_TIER_MUST_BE_ENCOMPASSED = "Higher tier regions must completely encompass lower tiered regions";
 }
