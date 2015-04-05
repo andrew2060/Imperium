@@ -5,6 +5,7 @@ import com.google.common.collect.HashMultimap;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
+import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
@@ -32,6 +34,9 @@ public class TownshipsRegion implements Region {
 
     private HashMultimap<UUID, RoleGroup> rolesByCitizenUid;
     private HashMultimap<RoleGroup, UUID> citizenUidsByRole;
+
+    private HashMultimap<UUID, AccessType> accessByCitizenUid;
+    private HashMultimap<RoleGroup, AccessType> accessByRole;
 
     private Map<String, Effect> effects;
 
@@ -44,10 +49,14 @@ public class TownshipsRegion implements Region {
     private String type;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
-        regionUid = rId;
+        // Set up basic data structures
         containingAreas = new LinkedList<Area>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
+        accessByCitizenUid = HashMultimap.create();
+        accessByRole = HashMultimap.create();
+        // Populate region identifier data
+        regionUid = rId;
         name = config.get("name", null);
         type = config.get("type", "UNDEFINED");
         Serializer<Integer> intSerializer = new Serializer<Integer>() {
@@ -182,6 +191,26 @@ public class TownshipsRegion implements Region {
         boolean ret = rolesByCitizenUid.remove(citizen.getUid(), group);
         boolean ret2 = citizenUidsByRole.remove(group, citizen.getUid());
         return ret || ret2;
+    }
 
+    @Override
+    public boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups) { // TODO further investigate if not n^2 algorithm is possible
+        if (citizen.isRoot()) {
+            return true;
+        } else {
+            for (AccessType access : accessByCitizenUid.get(citizen.getUid())) {
+                if (access.hasAccess(type)) {
+                    return true;
+                }
+            }
+            for (RoleGroup group : effectiveGroups) {
+                for (AccessType access : accessByRole.get(group)) {
+                    if (access.hasAccess(type)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

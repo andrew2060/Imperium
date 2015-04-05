@@ -43,10 +43,7 @@ public class CuboidSelection implements CuboidBoundingBox {
                 return true;
             }
         }
-        if (recurs) {
-            return box.intersects(box, false);
-        }
-        return false;
+        return recurs && box.intersects(box, false);
     }
 
     @Override
@@ -144,5 +141,15 @@ public class CuboidSelection implements CuboidBoundingBox {
             throw new IllegalStateException("A call was made without the selection being complete!");
         }
         return loc1.getWorld();
+    }
+
+    @Override
+    public boolean encompasses(BoundingBox other) {
+        for (Integer[] vertex : other.getVertices()) {
+             if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
+                 return false;
+             }
+        }
+        return true;
     }
 }

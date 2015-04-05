@@ -8,7 +8,7 @@ public class RoleGroup {
     public static final RoleGroup MODERATOR = new RoleGroup("MODERATOR");
     public static final RoleGroup MEMBER = new RoleGroup("MEMBER");
     public static final RoleGroup GUEST = new RoleGroup("GUEST");
-    public static final RoleGroup valueOf(String name) {
+    public static RoleGroup valueOf(String name) {
         return new RoleGroup(name.toUpperCase());
     }
 
@@ -26,11 +26,12 @@ public class RoleGroup {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof RoleGroup) {
-            return ((RoleGroup) other).name.equals(this.name);
-        } else {
-            return false;
-        }
+        return other instanceof RoleGroup && ((RoleGroup) other).name.equals(this.name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
 

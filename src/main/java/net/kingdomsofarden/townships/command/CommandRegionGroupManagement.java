@@ -1,7 +1,9 @@
 package net.kingdomsofarden.townships.command;
 
 import net.kingdomsofarden.townships.api.Townships;
+import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.util.I18N;
@@ -9,6 +11,9 @@ import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public class CommandRegionGroupManagement implements Command {
     @Override
@@ -35,17 +40,32 @@ public class CommandRegionGroupManagement implements Command {
     public boolean execute(CommandSender sender, String[] args) {
         String type = args[0].toLowerCase();
         if (type.equals("add") || type.equals("remove")) {
-            boolean addOp;
-            if (type.equals("add")) {
-                addOp = true;
-            } else {
-                addOp = false;
-            }
+            boolean addOp = type.equals("add");
             Region r = Townships.getRegions().get(args[1]).orNull();
             if (r == null) {
                 Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1].toLowerCase());
                 return true;
             }
+            if (sender instanceof Player) {
+                Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
+                Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(r.getBounds());
+                boolean perm = false;
+                HashSet<RoleGroup> effective = new HashSet<RoleGroup>();
+                for (Region found : intersections) {
+                    if (r.getTier() <= found.getTier()) {
+                        effective.addAll(r.getRoles(c));
+                        if (r.hasAccess(c, AccessType.GOVERNOR, effective)) {
+                            perm = true;
+                            break;
+                        }
+                    }
+                }
+                if (!perm) {
+                    Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_GOVERN);
+                    return true;
+                }
+            }
+
             RoleGroup group = RoleGroup.valueOf(args[2]);
             Player p = Bukkit.getPlayer(args[3]);
             if (p == null) {

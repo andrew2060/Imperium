@@ -48,7 +48,12 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         Collection<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
             @Override
             public int compare(Region o1, Region o2) {
-                return o2.getTier() - o1.getTier();
+                int ret = o2.getTier() - o1.getTier();
+                if (ret == 0) {
+                    return o1.getUid().compareTo(o2.getUid());
+                } else {
+                    return ret;
+                }
             }
         });
         for (Region r : contents) {
@@ -135,7 +140,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox bounds, HashSet<Region> col) {
+    public void getIntersectingRegions(BoundingBox bounds, TreeSet<Region> col) {
         for (Region r : contents) {
             if (bounds.intersects(r.getBounds(), true) && !bounds.equals(r.getBounds())) {
                 col.add(r);

@@ -2,7 +2,10 @@ package net.kingdomsofarden.townships.command;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.Townships;
+import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.permissions.AccessType;
+import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -102,6 +105,25 @@ public class CommandCreateRegion implements Command {
             Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_SMALL, maxX, maxHeight , maxZ);
             return true;
         }
+        // Check region permissions
+        Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
+        Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
+        int regionTier = data.get("tier", intSerializer, Integer.MIN_VALUE);
+        Set<RoleGroup> effectiveGroups = new HashSet<RoleGroup>();
+        boolean hasAccess = false;
+        for (Region parent : intersections) {
+            if (parent.getTier() >= regionTier) {
+                effectiveGroups.addAll(parent.getRoles(c));
+                if (parent.hasAccess(c, AccessType.ZONING, effectiveGroups)) {
+                    hasAccess = true;
+                    break;
+                }
+            }
+        }
+        if (!hasAccess) {
+            Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_ZONING);
+            return true;
+        }
         // Requirements checking
         StoredDataSection requirements = data.getSection("requirements");
         final Map<Material, Integer> blockReq = new HashMap<Material, Integer>();
@@ -184,7 +206,6 @@ public class CommandCreateRegion implements Command {
             e.printStackTrace(); // TODO print to debug instead
             return true;
         }
-        Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
         if (excludeAll && !(intersections.isEmpty())) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_MUTEX_FAIL);
             return true;
@@ -192,7 +213,7 @@ public class CommandCreateRegion implements Command {
         for (Region region : intersections) {
             int tier = region.getTier();
             String type = region.getType().toLowerCase();
-            if (excludeTiers.contains(tier) || excludeTypes.contains(type)) {
+            if (excludeTiers.contains(tier) || excludeTypes.contains(type) || tier == regionTier) {
                 Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_GENERAL);
                 return true;
             }
@@ -210,6 +231,12 @@ public class CommandCreateRegion implements Command {
                     regionTierReq.put(tier, amt);
                 } else {
                     regionTierReq.remove(tier);
+                }
+            }
+            if (tier < regionTier) {
+                if (!selection.encompasses(region.getBounds())) {
+                    Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
+                    return true;
                 }
             }
         }

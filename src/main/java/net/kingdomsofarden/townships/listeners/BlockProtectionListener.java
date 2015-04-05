@@ -6,7 +6,6 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.effects.core.EffectProtection;
 import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
@@ -37,8 +36,7 @@ public class BlockProtectionListener implements Listener {
         for (Region region : boundingRegions) {
             effectiveRoles.addAll(region.getRoles(c));
             if (region.hasEffect("protection")) {
-                EffectProtection effect = region.getEffect("protection");
-                if (effect.isPermitted(AccessType.ACCESS, c, effectiveRoles)) {
+                if (region.hasAccess(c, access, effectiveRoles)) {
                     return true;
                 }
             }

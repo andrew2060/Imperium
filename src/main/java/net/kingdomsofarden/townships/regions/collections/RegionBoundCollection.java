@@ -12,6 +12,7 @@ import org.bukkit.World;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class RegionBoundCollection implements Area {
 
@@ -90,5 +91,5 @@ public abstract class RegionBoundCollection implements Area {
 
     public abstract Optional<Area> getBoundingArea(int x, int z);
 
-    public abstract void getIntersectingRegions(BoundingBox bounds, HashSet<Region> col);
+    public abstract void getIntersectingRegions(BoundingBox bounds, TreeSet<Region> col);
 }

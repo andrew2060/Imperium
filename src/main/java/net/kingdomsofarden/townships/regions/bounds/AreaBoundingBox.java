@@ -103,4 +103,14 @@ public class AreaBoundingBox implements CuboidBoundingBox {
     public World getWorld() {
         return world;
     }
+
+    @Override
+    public boolean encompasses(BoundingBox other) {
+        for (Integer[] vertex : other.getVertices()) {
+            if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

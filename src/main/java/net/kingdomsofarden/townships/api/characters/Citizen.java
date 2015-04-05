@@ -27,4 +27,9 @@ public interface Citizen {
     void setCurrentArea(Area area);
 
     UUID getUid();
+
+    /**
+     * @return True if the citizen has access to and is currently in ROOT role/mode, which grants global access rights
+     */
+    boolean isRoot();
 }

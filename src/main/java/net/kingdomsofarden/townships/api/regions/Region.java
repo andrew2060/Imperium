@@ -3,11 +3,13 @@ package net.kingdomsofarden.townships.api.regions;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
+import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -87,4 +89,13 @@ public interface Region {
     void addRole(Citizen citizen, RoleGroup group);
 
     boolean removeRole(Citizen citizen, RoleGroup group);
+
+    /**
+     * @param citizen The citizen to check
+     * @param type The type of access type to check for
+     * @param effectiveGroups A (non-null) set of all effective groups possessed by this citizen prior to the check for
+     *                        this region (i.e. from parent regions)
+     * @return true if the citizen has the given or compatible access type
+     */
+    boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups);
 }

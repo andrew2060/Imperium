@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class AxisBoundCollection extends RegionBoundCollection {
 
@@ -191,7 +192,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox b, HashSet<Region> coll) {
+    public void getIntersectingRegions(BoundingBox b, TreeSet<Region> coll) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -232,11 +233,9 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    private void getIntersections(BoundingBox b, int i, boolean negative, HashSet<Region> add) {
+    private void getIntersections(BoundingBox b, int i, boolean negative, TreeSet<Region> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
-        if (coll[i] == null) {
-            return;
-        } else {
+        if (coll[i] != null) {
             coll[i].getIntersectingRegions(b, add);
         }
     }
@@ -386,11 +385,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     private boolean remove(BoundingBox bound, int i, boolean negative) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
-        if (i >= coll.length || coll[i] == null) {
-            return false;
-        } else {
-            return coll[i].remove(bound);
-        }
+        return !(i >= coll.length || coll[i] == null) && coll[i].remove(bound);
     }
 
     @Override

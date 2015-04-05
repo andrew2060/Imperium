@@ -14,11 +14,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class TownshipsRegionManager implements RegionManager {
@@ -52,10 +54,8 @@ public class TownshipsRegionManager implements RegionManager {
                     && uidToRegion.containsKey(nameToUid.get(((String) o).toLowerCase()));
         } else if (o instanceof UUID) {
             return uidToRegion.containsKey(o);
-        } else if (o instanceof Region) {
-            return uidToRegion.containsValue(o);
         } else {
-            return false;
+            return o instanceof Region && uidToRegion.containsValue(o);
         }
     }
 
@@ -188,11 +188,30 @@ public class TownshipsRegionManager implements RegionManager {
     public Collection<Region> getIntersectingRegions(BoundingBox bounds) {
         UUID world = bounds.getWorld().getUID();
         if (maps.containsKey(world)) {
-            HashSet<Region> ret = new HashSet<Region>();
+            TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
+                @Override
+                public int compare(Region o1, Region o2) {
+                    int ret = o2.getTier() - o1.getTier();
+                    if (ret == 0) {
+                        return o1.getUid().compareTo(o2.getUid());
+                    } else {
+                        return ret;
+                    }
+                }
+            });
             maps.get(world).getIntersectingRegions(bounds, ret);
             return ret;
         }
         return new HashSet<Region>();
+    }
+
+    @Override
+    public Optional<Region> get(String name) {
+        UUID id = nameToUid.get(name.toLowerCase());
+        if (id != null)
+            return Optional.fromNullable(uidToRegion.get(id));
+        else
+            return Optional.absent();
     }
 
 }

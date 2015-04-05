@@ -77,6 +77,16 @@ public class AxisAlignedBoundingBox implements CuboidBoundingBox {
     }
 
     @Override
+    public boolean encompasses(BoundingBox other) {
+        for (Integer[] vertex : other.getVertices()) {
+            if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public int getMinX() {
         return minX;
     }

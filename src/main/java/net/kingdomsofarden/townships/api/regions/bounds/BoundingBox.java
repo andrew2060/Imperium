@@ -40,4 +40,10 @@ public interface BoundingBox {
      * @return The world containing this bounding box
      */
     World getWorld();
+
+    /**
+     * @param other The other bounding box to check
+     * @return True if this bounding box completely encompasses the other
+     */
+    boolean encompasses(BoundingBox other);
 }

@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class QuadrantBoundCollection extends RegionBoundCollection {
 
@@ -63,9 +64,11 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override
     public Collection<Citizen> getCitizensInArea() {
-        HashSet s = new HashSet<Citizen>();
+        HashSet<Citizen> s = new HashSet<Citizen>();
         for (RegionBoundCollection col : subRegions) {
-            Collections.addAll(s, col.getCitizensInArea());
+            for (Citizen c : col.getCitizensInArea()) {
+                s.add(c);
+            }
         }
         return s;
     }
@@ -107,7 +110,6 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         for (RegionBoundCollection c : subRegions) {
             c.constructContainedRegions(regions);
         }
-        return;
     }
 
     @Override
@@ -130,7 +132,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox b, HashSet<Region> col) {
+    public void getIntersectingRegions(BoundingBox b, TreeSet<Region> col) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
