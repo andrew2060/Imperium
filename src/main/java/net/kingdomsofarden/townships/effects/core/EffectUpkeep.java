@@ -107,7 +107,7 @@ public class EffectUpkeep extends EffectPeriodic {
 
     @Override
     public String getName() {
-        return "Upkeep";
+        return "upkeep";
     }
 
     @Override

@@ -169,28 +169,45 @@ public class CommandCreateRegion implements Command {
             }
         }
         // Check region dependency requirements
-        Map<String, Integer> regionTypeReq;
-        Map<Integer, Integer> regionTierReq;
+        Map<String, Integer> regionTypeMinReq;
+        Map<Integer, Integer> regionTierMinReq;
+        Map<String, Integer> regionTypeMaxReq;
+        Map<Integer, Integer> regionTierMaxReq;
         Set<Integer> excludeTiers;
         Set<String> excludeTypes;
         boolean excludeAll;
         try {
-            regionTypeReq = new HashMap<String, Integer>();
-            regionTierReq = new HashMap<Integer, Integer>();
+            regionTypeMinReq = new HashMap<String, Integer>();
+            regionTierMinReq = new HashMap<Integer, Integer>();
+            regionTypeMaxReq = new HashMap<String, Integer>();
+            regionTierMaxReq = new HashMap<Integer, Integer>();
             excludeTiers = new HashSet<Integer>();
             excludeTypes = new HashSet<String>();
-            StoredDataSection regionReqSection = requirements.getSection("region-types");
+            StoredDataSection regionReqSection = requirements.getSection("region-types-min");
             for (String type : regionReqSection.getKeys(false)) {
                 int amt = regionReqSection.get(type, intSerializer, 0);
                 if (amt > 0) {
-                    regionTypeReq.put(type.toLowerCase(), amt);
+                    regionTypeMinReq.put(type.toLowerCase(), amt);
                 }
             }
-            StoredDataSection tierReqSection = requirements.getSection("region-tiers");
+            StoredDataSection tierReqSection = requirements.getSection("region-tiers-min");
             for (String tierNum : tierReqSection.getKeys(false)) {
                 int tier = Integer.parseInt(tierNum);
                 int arg = regionReqSection.get(tierNum, intSerializer, 0);
-                regionTierReq.put(tier, arg);
+                regionTierMinReq.put(tier, arg);
+            }
+            StoredDataSection maxRegionReqSection = requirements.getSection("region-types-max");
+            for (String type : maxRegionReqSection.getKeys(false)) {
+                int amt = maxRegionReqSection.get(type, intSerializer, 0);
+                if (amt > 0) {
+                    regionTypeMaxReq.put(type.toLowerCase(), amt);
+                }
+            }
+            StoredDataSection maxTierReqSection = requirements.getSection("region-tiers-max");
+            for (String tierNum : maxTierReqSection.getKeys(false)) {
+                int tier = Integer.parseInt(tierNum);
+                int arg = maxTierReqSection.get(tierNum, intSerializer, 0);
+                regionTierMaxReq.put(tier, arg);
             }
             StoredDataSection excludeSection = requirements.getSection("exclude");
             excludeAll = Boolean.valueOf(excludeSection.get("all", "false"));
@@ -219,20 +236,30 @@ public class CommandCreateRegion implements Command {
                 Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_GENERAL);
                 return true;
             }
-            if (regionTypeReq.containsKey(type)) {
-                int amt = regionTypeReq.get(type) - 1;
+            if (regionTypeMinReq.containsKey(type)) {
+                int amt = regionTypeMinReq.get(type) - 1;
                 if (amt > 0) {
-                    regionTypeReq.put(type.toLowerCase(), amt);
+                    regionTypeMinReq.put(type.toLowerCase(), amt);
                 } else {
-                    regionTypeReq.remove(type);
+                    regionTypeMinReq.remove(type);
                 }
             }
-            if (regionTierReq.containsKey(tier)) {
-                int amt = regionTierReq.get(tier) - 1;
-                if (amt > 0) {
-                    regionTierReq.put(tier, amt);
+            if (regionTypeMaxReq.containsKey(type)) {
+                int amt = regionTypeMinReq.get(type) - 1;
+                if (amt < 0) {
+                    Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TYPE);
+                    return true;
                 } else {
-                    regionTierReq.remove(tier);
+                    regionTypeMaxReq.put(type.toLowerCase(), amt);
+                }
+            }
+            if (regionTierMinReq.containsKey(tier)) {
+                int amt = regionTierMinReq.get(tier) - 1;
+                if (amt < 0) {
+                    Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TYPE);
+                    return true;
+                } else {
+                    regionTierMaxReq.put(tier, amt);
                 }
             }
             if (tier < regionTier && !selection.encompasses(region.getBounds())) {
@@ -243,11 +270,11 @@ public class CommandCreateRegion implements Command {
                 return true;
             }
         }
-        if (!regionTypeReq.isEmpty()) {
+        if (!regionTypeMinReq.isEmpty()) {
             Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_REGION_TYPE);
             return true;
         }
-        if (!regionTierReq.isEmpty()) {
+        if (!regionTierMinReq.isEmpty()) {
             Messaging.sendFormattedMessage(sender, I18N.INSUFFICIENT_REQUIREMENT_REGION_TIER);
             return true;
         }
