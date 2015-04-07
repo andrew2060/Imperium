@@ -4,6 +4,7 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
+import net.kingdomsofarden.townships.api.regions.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
@@ -27,13 +28,39 @@ public class EffectUpkeep extends EffectPeriodic {
 
     @Override
     public long onTick(Region region, long time) {
-        if (cost > 0 /*&& !region.getEconomyProvider().withdraw(cost)*/) {
-            RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.UPKEEP);
-            Bukkit.getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
-                Townships.getRegions().remove(region);
+        Collection<EconomyProvider> econProviders = region.getEconomyProviders();
+        if (cost > 0) {
+            double amt = cost;
+            for (EconomyProvider provider : econProviders) {
+                amt -= provider.getBalance();
+                if (amt <= 0) {
+                    break;
+                }
             }
-            return Long.MAX_VALUE; // Safety in case not properly removed
+            if (amt > 0) {
+                RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.UPKEEP);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    Townships.getRegions().remove(region);
+                }
+                return Long.MAX_VALUE; // Safety in case not properly removed
+            } else {
+                amt = cost;
+                for (EconomyProvider provider : econProviders) {
+                    double bal = provider.getBalance();
+                    double withdraw;
+                    if (bal >= amt) {
+                        withdraw = amt;
+                    } else {
+                        withdraw = bal;
+                    }
+                    provider.withdraw(withdraw);
+                    amt -= withdraw;
+                    if (amt <= 0) {
+                        break;
+                    }
+                }
+            }
         }
         Collection<ResourceProvider> resourceProviders = region.getResourceProviders();
 
