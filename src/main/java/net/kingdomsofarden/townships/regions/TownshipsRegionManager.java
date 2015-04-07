@@ -124,6 +124,7 @@ public class TownshipsRegionManager implements RegionManager {
         }
         plugin.getStorage().removeRegion(id);
         UUID world = r.getBounds().getWorld().getUID();
+        r.setValid(false);
         return maps.containsKey(world) && maps.get(world).remove(r);
     }
 

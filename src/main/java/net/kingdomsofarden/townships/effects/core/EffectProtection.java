@@ -19,9 +19,6 @@ public class EffectProtection implements Effect {
         this.region = region;
     }
 
-
-
-
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = null;

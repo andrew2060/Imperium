@@ -8,8 +8,10 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
+import net.kingdomsofarden.townships.api.regions.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
@@ -48,8 +50,11 @@ public class TownshipsRegion implements Region {
     private Collection<Area> containingAreas;
     private String type;
 
+    private boolean valid;
+
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
+        valid = true;
         containingAreas = new LinkedList<Area>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
@@ -210,5 +215,25 @@ public class TownshipsRegion implements Region {
             }
         }
         return false;
+    }
+
+    @Override
+    public Collection<EconomyProvider> getEconomyProviders() {
+        return null; //TODO
+    }
+
+    @Override
+    public Collection<ResourceProvider> getResourceProviders() {
+        return null;
+    }
+
+    @Override
+    public boolean isValid() {
+        return valid;
+    }
+
+    @Override
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 }

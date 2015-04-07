@@ -85,6 +85,9 @@ public class EffectTaskManager implements Runnable {
         EffectTask task;
         while (stack != null && (task = stack.pollLast()) != null) {
             task.tick();
+            if (task.isReschedulable()) {
+                cooldownHeap.add(task);
+            }
         }
         if (stack != null) {
             percolateUp(stack.getPosition());
