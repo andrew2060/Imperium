@@ -6,6 +6,7 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
@@ -112,4 +113,21 @@ public interface Region {
     boolean isValid();
 
     void setValid(boolean valid);
+
+    /**
+     * @return A collection of parent regions that encompass this region
+     */
+    Collection<Region> getParents();
+
+    /**
+     * @return A collection of child regions that are encompassed by this region
+     */
+    Collection<Region> getChildren();
+
+    /**
+     * @param region The region to check
+     * @return Whether the given region is compatible (i.e. satisfies tier/type restrictions, amongst others) as a
+     * parent/child of this region
+     */
+    boolean isCompatible(Region region);
 }

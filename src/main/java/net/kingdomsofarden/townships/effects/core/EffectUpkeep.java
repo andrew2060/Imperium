@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
-import net.kingdomsofarden.townships.api.regions.EconomyProvider;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;

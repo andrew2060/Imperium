@@ -113,10 +113,10 @@ public class CommandCreateRegion implements Command {
         int regionTier = data.get("tier", intSerializer, Integer.MIN_VALUE);
         Set<RoleGroup> effectiveGroups = new HashSet<RoleGroup>();
         boolean hasAccess = false;
-        for (Region parent : intersections) {
-            if (parent.getTier() >= regionTier) {
-                effectiveGroups.addAll(parent.getRoles(c));
-                if (parent.hasAccess(c, AccessType.ZONING, effectiveGroups)) {
+        for (Region intersect : intersections) {
+            if (intersect.getTier() >= regionTier && !hasAccess) {
+                effectiveGroups.addAll(intersect.getRoles(c));
+                if (intersect.hasAccess(c, AccessType.ZONING, effectiveGroups)) {
                     hasAccess = true;
                     break;
                 }
@@ -286,6 +286,12 @@ public class CommandCreateRegion implements Command {
         data.set("position-1", selection.getLoc1());
         data.set("position-2", selection.getLoc2());
         Region created = new TownshipsRegion(createdId, data); // TODO grant administrative rights
+        for (Region intersect : intersections) {
+            if (!intersect.isCompatible(created)) {
+                Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_GENERAL);
+                return true;
+            }
+        }
         RegionCreateEvent e = new RegionCreateEvent(c, created);
         Bukkit.getPluginManager().callEvent(e);
         if (!e.isCancelled()) {

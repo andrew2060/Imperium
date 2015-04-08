@@ -8,9 +8,9 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -21,11 +21,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class TownshipsRegion implements Region {
@@ -40,6 +42,9 @@ public class TownshipsRegion implements Region {
     private HashMultimap<UUID, AccessType> accessByCitizenUid;
     private HashMultimap<RoleGroup, AccessType> accessByRole;
 
+    private Map<String, Integer> maxTypeInRegion;
+    private Map<Integer, Integer> maxTierInRegion;
+
     private Map<String, Effect> effects;
 
     private RegionBoundingBox bounds;
@@ -50,9 +55,13 @@ public class TownshipsRegion implements Region {
     private Collection<Area> containingAreas;
     private String type;
 
+    private TreeSet<Region> parents;
+    private TreeSet<Region> children;
+
     private boolean valid;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
+
         // Set up basic data structures
         valid = true;
         containingAreas = new LinkedList<Area>();
@@ -60,6 +69,19 @@ public class TownshipsRegion implements Region {
         citizenUidsByRole = HashMultimap.create();
         accessByCitizenUid = HashMultimap.create();
         accessByRole = HashMultimap.create();
+        Comparator<Region> regionComparator = new Comparator<Region>() {
+            @Override
+            public int compare(Region o1, Region o2) {
+                int ret = o2.getTier() - o1.getTier();
+                if (ret == 0) {
+                    return o1.getUid().compareTo(o2.getUid());
+                } else {
+                    return ret;
+                }
+            }
+        };
+        parents = new TreeSet<Region>(regionComparator);
+        children = new TreeSet<Region>(regionComparator);
         // Populate region identifier data
         regionUid = rId;
         name = config.get("name", null);
@@ -235,5 +257,34 @@ public class TownshipsRegion implements Region {
     @Override
     public void setValid(boolean valid) {
         this.valid = valid;
+    }
+
+    @Override
+    public Collection<Region> getParents() {
+        return parents;
+    }
+
+    @Override
+    public Collection<Region> getChildren() {
+        return children;
+    }
+
+    @Override
+    public boolean isCompatible(Region child) {
+        String type = child.getType().toLowerCase();
+        int tier = child.getTier();
+        boolean careType = maxTypeInRegion.containsKey(type);
+        int amtType = maxTypeInRegion.get(type);
+        boolean careTier = maxTierInRegion.containsKey(tier);
+        int amtTier = maxTierInRegion.get(tier);
+        for (Region r : getChildren()) {
+            if (careTier && r.getTier() == tier) {
+                amtTier--;
+            }
+            if (careType && r.getType().equalsIgnoreCase(type)) {
+                amtType--;
+            }
+        }
+        return !(amtTier <= 0 || amtType <= 0);
     }
 }
