@@ -12,7 +12,6 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
-import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
@@ -21,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -59,8 +59,8 @@ public class TownshipsRegion implements Region {
     private TreeSet<Region> parents;
     private TreeSet<Region> children;
 
-    private TreeSet<EconomyProvider> economyProviders;
-    private TreeSet<ItemProvider> itemProviders;
+    private EconomyProvider[] economyProviders;
+    private ItemProvider[] itemProviders;
 
     private boolean valid;
 
@@ -145,19 +145,8 @@ public class TownshipsRegion implements Region {
             int arg = maxTierReqSection.get(tierNum, intSerializer, 0);
             maxTierInRegion.put(tier, arg);
         }
-        Comparator<ResourceProvider> resourceComparator = new Comparator<ResourceProvider>() {
-            @Override
-            public int compare(ResourceProvider o1, ResourceProvider o2) {
-                int ret = o2.getPriority() - o1.getPriority();
-                if (ret == 0) {
-                    return o2.getName().compareTo(o1.getName());
-                }
-                return ret;
-            }
-        };
-        economyProviders = new TreeSet<EconomyProvider>(resourceComparator);
-        itemProviders = new TreeSet<ItemProvider>(resourceComparator);
-
+        economyProviders = new EconomyProvider[0];
+        itemProviders = new ItemProvider[0];
     }
 
     @Override
@@ -272,12 +261,71 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public Collection<EconomyProvider> getEconomyProviders() {
+    public void addEconomyProvider(EconomyProvider provider) {
+        economyProviders = Arrays.copyOf(economyProviders, economyProviders.length + 1);
+        economyProviders[economyProviders.length - 1] = provider;
+        int i = economyProviders.length - 2;
+        while (i > 0) {
+            if (provider.getPriority() > economyProviders[i].getPriority()) {
+                economyProviders[i + 1] = economyProviders[i];
+                economyProviders[i] = provider;
+                i--;
+            } else {
+                break;
+            }
+        }
+    }
+    @Override
+    public void addItemProvider(ItemProvider provider) {
+        itemProviders = Arrays.copyOf(itemProviders, itemProviders.length + 1);
+        itemProviders[itemProviders.length - 1] = provider;
+        int i = itemProviders.length - 2;
+        while (i > 0) {
+            if (provider.getPriority() > itemProviders[i].getPriority()) {
+                itemProviders[i + 1] = itemProviders[i];
+                itemProviders[i] = provider;
+                i--;
+            } else {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void removeEconomyProvider(EconomyProvider provider) {
+        EconomyProvider[] temp = new EconomyProvider[economyProviders.length - 1];
+        for (int i = 0, offset = 0; i < economyProviders.length; i++) {
+            if (economyProviders[i].equals(provider)) {
+                offset++;
+            } else {
+                temp[i - offset] = economyProviders[i];
+            }
+            economyProviders[i] = null;
+        }
+        economyProviders = temp;
+    }
+
+    @Override
+    public void removeItemProvider(ItemProvider provider) {
+        ItemProvider[] temp = new ItemProvider[itemProviders.length - 1];
+        for (int i = 0, offset = 0; i < itemProviders.length; i++) {
+            if (itemProviders[i].equals(provider)) {
+                offset++;
+            } else {
+                temp[i - offset] = itemProviders[i];
+            }
+            itemProviders[i] = null;
+        }
+        itemProviders = temp;
+    }
+
+    @Override
+    public EconomyProvider[] getEconomyProviders() {
         return economyProviders;
     }
 
     @Override
-    public Collection<ItemProvider> getItemProviders() {
+    public ItemProvider[] getItemProviders() {
         return itemProviders;
     }
 

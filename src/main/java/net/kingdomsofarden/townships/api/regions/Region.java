@@ -101,9 +101,17 @@ public interface Region {
      */
     boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups);
 
-    Collection<EconomyProvider> getEconomyProviders();
+    void addEconomyProvider(EconomyProvider provider);
 
-    Collection<ItemProvider> getItemProviders();
+    void addItemProvider(ItemProvider provider);
+
+    void removeEconomyProvider(EconomyProvider provider);
+
+    void removeItemProvider(ItemProvider provider);
+
+    EconomyProvider[] getEconomyProviders();
+
+    ItemProvider[] getItemProviders();
 
     /**
      * @return The region's validity, i.e. whether it is currently considered a valid region (may not be true if, for
