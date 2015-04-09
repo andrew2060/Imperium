@@ -6,7 +6,7 @@ import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.resources.ResourceProvider;
+import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
@@ -62,13 +62,13 @@ public class EffectUpkeep extends EffectPeriodic {
                 }
             }
         }
-        Collection<ResourceProvider> resourceProviders = region.getResourceProviders();
+        Collection<ItemProvider> itemProviders = region.getItemProviders();
 
         if (!resources.isEmpty()) {
             boolean hasAll = true;
             for (Entry<Material, Integer> entry : resources.entrySet()) {
                 int amt = entry.getValue();
-                for (ResourceProvider provider : resourceProviders) {
+                for (ItemProvider provider : itemProviders) {
                     amt -= provider.getAmount(entry.getKey());
                     if (amt <= 0) {
                         break;
@@ -91,7 +91,7 @@ public class EffectUpkeep extends EffectPeriodic {
             } else {
                 for (Entry<Material, Integer> entry : resources.entrySet()) {
                     int amt = entry.getValue();
-                    for (ResourceProvider provider : resourceProviders) {
+                    for (ItemProvider provider : itemProviders) {
                         amt -= provider.remove(entry.getKey(), amt);
                         if (amt <= 0) {
                             break;

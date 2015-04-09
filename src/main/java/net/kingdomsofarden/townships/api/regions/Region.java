@@ -7,7 +7,7 @@ import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
-import net.kingdomsofarden.townships.api.resources.ResourceProvider;
+import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
@@ -103,7 +103,7 @@ public interface Region {
 
     Collection<EconomyProvider> getEconomyProviders();
 
-    Collection<ResourceProvider> getResourceProviders();
+    Collection<ItemProvider> getItemProviders();
 
     /**
      * @return The region's validity, i.e. whether it is currently considered a valid region (may not be true if, for

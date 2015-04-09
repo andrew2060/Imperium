@@ -11,6 +11,7 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
+import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.resources.ResourceProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -58,10 +59,12 @@ public class TownshipsRegion implements Region {
     private TreeSet<Region> parents;
     private TreeSet<Region> children;
 
+    private TreeSet<EconomyProvider> economyProviders;
+    private TreeSet<ItemProvider> itemProviders;
+
     private boolean valid;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
-
         // Set up basic data structures
         valid = true;
         containingAreas = new LinkedList<Area>();
@@ -69,6 +72,8 @@ public class TownshipsRegion implements Region {
         citizenUidsByRole = HashMultimap.create();
         accessByCitizenUid = HashMultimap.create();
         accessByRole = HashMultimap.create();
+        maxTypeInRegion = new HashMap<String, Integer>();
+        maxTierInRegion = new HashMap<Integer, Integer>();
         Comparator<Region> regionComparator = new Comparator<Region>() {
             @Override
             public int compare(Region o1, Region o2) {
@@ -126,6 +131,33 @@ public class TownshipsRegion implements Region {
             Effect e = Townships.getEffectManager().loadEffect(eName, this, effectSection.getSection(eName));
             effects.put(eName.toLowerCase(), e);
         }
+        StoredDataSection requirements = config.getSection("requirements");
+        StoredDataSection maxRegionReqSection = requirements.getSection("region-types-max");
+        for (String type : maxRegionReqSection.getKeys(false)) {
+            int amt = maxRegionReqSection.get(type, intSerializer, 0);
+            if (amt > 0) {
+                maxTypeInRegion.put(type.toLowerCase(), amt);
+            }
+        }
+        StoredDataSection maxTierReqSection = requirements.getSection("region-tiers-max");
+        for (String tierNum : maxTierReqSection.getKeys(false)) {
+            int tier = Integer.parseInt(tierNum);
+            int arg = maxTierReqSection.get(tierNum, intSerializer, 0);
+            maxTierInRegion.put(tier, arg);
+        }
+        Comparator<ResourceProvider> resourceComparator = new Comparator<ResourceProvider>() {
+            @Override
+            public int compare(ResourceProvider o1, ResourceProvider o2) {
+                int ret = o2.getPriority() - o1.getPriority();
+                if (ret == 0) {
+                    return o2.getName().compareTo(o1.getName());
+                }
+                return ret;
+            }
+        };
+        economyProviders = new TreeSet<EconomyProvider>(resourceComparator);
+        itemProviders = new TreeSet<ItemProvider>(resourceComparator);
+
     }
 
     @Override
@@ -241,12 +273,12 @@ public class TownshipsRegion implements Region {
 
     @Override
     public Collection<EconomyProvider> getEconomyProviders() {
-        return null; //TODO
+        return economyProviders;
     }
 
     @Override
-    public Collection<ResourceProvider> getResourceProviders() {
-        return null;
+    public Collection<ItemProvider> getItemProviders() {
+        return itemProviders;
     }
 
     @Override
