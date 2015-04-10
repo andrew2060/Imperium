@@ -14,18 +14,12 @@ import java.util.Map.Entry;
 
 public class PhysicalChestItemProvider implements ItemProvider {
 
-
-    private Location location;
-    private int priority;
-
-    public PhysicalChestItemProvider(Location location, int priority) {
-        this.location = location;
-        this.priority = priority;
-    }
+    protected Location chestLocation;
+    protected int priority;
 
     @Override
     public int getAmount(Material mat) {
-        Block b = location.getBlock();
+        Block b = chestLocation.getBlock();
         Chest chest;
         if (b.getType() == Material.CHEST) {
             chest = (Chest) b.getState();
@@ -41,7 +35,7 @@ public class PhysicalChestItemProvider implements ItemProvider {
 
     @Override
     public int remove(Material mat, int max) {
-        Block b = location.getBlock();
+        Block b = chestLocation.getBlock();
         Chest chest;
         if (b.getType() == Material.CHEST) {
             chest = (Chest) b.getState();
