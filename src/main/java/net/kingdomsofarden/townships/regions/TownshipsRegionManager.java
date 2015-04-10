@@ -88,12 +88,19 @@ public class TownshipsRegionManager implements RegionManager {
         }
         World world = region.getBounds().getWorld();
         UUID wUid = world.getUID();
-        if (maps.containsKey(wUid)) {
-            return maps.get(wUid).add(region);
-        } else {
+        boolean ret;
+        if (!maps.containsKey(wUid)) {
             maps.put(wUid, new AxisBoundCollection(world, true));
-            return maps.get(wUid).add(region);
         }
+        ret =  maps.get(wUid).add(region);
+        for (Region r : getIntersectingRegions(region.getBounds())) {
+            if (r.getTier() > region.getTier()) {
+                r.getChildren().add(region);
+            } else if (r.getTier() < region.getTier()) {
+                r.getParents().add(region);
+            }
+        }
+        return ret;
     }
 
     @Override
@@ -125,7 +132,17 @@ public class TownshipsRegionManager implements RegionManager {
         plugin.getStorage().removeRegion(id);
         UUID world = r.getBounds().getWorld().getUID();
         r.setValid(false);
-        return maps.containsKey(world) && maps.get(world).remove(r);
+        boolean ret = maps.containsKey(world) && maps.get(world).remove(r);
+        if (ret) {
+            for (Region region : getIntersectingRegions(r.getBounds())) {
+                if (region.getTier() > r.getTier()) {
+                    region.getChildren().remove(r);
+                } else if (region.getTier() < r.getTier()) {
+                    region.getParents().remove(r);
+                }
+            }
+        }
+        return ret;
     }
 
     @Override

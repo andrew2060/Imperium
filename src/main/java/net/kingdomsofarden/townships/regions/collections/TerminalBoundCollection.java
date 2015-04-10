@@ -108,10 +108,10 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         if(contents.remove(o)) {
             if (o instanceof Region) {
                 TownshipsRegion r = (TownshipsRegion) o;
-                r.getBoundingAreas().add(this);
+                r.getBoundingAreas().remove(this);
             } else if (o instanceof RegionBoundingBox) {
                 TownshipsRegion r = (TownshipsRegion) ((RegionBoundingBox) o).getRegion();
-                r.getBoundingAreas().add(this);
+                r.getBoundingAreas().remove(this);
             }
             return true;
         } else {
