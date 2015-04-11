@@ -8,13 +8,13 @@ import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.resources.PhysicalChestItemProvider;
 import net.kingdomsofarden.townships.util.LocationSerializer;
 
-public class EffectResourceChest extends PhysicalChestItemProvider implements Effect {
+public class EffectPhysicalItemChest extends PhysicalChestItemProvider implements Effect {
 
     private Region region;
 
     @Override
     public String getName() {
-        return "resource-chest";
+        return "physical-resource-chest";
     }
 
     @Override
