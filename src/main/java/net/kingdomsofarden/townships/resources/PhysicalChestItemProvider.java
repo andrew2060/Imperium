@@ -19,6 +19,9 @@ public class PhysicalChestItemProvider implements ItemProvider {
 
     @Override
     public int getAmount(Material mat) {
+        if (chestLocation == null) {
+            return 0;
+        }
         Block b = chestLocation.getBlock();
         Chest chest;
         if (b.getType() == Material.CHEST) {
@@ -35,6 +38,9 @@ public class PhysicalChestItemProvider implements ItemProvider {
 
     @Override
     public int remove(Material mat, int max) {
+        if (chestLocation == null) {
+            return 0;
+        }
         Block b = chestLocation.getBlock();
         Chest chest;
         if (b.getType() == Material.CHEST) {
