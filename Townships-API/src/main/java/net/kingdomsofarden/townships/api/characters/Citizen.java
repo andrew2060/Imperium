@@ -1,13 +1,17 @@
 package net.kingdomsofarden.townships.api.characters;
 
+import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
 import java.util.UUID;
 
 public interface Citizen {
+
+    StoredDataSection getStoredEffectSettings(Effect effect);
 
     /**
      * @param region The region to get roles for

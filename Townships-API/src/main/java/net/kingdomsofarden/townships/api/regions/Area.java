@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  * <p>Represents an Area of a given world with upper/lower x/z bounds. Depending on implementation,
@@ -35,7 +36,7 @@ public interface Area extends Collection<Region> {
      * @return A collection of regions within this region bound collection that contain the parameter
      * x/y/z coordinates in their bounding box, sorted in descending tier order
      */
-    Collection<Region> getBoundingRegions(int x, int y, int z);
+    TreeSet<Region> getBoundingRegions(int x, int y, int z);
 
     /**
      * Utility method to check whether a given location is within the bounds tracked by this collection

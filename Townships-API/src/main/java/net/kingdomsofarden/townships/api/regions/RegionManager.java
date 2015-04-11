@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
 import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.TreeSet;
 import java.util.UUID;
 
 
@@ -13,7 +14,7 @@ public interface RegionManager extends Collection<Region> {
      * @param loc The location to check
      * @return A Collection of Regions that bound (contain) the given location
      */
-    Collection<Region> getBoundingRegions(Location loc);
+    TreeSet<Region> getBoundingRegions(Location loc);
 
     /**
      * @param loc The location to check
@@ -25,7 +26,7 @@ public interface RegionManager extends Collection<Region> {
      * @param bounds The bounds to check
      * @return A collection of all regions that intersect this bounding box in some way
      */
-    Collection<Region> getIntersectingRegions(BoundingBox bounds);
+    TreeSet<Region> getIntersectingRegions(BoundingBox bounds);
 
     /**
      * @param name The name of the region, non case-sensitive

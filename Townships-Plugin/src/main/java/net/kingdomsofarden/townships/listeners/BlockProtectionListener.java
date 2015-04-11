@@ -4,7 +4,6 @@ import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
@@ -19,8 +18,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 public class BlockProtectionListener implements Listener {
 
@@ -31,17 +29,8 @@ public class BlockProtectionListener implements Listener {
     }
 
 
-    private boolean hasAccess(Collection<Region> boundingRegions, Citizen c, AccessType access) {
-        HashSet<RoleGroup> effectiveRoles = new HashSet<RoleGroup>();
-        for (Region region : boundingRegions) {
-            effectiveRoles.addAll(region.getRoles(c));
-            if (region.hasEffect("protection")) {
-                if (region.hasAccess(c, access, effectiveRoles)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private boolean hasAccess(TreeSet<Region> boundingRegions, Citizen c, AccessType access) {
+        return boundingRegions.last().hasAccess(c, access);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -49,7 +38,7 @@ public class BlockProtectionListener implements Listener {
         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
             Block b = event.getClickedBlock();
             if (Constants.ACCESS_TYPES.contains(b.getType())) {
-                Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
+                TreeSet<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
                 if (!hasAccess(boundingRegions, c, AccessType.ACCESS)) {
                     event.setCancelled(true);
@@ -57,7 +46,7 @@ public class BlockProtectionListener implements Listener {
                 }
             } else if (Constants.INTERACT_TYPES.contains(b.getType())
                     || (Constants.PROTECT_FIRE && event.getItem() != null && event.getItem().getType().equals(Material.FLINT_AND_STEEL))) {
-                Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
+                TreeSet<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getClickedBlock().getLocation());
                 Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
                 if (!hasAccess(boundingRegions, c, AccessType.INTERACT)) {
                     event.setCancelled(true);
@@ -69,7 +58,7 @@ public class BlockProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
+        TreeSet<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         if (!hasAccess(boundingRegions, c, AccessType.CONSTRUCT)) {
             event.setCancelled(true);
@@ -79,7 +68,7 @@ public class BlockProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        Collection<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
+        TreeSet<Region> boundingRegions = plugin.getRegions().getBoundingRegions(event.getBlock().getLocation());
         Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         if (!hasAccess(boundingRegions, c, AccessType.CONSTRUCT)) {
             event.setCancelled(true);

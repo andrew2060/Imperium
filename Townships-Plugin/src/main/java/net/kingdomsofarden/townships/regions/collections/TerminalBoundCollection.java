@@ -44,8 +44,8 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public Collection<Region> getBoundingRegions(int x, int y, int z) {
-        Collection<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
+    public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
+        TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
             @Override
             public int compare(Region o1, Region o2) {
                 int ret = o2.getTier() - o1.getTier();

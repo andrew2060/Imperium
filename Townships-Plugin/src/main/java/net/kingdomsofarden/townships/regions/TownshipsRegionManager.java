@@ -16,9 +16,7 @@ import org.bukkit.World;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -191,12 +189,12 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override
-    public Collection<Region> getBoundingRegions(Location loc) {
+    public TreeSet<Region> getBoundingRegions(Location loc) {
         UUID world = loc.getWorld().getUID();
         if (maps.containsKey(world)) {
             return maps.get(world).getBoundingRegions(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
         } else {
-            return new LinkedList<Region>();
+            return new TreeSet<Region>();
         }
     }
 
@@ -207,7 +205,7 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override
-    public Collection<Region> getIntersectingRegions(BoundingBox bounds) {
+    public TreeSet<Region> getIntersectingRegions(BoundingBox bounds) {
         UUID world = bounds.getWorld().getUID();
         if (maps.containsKey(world)) {
             TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
@@ -224,7 +222,7 @@ public class TownshipsRegionManager implements RegionManager {
             maps.get(world).getIntersectingRegions(bounds, ret);
             return ret;
         }
-        return new HashSet<Region>();
+        return new TreeSet<Region>();
     }
 
     @Override

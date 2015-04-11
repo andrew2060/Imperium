@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -240,7 +239,7 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups) { // TODO further investigate if not n^2 algorithm is possible
+    public boolean hasAccess(Citizen citizen, AccessType type) { // TODO further investigate if not n^2 algorithm is possible
         if (citizen.isRoot()) {
             return true;
         } else {
@@ -249,12 +248,31 @@ public class TownshipsRegion implements Region {
                     return true;
                 }
             }
-            for (RoleGroup group : effectiveGroups) {
-                for (AccessType access :accessByRole.get(group)) {
+            HashSet<RoleGroup> effective = new HashSet<RoleGroup>();
+            for (Region r : parents) {
+                effective.addAll(r.getRoles(citizen));
+                for (RoleGroup group : effective) {
+                    if (r.hasAccess(group, type)) {
+                        return true;
+                    }
+                }
+            }
+            for (RoleGroup group : effective) {
+                for (AccessType access : accessByRole.get(group)) {
                     if (access.hasAccess(type)) {
                         return true;
                     }
                 }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasAccess(RoleGroup group, AccessType type) {
+        for (AccessType access : accessByRole.get(group)) {
+            if (access.hasAccess(type)) {
+                return true;
             }
         }
         return false;
@@ -367,4 +385,5 @@ public class TownshipsRegion implements Region {
         }
         return !(amtTier <= 0 || amtType <= 0);
     }
+
 }

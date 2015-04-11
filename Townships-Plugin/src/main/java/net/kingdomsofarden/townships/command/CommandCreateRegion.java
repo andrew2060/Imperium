@@ -6,7 +6,6 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.events.RegionCreateEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -22,11 +21,11 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -108,21 +107,10 @@ public class CommandCreateRegion implements Command {
             return true;
         }
         // Check region permissions
-        Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
+        TreeSet<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
         Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
         int regionTier = data.get("tier", intSerializer, Integer.MIN_VALUE);
-        Set<RoleGroup> effectiveGroups = new HashSet<RoleGroup>();
-        boolean hasAccess = false;
-        for (Region intersect : intersections) {
-            if (intersect.getTier() >= regionTier && !hasAccess) {
-                effectiveGroups.addAll(intersect.getRoles(c));
-                if (intersect.hasAccess(c, AccessType.ZONING, effectiveGroups)) {
-                    hasAccess = true;
-                    break;
-                }
-            }
-        }
-        if (!hasAccess) {
+        if (!intersections.last().hasAccess(c, AccessType.ZONING)) {
             Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_ZONING);
             return true;
         }

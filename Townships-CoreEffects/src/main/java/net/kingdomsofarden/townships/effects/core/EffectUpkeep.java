@@ -4,8 +4,8 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
-import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -13,7 +13,6 @@ import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class EffectUpkeep extends EffectPeriodic {
 
     @Override
     public long onTick(Region region, long time) {
-        Collection<EconomyProvider> econProviders = region.getEconomyProviders();
+        EconomyProvider[] econProviders = region.getEconomyProviders();
         if (cost > 0) {
             double amt = cost;
             for (EconomyProvider provider : econProviders) {
@@ -62,8 +61,7 @@ public class EffectUpkeep extends EffectPeriodic {
                 }
             }
         }
-        Collection<ItemProvider> itemProviders = region.getItemProviders();
-
+        ItemProvider[] itemProviders = region.getItemProviders();
         if (!resources.isEmpty()) {
             boolean hasAll = true;
             for (Entry<Material, Integer> entry : resources.entrySet()) {

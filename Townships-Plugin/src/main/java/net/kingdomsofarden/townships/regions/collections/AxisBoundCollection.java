@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -242,10 +241,10 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
 
     @Override
-    public Collection<Region> getBoundingRegions(int x, int y, int z) {
+    public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
         RegionBoundCollection ret = get(x, z);
         if (ret == null) {
-            return new LinkedList<Region>();
+            return new TreeSet<Region>();
         } else {
             return ret.getBoundingRegions(x, y, z);
         }

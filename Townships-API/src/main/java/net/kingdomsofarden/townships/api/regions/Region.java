@@ -11,7 +11,6 @@ import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -94,12 +93,17 @@ public interface Region {
 
     /**
      * @param citizen The citizen to check
-     * @param type The type of access type to check for
-     * @param effectiveGroups A (non-null) set of all effective groups possessed by this citizen prior to the check for
-     *                        this region (i.e. from parent regions)
+     * @param type The type of access to check for
      * @return true if the citizen has the given or compatible access type
      */
-    boolean hasAccess(Citizen citizen, AccessType type, Set<RoleGroup> effectiveGroups);
+    boolean hasAccess(Citizen citizen, AccessType type);
+
+    /**
+     * @param group The group to check
+     * @param type The type of access to check for
+     * @return true if the group has the given or compatible access type
+     */
+    boolean hasAccess(RoleGroup group, AccessType type);
 
     void addEconomyProvider(EconomyProvider provider);
 

@@ -11,7 +11,6 @@ import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
 import org.bukkit.World;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -44,20 +43,20 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public Collection<Region> getBoundingRegions(int x, int y, int z) {
+    public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
         boolean upperHalf = z > zDivisor;
         boolean leftHalf = x <= xDivisor;
         if (leftHalf) {
             if (upperHalf) {
-                return subRegions[0] != null ? subRegions[0].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
+                return subRegions[0] != null ? subRegions[0].getBoundingRegions(x, y, z) : new TreeSet<Region>();
             } else {
-                return subRegions[2] != null ? subRegions[2].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
+                return subRegions[2] != null ? subRegions[2].getBoundingRegions(x, y, z) : new TreeSet<Region>();
             }
         } else {
             if (upperHalf) {
-                return subRegions[1] != null ? subRegions[1].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
+                return subRegions[1] != null ? subRegions[1].getBoundingRegions(x, y, z) : new TreeSet<Region>();
             } else {
-                return subRegions[3] != null ? subRegions[3].getBoundingRegions(x, y, z) : Collections.<Region>emptyList();
+                return subRegions[3] != null ? subRegions[3].getBoundingRegions(x, y, z) : new TreeSet<Region>();
             }
         }
     }
