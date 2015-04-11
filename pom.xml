@@ -5,8 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.kingdomsofarden</groupId>
-    <artifactId>Townships</artifactId>
+    <artifactId>Townships-Parent</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <repositories>
         <repository>
@@ -15,9 +16,12 @@
         </repository>
     </repositories>
 
+    <modules>
+        <module>Townships-API</module>
+        <module>Townships-Plugin</module>
+        <module>Townships-CoreEffects</module>
+    </modules>
     <build>
-        <defaultGoal>clean install</defaultGoal>
-        <finalName>Townships</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -36,32 +40,6 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.8-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>1.4.9</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.4.9</version>
-            <type>jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -6,36 +6,40 @@ import java.util.HashSet;
 /**
  * Types of access available to a given region
  */
-public enum AccessType implements Comparable<AccessType> {
+public final class AccessType {
 
     /**
      * Block Access: Build/Break Blocks - will automatically have all other block access levels
      */
-    CONSTRUCT(AccessType.INTERACT, AccessType.ACCESS),
+    public static AccessType CONSTRUCT = new AccessType("CONSTRUCT", AccessType.INTERACT, AccessType.ACCESS);
     /**
      * Block Access: Interact with Redstone Components - will automatically have the "ACCESS" access level
      */
-    INTERACT(AccessType.ACCESS),
+    public static final AccessType INTERACT= new AccessType("INTERACT", AccessType.ACCESS);
     /**
      * Block Access: Interact with Containers
      */
-    ACCESS,
+    public static final AccessType ACCESS = new AccessType("ACCESS");
     /**
      * Administrative Access: Grants all administrative roles by default as well as grants region destruction rights
      */
-    GOVERNOR(AccessType.ZONING, AccessType.TREASURER),
+    public static final AccessType GOVERNOR = new AccessType("GOVERNOR", AccessType.ZONING, AccessType.TREASURER);
     /**
      * Administrative Access: Grants region creation rights for lower tiered regions, as well as treasurer rights
      */
-    ZONING(AccessType.TREASURER),
+    public static final AccessType ZONING = new AccessType("ZONING", AccessType.TREASURER);
     /**
      * Administrative Access: Manage regional finances, i.e. paying for upkeep
      */
-    TREASURER;
+    public static final AccessType TREASURER = new AccessType("TREASURER");
+
+    public static final AccessType valueOf(String name) {
+        return new AccessType(name.toUpperCase());
+    }
 
     private HashSet<AccessType> childColl;
 
-    AccessType(AccessType... children) {
+    AccessType(String name, AccessType... children) {
         this.childColl = new HashSet<AccessType>();
         Collections.addAll(this.childColl, children);
     }

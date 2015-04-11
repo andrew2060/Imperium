@@ -15,6 +15,10 @@ public class EffectProtection implements Effect {
     }
 
     @Override
+    public void onInit(ITownshipsPlugin plugin) {
+    }
+
+    @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
     }

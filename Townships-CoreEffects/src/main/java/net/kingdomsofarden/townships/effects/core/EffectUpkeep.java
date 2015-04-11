@@ -111,6 +111,11 @@ public class EffectUpkeep extends EffectPeriodic {
     }
 
     @Override
+    public void onInit(ITownshipsPlugin plugin) {
+
+    }
+
+    @Override
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         region = r;
         resources = new HashMap<Material, Integer>();

@@ -18,6 +18,11 @@ public class EffectPhysicalItemChest extends PhysicalChestItemProvider implement
     }
 
     @Override
+    public void onInit(ITownshipsPlugin plugin) {
+
+    }
+
+    @Override
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         region = r;
         chestLocation = data.get("location", new LocationSerializer(), null);

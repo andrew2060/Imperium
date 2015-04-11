@@ -11,6 +11,12 @@ public interface Effect {
     String getName();
 
     /**
+     * Called when the effect is initialized for the first time
+     * @param plugin The initializing plugin
+     */
+    void onInit(ITownshipsPlugin plugin);
+
+    /**
      * @param plugin The plugin loading this effect
      * @param region The region containing this effect
      * @param data Any data associated with this effect

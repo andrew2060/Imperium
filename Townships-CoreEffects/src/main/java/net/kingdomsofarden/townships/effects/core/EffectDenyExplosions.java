@@ -17,6 +17,11 @@ public class EffectDenyExplosions implements Effect, Listener {
     }
 
     @Override
+    public void onInit(ITownshipsPlugin plugin) {
+
+    }
+
+    @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
         ExplosiveProtectionListener.instance.registerProtectionEffect(this);

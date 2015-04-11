@@ -38,4 +38,9 @@ public class TownshipsCitizen implements Citizen {
     public UUID getUid() {
         return uuid;
     }
+
+    @Override
+    public boolean isRoot() {
+        return false; //TODO
+    }
 }
