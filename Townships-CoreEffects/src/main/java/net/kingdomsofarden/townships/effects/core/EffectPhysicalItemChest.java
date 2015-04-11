@@ -14,7 +14,7 @@ public class EffectPhysicalItemChest extends PhysicalChestItemProvider implement
 
     @Override
     public String getName() {
-        return "physical-resource-chest";
+        return "resource-chest";
     }
 
     @Override

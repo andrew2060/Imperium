@@ -1,16 +1,11 @@
-package net.kingdomsofarden.townships.effects.core;
+package net.kingdomsofarden.townships.effects.common;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
-import net.kingdomsofarden.townships.api.Townships;
-import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
-import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
-import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -19,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class EffectUpkeep extends EffectPeriodic {
+public abstract class EffectUpkeep extends EffectPeriodic {
 
 
     private Double cost;
@@ -37,12 +32,11 @@ public class EffectUpkeep extends EffectPeriodic {
                 }
             }
             if (amt > 0) {
-                RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.UPKEEP);
-                Bukkit.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
-                    Townships.getRegions().remove(region);
+                if (onInsufficientResources(region)) {
+                    return super.onTick(region, time);
+                } else {
+                    return Long.MAX_VALUE;
                 }
-                return Long.MAX_VALUE; // Safety in case not properly removed
             } else {
                 amt = cost;
                 for (EconomyProvider provider : econProviders) {
@@ -78,13 +72,10 @@ public class EffectUpkeep extends EffectPeriodic {
                 }
             }
             if (!hasAll) {
-                RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.UPKEEP);
-                Bukkit.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
-                    Townships.getRegions().remove(region);
-                    return Long.MAX_VALUE;
-                } else {
+                if (onInsufficientResources(region)) {
                     return super.onTick(region, time);
+                } else {
+                    return Long.MAX_VALUE;
                 }
             } else {
                 for (Entry<Material, Integer> entry : resources.entrySet()) {
@@ -98,20 +89,27 @@ public class EffectUpkeep extends EffectPeriodic {
                 }
                 return super.onTick(region, time);
             }
-        } else {
+        }
+        if (this.onSuccessfulTick(region)) {
             return super.onTick(region, time);
+        } else {
+            return Long.MAX_VALUE;
         }
     }
 
-    @Override
-    public String getName() {
-        return "upkeep";
-    }
+    /**
+     * Runs when tick is run successfully
+     * @param region The region to be ticked
+     * @return Whether a repeat should be scheduled
+     */
+    protected abstract boolean onSuccessfulTick(Region region);
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
-
-    }
+    /**
+     * Runs when tick is run unsuccessfully (i.e. upkeep requirements not met)
+     * @param region The region being ticked
+     * @return Whether the region should be ticked again
+     */
+    protected abstract boolean onInsufficientResources(Region region);
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
