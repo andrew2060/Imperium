@@ -11,6 +11,6 @@ public interface ITownshipsPlugin {
     CitizenManager getCitizens();
     EffectManager getEffectManager();
     Configuration getConfiguration();
-
     Storage getStorage();
+    <T extends ITownshipsPlugin> T getBackingImplementation();
 }

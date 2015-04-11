@@ -74,4 +74,9 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     public Storage getStorage() {
         return storage;
     }
+
+    @Override
+    public <T extends ITownshipsPlugin> T getBackingImplementation() {
+        return (T) this;
+    }
 }
