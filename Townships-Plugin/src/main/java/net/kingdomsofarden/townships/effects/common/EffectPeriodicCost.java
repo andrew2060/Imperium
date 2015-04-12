@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class EffectUpkeep extends EffectPeriodic {
+public abstract class EffectPeriodicCost extends EffectPeriodic {
 
 
     private Double cost;
@@ -113,9 +113,22 @@ public abstract class EffectUpkeep extends EffectPeriodic {
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+        lastTick = 0;
+        period = data.get("period", new Serializer<Long>() {
+            @Override
+            public String serialize(Long obj) {
+                return obj + "";
+            }
+
+            @Override
+            public Long deserialize(String input) {
+                return Long.valueOf(input);
+            }
+        }, Long.MAX_VALUE);
+        StoredDataSection subSection = data.getSection("cost");
         region = r;
         resources = new HashMap<Material, Integer>();
-        for (String entry : data.getList("resources")) {
+        for (String entry : subSection.getList("resources")) {
             String[] parse = entry.split(" ");
             try {
                 Material mat = Material.matchMaterial(parse[0]);
@@ -125,7 +138,7 @@ public abstract class EffectUpkeep extends EffectPeriodic {
                 // TODO debug
             }
         }
-        cost = data.get("money", new Serializer<Double>() {
+        cost = subSection.get("money", new Serializer<Double>() {
             @Override
             public String serialize(Double obj) {
                 return obj + "";
@@ -140,15 +153,17 @@ public abstract class EffectUpkeep extends EffectPeriodic {
 
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+        data.set("period", period);
+        StoredDataSection subSection = data.getSection("cost");
         if (cost != 0.00) {
-            data.set("money", cost);
+            subSection.set("money", cost);
         }
         if (!resources.isEmpty()) {
             List<String> save = new LinkedList<String>();
             for (Entry<Material, Integer> e : resources.entrySet()) {
                 save.add(e.getKey().name() + " " + e.getValue());
             }
-            data.set("resources", save);
+            subSection.set("resources", save);
         }
     }
 

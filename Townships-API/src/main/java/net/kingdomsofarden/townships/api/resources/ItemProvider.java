@@ -16,4 +16,12 @@ public interface ItemProvider extends ResourceProvider {
      * @return The actual amount removed
      */
     int remove(Material mat, int max);
+
+    /**
+     * Attempts to add amt of type into the ItemProvider
+     * @param type The type to add
+     * @param amt The amount to add
+     * @return The actual amount added
+     */
+    int add(Material type, int amt);
 }
