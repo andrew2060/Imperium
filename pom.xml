@@ -19,7 +19,7 @@
     <modules>
         <module>Townships-API</module>
         <module>Townships-Plugin</module>
-        <module>Townships-CoreEffects</module>
+        <module>Townships-Effects</module>
     </modules>
     <build>
         <plugins>
