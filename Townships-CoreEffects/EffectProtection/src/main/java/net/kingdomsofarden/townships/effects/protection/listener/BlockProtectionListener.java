@@ -1,4 +1,4 @@
-package net.kingdomsofarden.townships.listeners;
+package net.kingdomsofarden.townships.effects.protection.listener;
 
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;

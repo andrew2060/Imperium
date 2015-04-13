@@ -1,21 +1,26 @@
-package net.kingdomsofarden.townships.effects.core;
+package net.kingdomsofarden.townships.effects.denyexplosions;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
+import net.kingdomsofarden.townships.effects.denyexplosions.listener.ExplosiveProtectionListener;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
-public class EffectProtection implements Effect {
+public class EffectDenyExplosions implements Effect, Listener {
 
     private Region region;
 
     @Override
     public String getName() {
-        return "protection";
+        return "deny-explosions";
     }
 
     @Override
     public void onInit(ITownshipsPlugin plugin) {
+        Bukkit.getPluginManager().registerEvents(new ExplosiveProtectionListener(), (Plugin)plugin);
     }
 
     @Override
@@ -26,7 +31,6 @@ public class EffectProtection implements Effect {
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = null;
-        // Do nothing, this is a core effect and listeners will handle logic
     }
 
     @Override
