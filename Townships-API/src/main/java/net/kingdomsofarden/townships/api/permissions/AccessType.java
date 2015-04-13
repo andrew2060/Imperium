@@ -33,13 +33,16 @@ public final class AccessType {
      */
     public static final AccessType TREASURER = new AccessType("TREASURER");
 
-    public static final AccessType valueOf(String name) {
+
+    public static AccessType valueOf(String name) {
         return new AccessType(name.toUpperCase());
     }
 
+    private final String name;
     private HashSet<AccessType> childColl;
 
     AccessType(String name, AccessType... children) {
+        this.name = name;
         this.childColl = new HashSet<AccessType>();
         Collections.addAll(this.childColl, children);
     }
@@ -48,6 +51,14 @@ public final class AccessType {
         return this == type || childColl.contains(type);
     }
 
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
 
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AccessType && ((AccessType) other).name.equals(this.name);
+    }
 
 }

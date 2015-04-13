@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.permissions;
 
-public class RoleGroup {
+public final class RoleGroup {
 
     public static final RoleGroup ROOT = new RoleGroup("ROOT");
     public static final RoleGroup OWNER = new RoleGroup("OWNER");
