@@ -18,6 +18,7 @@ import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox
 import net.kingdomsofarden.townships.util.LocationSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -62,6 +63,7 @@ public class TownshipsRegion implements Region {
     private ItemProvider[] itemProviders;
 
     private boolean valid;
+    private Map<String, Object> metadata;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -73,6 +75,7 @@ public class TownshipsRegion implements Region {
         accessByRole = HashMultimap.create();
         maxTypeInRegion = new HashMap<String, Integer>();
         maxTierInRegion = new HashMap<Integer, Integer>();
+        metadata = new HashMap<String, Object>();
         Comparator<Region> regionComparator = new Comparator<Region>() {
             @Override
             public int compare(Region o1, Region o2) {
@@ -125,6 +128,10 @@ public class TownshipsRegion implements Region {
             }
         }
         effects = new HashMap<String, Effect>();
+        StoredDataSection meta = config.getSection("metadata");
+        for (String key : meta.getKeys(false)) {
+            metadata.put(key, meta.<ConfigurationSection>getBackingImplementation().get(key));
+        }
         StoredDataSection effectSection = config.getSection("effects");
         for (String eName : effectSection.getKeys(false)) {
             Effect e = Townships.getEffectManager().loadEffect(eName, this, effectSection.getSection(eName));
@@ -384,6 +391,11 @@ public class TownshipsRegion implements Region {
             }
         }
         return !(amtTier <= 0 || amtType <= 0);
+    }
+
+    @Override
+    public Map<String, ?> getMetadata() {
+        return metadata;
     }
 
 }

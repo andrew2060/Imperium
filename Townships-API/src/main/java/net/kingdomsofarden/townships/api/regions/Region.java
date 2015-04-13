@@ -11,6 +11,7 @@ import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -124,6 +125,11 @@ public interface Region {
      */
     boolean isValid();
 
+    /**
+     * Sets the region's validity
+     * @param valid The validity state of the region
+     * @see #isValid()
+     */
     void setValid(boolean valid);
 
     /**
@@ -142,4 +148,9 @@ public interface Region {
      * parent/child of this region
      */
     boolean isCompatible(Region region);
+
+    /**
+     * @return A mapping of metadata values currently associated with the region
+     */
+    Map<String, ?> getMetadata();
 }
