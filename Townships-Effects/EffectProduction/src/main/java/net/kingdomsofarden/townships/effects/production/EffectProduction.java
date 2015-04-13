@@ -9,6 +9,8 @@ import net.kingdomsofarden.townships.effects.common.EffectPeriodicCost;
 import org.bukkit.Material;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class EffectProduction extends EffectPeriodicCost {
@@ -62,5 +64,17 @@ public class EffectProduction extends EffectPeriodicCost {
             production.put(type, amount);
         }
         econProduction = Double.valueOf(produce.get("money", "0"));
+    }
+
+    @Override
+    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+        super.onUnload(plugin, region, data);
+        StoredDataSection subSection = data.getSection("produce");
+        subSection.set("money", econProduction);
+        List<String> store = new LinkedList<String>();
+        for (Entry<Material, Integer> e : production.entrySet()) {
+            store.add(e.getKey().name() + " " + e.getValue());
+        }
+        subSection.set("resources", store);
     }
 }
