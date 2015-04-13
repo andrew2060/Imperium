@@ -7,6 +7,7 @@ import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.resources.PhysicalChestItemProvider;
 import net.kingdomsofarden.townships.util.LocationSerializer;
+import org.bukkit.Material;
 
 public class EffectPhysicalItemChest extends PhysicalChestItemProvider implements Effect {
 
@@ -49,4 +50,5 @@ public class EffectPhysicalItemChest extends PhysicalChestItemProvider implement
     public Region getRegion() {
         return region;
     }
+
 }

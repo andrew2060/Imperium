@@ -68,6 +68,27 @@ public class PhysicalChestItemProvider implements ItemProvider {
         return max - amt;
     }
 
+
+    @Override
+    public int add(Material type, int max) {
+        if (chestLocation == null) {
+            return 0;
+        }
+        Block b = chestLocation.getBlock();
+        Chest chest;
+        if (b.getType() == Material.CHEST) {
+            chest = (Chest) b.getState();
+        } else {
+            return 0;
+        }
+        Inventory inv = chest.getBlockInventory();
+        int rem = 0;
+        for (Entry<Integer, ItemStack> remaining : inv.addItem(new ItemStack(type, max)).entrySet()) {
+            rem += remaining.getValue().getAmount();
+        }
+        return max - rem;
+    }
+
     @Override
     public int getPriority() {
         return priority;

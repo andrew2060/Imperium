@@ -51,6 +51,18 @@ public class VirtualChestItemProvider implements ItemProvider {
     }
 
     @Override
+    public int add(Material type, int max) {
+        if (inventory == null) {
+            return 0;
+        }
+        int rem = 0;
+        for (Entry<Integer, ItemStack> remaining : inventory.addItem(new ItemStack(type, max)).entrySet()) {
+            rem += remaining.getValue().getAmount();
+        }
+        return max - rem;
+    }
+
+    @Override
     public int getPriority() {
         return priority;
     }
