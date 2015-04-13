@@ -3,6 +3,7 @@ package net.kingdomsofarden.townships;
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.configuration.Configuration;
+import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
@@ -44,6 +45,9 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     @Override
     public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
+        for (Region r : getRegions()) {
+            getStorage().saveRegion(r, false);
+        }
     }
 
     @Override
