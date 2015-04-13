@@ -152,5 +152,5 @@ public interface Region {
     /**
      * @return A mapping of metadata values currently associated with the region
      */
-    Map<String, ?> getMetadata();
+    Map<String, Object> getMetadata();
 }

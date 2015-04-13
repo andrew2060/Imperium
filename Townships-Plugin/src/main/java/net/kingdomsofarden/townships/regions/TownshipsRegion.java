@@ -394,7 +394,7 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public Map<String, ?> getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
 
