@@ -1,4 +1,4 @@
-package net.kingdomsofarden.townships.effects.power;
+package net.kingdomsofarden.townships.effects.regeneratepower;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.regions.Region;

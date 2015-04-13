@@ -33,6 +33,10 @@ public final class Townships {
         Townships.i = instance;
     }
 
+    public static ITownshipsPlugin getInstance() {
+        return i;
+    }
+
     public static EffectManager getEffectManager() {
         return i.getEffectManager();
     }

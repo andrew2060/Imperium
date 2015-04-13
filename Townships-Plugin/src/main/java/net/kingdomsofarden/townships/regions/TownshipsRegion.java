@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -220,7 +221,36 @@ public class TownshipsRegion implements Region {
 
     @Override
     public void saveConfigs(StoredDataSection data) {
-        //TODO
+        data.set("name", name);
+        data.set("type", type);
+        data.set("tier", tier);
+        data.set("position-1", pos1, new LocationSerializer());
+        data.set("position-2", pos2, new LocationSerializer());
+        StoredDataSection roleSection = data.getSection("roles");
+        for (RoleGroup group : citizenUidsByRole.keySet()) {
+            List<String> toAdd = new LinkedList<String>();
+            for (UUID uid : citizenUidsByRole.get(group)) {
+                toAdd.add(uid + "");
+            }
+            roleSection.set(group.toString(), toAdd);
+        }
+        StoredDataSection meta = data.getSection("metadata");
+        for (String key : metadata.keySet()) {
+            meta.set(key, metadata.get(key));
+        }
+        StoredDataSection effectSection = data.getSection("effects");
+        for (Effect effect : effects.values()) {
+            effect.onUnload(Townships.getInstance(), this, effectSection.getSection(effect.getName()));
+        }
+        StoredDataSection requirements = data.getSection("requirements");
+        StoredDataSection maxRegionReqSection = requirements.getSection("region-types-max");
+        for (String type : maxTypeInRegion.keySet()) {
+            maxRegionReqSection.set(type, maxTypeInRegion.get(type));
+        }
+        StoredDataSection maxTierReqSection = requirements.getSection("region-tiers-max");
+        for (int tierNum : maxTierInRegion.keySet()) {
+            maxTierReqSection.set(tierNum + "", maxTierInRegion.get(tierNum));
+        }
     }
 
     @Override
