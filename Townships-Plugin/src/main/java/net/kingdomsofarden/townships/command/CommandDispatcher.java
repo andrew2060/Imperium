@@ -40,7 +40,7 @@ public class CommandDispatcher implements CommandExecutor {
             // Check permissions
             if (sender instanceof Player) {
                 if (command.getPermission() != null && !sender.hasPermission(command.getPermission())) {
-                    Messaging.sendFormattedMessage((Player)sender, I18N.NO_PERMISSION_COMMAND, command.getPermission());
+                    Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_COMMAND, command.getPermission());
                     return true;
                 }
             }
@@ -51,13 +51,13 @@ public class CommandDispatcher implements CommandExecutor {
             if (len < command.getMinArguments() || (command.getMaxArguments() != -1
                     && len > command.getMaxArguments())) {
                 if (sender instanceof Player) {
-                    Messaging.sendFormattedMessage((Player) sender, I18N.COMMAND_IMPROPER_ARGUMENTS, command.getUsage());
+                    Messaging.sendFormattedMessage(sender, I18N.COMMAND_IMPROPER_ARGUMENTS, command.getUsage());
                     return true;
                 }
             }
             return command.execute(sender, args);
         }
-        Messaging.sendFormattedMessage((Player)sender, I18N.COMMAND_NOT_FOUND);
+        Messaging.sendFormattedMessage(sender, I18N.COMMAND_NOT_FOUND);
         return true;
     }
 }

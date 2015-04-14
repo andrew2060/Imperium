@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 public class CommandRegionGroupManagement implements Command {
     @Override
@@ -50,15 +49,8 @@ public class CommandRegionGroupManagement implements Command {
                 Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
                 Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(r.getBounds());
                 boolean perm = false;
-                HashSet<RoleGroup> effective = new HashSet<RoleGroup>();
-                for (Region found : intersections) {
-                    if (r.getTier() <= found.getTier()) {
-                        effective.addAll(r.getRoles(c));
-                        if (r.hasAccess(c, AccessType.GOVERNOR, effective)) {
-                            perm = true;
-                            break;
-                        }
-                    }
+                if (r.hasAccess(c, AccessType.GOVERNOR)) {
+                    perm = true;
                 }
                 if (!perm) {
                     Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_GOVERN);

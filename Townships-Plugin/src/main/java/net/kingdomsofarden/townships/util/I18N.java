@@ -46,4 +46,5 @@ public class I18N {
     public static final String LOWER_TIER_MUST_BE_ENCOMPASSED = "Higher tier regions must completely encompass lower tiered regions";
     public static final String MAX_REGION_TYPE = "A larger number of a certain region type is within this selection than is allowed for the region that is being created";
     public static final String MAX_REGION_TIER = "A larger number of a certain region tier is within this selection than is allowed for the region that is being created";
+    public static final String ACCESS_NOT_PRESENT = "The access you are attempting to modify is not present";
 }

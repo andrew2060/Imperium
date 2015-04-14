@@ -428,4 +428,24 @@ public class TownshipsRegion implements Region {
         return metadata;
     }
 
+    @Override
+    public boolean addAccess(RoleGroup group, AccessType access) {
+        return accessByRole.put(group, access);
+    }
+
+    @Override
+    public boolean removeAccess(RoleGroup group, AccessType access) {
+        return accessByRole.remove(group, access);
+    }
+
+    @Override
+    public boolean addAccess(UUID uid, AccessType access) {
+        return accessByCitizenUid.put(uid, access);
+    }
+
+    @Override
+    public boolean removeAccess(UUID uid, AccessType access) {
+        return accessByCitizenUid.remove(uid, access);
+    }
+
 }
