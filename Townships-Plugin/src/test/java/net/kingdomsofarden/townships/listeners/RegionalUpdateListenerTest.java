@@ -62,7 +62,11 @@ public class RegionalUpdateListenerTest {
                 for (int i = 0; i < regions; i++) {
                     Region r = mock(TownshipsRegion.class);
                     Location genCenter = new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0, z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);
-                    RegionAxisAlignedBoundingBox bounds = new RegionAxisAlignedBoundingBox(r, rand.nextInt(10) + 1, 5, rand.nextInt(10) + 1);
+                    int modifyX = rand.nextInt(10) + 1;
+                    int modifyZ = rand.nextInt(10) + 1;
+                    Location pos1 = genCenter.clone().add(modifyX, 5, modifyZ);
+                    Location pos2 = genCenter.clone().subtract(modifyX, 5, modifyZ);
+                    RegionAxisAlignedBoundingBox bounds = new RegionAxisAlignedBoundingBox(r, pos1, pos2);
                     when(r.getBounds()).thenReturn(bounds);
                     when(r.getName()).thenReturn(Optional.<String>absent());
                     when(r.getUid()).thenReturn(UUID.randomUUID());

@@ -29,10 +29,11 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     public void onEnable() {
         // Initialize
         Townships.setInstance(this);
-        regionManager = new TownshipsRegionManager(this);
-        effectManager = new TownshipsEffectManager(this);
         config = new TownshipsConfiguration(this);
         storage = new YAMLStorage(this);
+        effectManager = new TownshipsEffectManager(this);
+        regionManager = new TownshipsRegionManager(this);
+        storage.loadAllRegions(regionManager);
 
         // Register Events
         regionalUpdateListener = new RegionalUpdateListener(this);

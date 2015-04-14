@@ -153,4 +153,11 @@ public interface Region {
      * @return A mapping of metadata values currently associated with the region
      */
     Map<String, Object> getMetadata();
+
+    boolean addAccess(RoleGroup group, AccessType access);
+    boolean removeAccess(RoleGroup group, AccessType access);
+
+    boolean addAccess(UUID uid, AccessType access);
+    boolean removeAccess(UUID uid, AccessType access);
+
 }

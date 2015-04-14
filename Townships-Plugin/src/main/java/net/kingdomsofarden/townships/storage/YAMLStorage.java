@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.UUID;
 
 public class YAMLStorage implements Storage {
@@ -50,6 +51,20 @@ public class YAMLStorage implements Storage {
         File f = new File(regionSaves, id + ".yml");
         if (f.exists()) {
             f.delete();
+        }
+    }
+
+    @Override
+    public void loadAllRegions(Collection<Region> regions) {
+        for (String name : regionSaves.list()) {
+            try {
+                if (name.toLowerCase().endsWith(".yml")) {
+                    UUID uid = UUID.fromString(name.substring(0, name.length()-4));
+                    loadRegion(uid);
+                }
+            } catch (Exception e) {
+                // TODO debug
+            }
         }
     }
 }
