@@ -40,7 +40,6 @@ public class EffectDrainPower extends EffectPeriodicCost {
     @Override
     public void onInit(ITownshipsPlugin plugin) {}
 
-
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onLoad(plugin, region, data);
@@ -52,7 +51,5 @@ public class EffectDrainPower extends EffectPeriodicCost {
         super.onUnload(plugin, region, data);
         data.set("amount", drainAmount);
     }
-
-
 
 }
