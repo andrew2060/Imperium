@@ -73,7 +73,7 @@ public class AxisAlignedBoundingBox implements CuboidBoundingBox {
 
     @Override
     public World getWorld() {
-        return null;
+        return world;
     }
 
     @Override
