@@ -7,7 +7,6 @@ import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
@@ -15,8 +14,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 
 public class CommandRegionDisband implements Command {
@@ -53,19 +50,7 @@ public class CommandRegionDisband implements Command {
             // Check permission
             if (sender instanceof Player) {
                 Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
-                Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(r.getBounds());
-                boolean perm = false;
-                HashSet<RoleGroup> effective = new HashSet<RoleGroup>();
-                for (Region found : intersections) {
-                    if (r.getTier() <= found.getTier()) {
-                        effective.addAll(r.getRoles(c));
-                        if (r.hasAccess(c, AccessType.ZONING, effective)) {
-                            perm = true;
-                            break;
-                        }
-                    }
-                }
-                if (!perm) {
+                if (!r.hasAccess(c, AccessType.ZONING)) {
                     Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_ZONING);
                     return true;
                 }

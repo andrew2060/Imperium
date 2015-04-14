@@ -1,17 +1,27 @@
 package net.kingdomsofarden.townships.characters;
 
 import net.kingdomsofarden.townships.api.characters.Citizen;
+import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
 import java.util.UUID;
 
 public class TownshipsCitizen implements Citizen {
 
+    //TODO load citizen, constructor
+
     private UUID uuid;
     private Area currTerminalArea;
+    private StoredDataSection effectSettings;
+
+    @Override
+    public StoredDataSection getStoredEffectSettings(Effect effect) {
+        return effectSettings;
+    }
 
     @Override
     public Collection<RoleGroup> getRoles(Region region) {

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TownshipsCitizenManager implements CitizenManager {
+    // TODO
 
     private TownshipsPlugin plugin;
     private Map<UUID, TownshipsCitizen> citizenMap;

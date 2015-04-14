@@ -12,8 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
-
 public class CommandRegionGroupManagement implements Command {
     @Override
     public String[] getIdentifiers() {
@@ -47,12 +45,7 @@ public class CommandRegionGroupManagement implements Command {
             }
             if (sender instanceof Player) {
                 Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
-                Collection<Region> intersections = Townships.getRegions().getIntersectingRegions(r.getBounds());
-                boolean perm = false;
-                if (r.hasAccess(c, AccessType.GOVERNOR)) {
-                    perm = true;
-                }
-                if (!perm) {
+                if (!r.hasAccess(c, AccessType.GOVERNOR)) {
                     Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_AREA_GOVERN);
                     return true;
                 }
