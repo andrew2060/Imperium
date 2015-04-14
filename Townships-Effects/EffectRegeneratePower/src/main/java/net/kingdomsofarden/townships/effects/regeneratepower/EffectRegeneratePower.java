@@ -46,7 +46,7 @@ public class EffectRegeneratePower extends EffectPeriodicCost {
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onLoad(plugin, region, data);
         regenAmount = Integer.valueOf(data.get("amount", "0"));
-        max = Integer.valueOf(data.get("max-amount", "-1"));
+        max = (Integer) region.getMetadata().getOrDefault(MetaKeys.MAX_POWER, -1);
     }
 
     @Override
