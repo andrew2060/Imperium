@@ -73,7 +73,7 @@ public abstract class RegionBoundCollection implements Area {
      * @return True if some portion of b falls within the area managed by this collection
      */
     protected boolean isInBounds(BoundingBox b) {
-        return getBoundingBox().intersects(b, true);
+        return getBoundingBox().intersects(b);
     }
 
     protected boolean checkBounds(double x, int l, int u) {

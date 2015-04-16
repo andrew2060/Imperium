@@ -142,7 +142,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     @Override
     public void getIntersectingRegions(BoundingBox bounds, TreeSet<Region> col) {
         for (Region r : contents) {
-            if (bounds.intersects(r.getBounds(), true) && !bounds.equals(r.getBounds())) {
+            if (bounds.intersects(r.getBounds()) && !bounds.equals(r.getBounds())) {
                 col.add(r);
             }
         }

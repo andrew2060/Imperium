@@ -34,7 +34,7 @@ public class CuboidSelection implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean intersects(BoundingBox box, boolean recurs) {
+    public boolean intersects(BoundingBox box) {
         if (!box.getWorld().equals(getWorld())) {
             return false;
         }
@@ -43,7 +43,7 @@ public class CuboidSelection implements CuboidBoundingBox {
                 return true;
             }
         }
-        return recurs && box.intersects(box, false);
+        return box.encapsulates(this);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class CuboidSelection implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean encompasses(BoundingBox other) {
+    public boolean encapsulates(BoundingBox other) {
         for (Integer[] vertex : other.getVertices()) {
              if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                  return false;

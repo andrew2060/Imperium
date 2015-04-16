@@ -79,19 +79,16 @@ public class AreaBoundingBox implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean intersects(BoundingBox box, boolean recurs) {
+    public boolean intersects(BoundingBox box) {
         if (!box.getWorld().equals(this.world)) {
             return false;
         }
         for (Integer[] vertex : box.getVertices()) {
-            if (box.isInBounds(vertex[0], vertex[1], vertex[2])) {
+            if (isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return true;
             }
         }
-        if (recurs) {
-            return box.intersects(box, false);
-        }
-        return false;
+        return box.encapsulates(this);
     }
 
     @Override
@@ -105,7 +102,7 @@ public class AreaBoundingBox implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean encompasses(BoundingBox other) {
+    public boolean encapsulates(BoundingBox other) {
         for (Integer[] vertex : other.getVertices()) {
             if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return false;

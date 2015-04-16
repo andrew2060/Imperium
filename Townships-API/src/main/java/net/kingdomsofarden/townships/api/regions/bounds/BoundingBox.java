@@ -25,10 +25,9 @@ public interface BoundingBox {
 
     /**
      * @param box The other bounding box to check
-     * @param init True if this is the first (external) call to the method - all external calls should always have this as true
      * @return True if this bounding box interacts with the parameter bounding box at some point
      */
-    boolean intersects(BoundingBox box, boolean init);
+    boolean intersects(BoundingBox box);
 
     /**
      * @return A sorted collection of vertices using Double[] {x, y, z} representation
@@ -43,7 +42,7 @@ public interface BoundingBox {
 
     /**
      * @param other The other bounding box to check
-     * @return True if this bounding box completely encompasses the other
+     * @return True if this bounding box completely encapsulates the other
      */
-    boolean encompasses(BoundingBox other);
+    boolean encapsulates(BoundingBox other);
 }

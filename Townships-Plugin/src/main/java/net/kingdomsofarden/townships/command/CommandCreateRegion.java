@@ -250,10 +250,10 @@ public class CommandCreateRegion implements Command {
                     regionTierMaxReq.put(tier, amt);
                 }
             }
-            if (tier < regionTier && !selection.encompasses(region.getBounds())) {
+            if (tier < regionTier && !selection.encapsulates(region.getBounds())) {
                 Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
                 return true;
-            } else if (tier > regionTier && !region.getBounds().encompasses(selection)) {
+            } else if (tier > regionTier && !region.getBounds().encapsulates(selection)) {
                 Messaging.sendFormattedMessage(sender, I18N.LOWER_TIER_MUST_BE_ENCOMPASSED);
                 return true;
             }
