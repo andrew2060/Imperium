@@ -8,6 +8,7 @@ import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RegionBlockCheckTask implements Runnable {
@@ -39,7 +40,7 @@ public class RegionBlockCheckTask implements Runnable {
     @Override
     public void run() {
         if (region.isValid()) { // If invalid, assume pending removal anyways
-            Map<Material, Integer> remaining = region.getBounds().checkForBlocks(reqs);
+            Map<Material, Integer> remaining = region.getBounds().checkForBlocks(new HashMap<Material, Integer>(reqs));
             if (!remaining.isEmpty()) {
                 // Trigger a region disband
                 region.setValid(false); // Indicate this region is pending deletion and no longer valid/should not be checked again
