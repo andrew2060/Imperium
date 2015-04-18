@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class RegionBlockCheckTask implements Runnable {
 
-    Map<Material, Integer> reqs;
+    private Region region;
+    private Map<Material, Integer> reqs;
 
     public RegionBlockCheckTask(Region region){
         StoredDataSection data = Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
@@ -29,6 +30,7 @@ public class RegionBlockCheckTask implements Runnable {
                 reqs.put(mat, amt);
             }
         }
+        this.region = region;
     }
 
     @Override
