@@ -43,10 +43,9 @@ public class RegionBlockCheckTask implements Runnable {
             Map<Material, Integer> remaining = region.getBounds().checkForBlocks(new HashMap<Material, Integer>(reqs));
             if (!remaining.isEmpty()) {
                 // Trigger a region disband
-                region.setValid(false); // Indicate this region is pending deletion and no longer valid/should not be checked again
+                Townships.getRegions().remove(region); // We ignore cancellation state for requirement failures
                 RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
                 Bukkit.getPluginManager().callEvent(event);
-                Townships.getRegions().remove(region); // We ignore cancellation state for requirement failures
             }
         }
     }
