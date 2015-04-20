@@ -1,9 +1,11 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface BoundingBox {
 
@@ -45,4 +47,11 @@ public interface BoundingBox {
      * @return True if this bounding box completely encapsulates the other
      */
     boolean encapsulates(BoundingBox other);
+
+    /**
+     * Checks the given region for the parameter blocks
+     * @param blocks A mapping of block type/amount to check for
+     * @return A mapping of remainder block type/amount not found
+     */
+    Map<Material,Integer> checkForBlocks(Map<Material, Integer> blocks);
 }

@@ -4,6 +4,10 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Is called when a region is about to disband. <br>
+ * <b>Important:</b> Does not respect cancellation state when region is disbanding due to failure to meet requirements
+ */
 public class RegionDisbandEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final DisbandCause cause;
@@ -14,6 +18,9 @@ public class RegionDisbandEvent extends Event {
 
         public static final DisbandCause COMMAND = new DisbandCause("COMMAND");
         public static final DisbandCause UPKEEP = new DisbandCause("UPKEEP");
+        public static final DisbandCause BLOCK_REQUIREMENTS_NOT_MET = new DisbandCause("BLOCK_REQUIREMENTS_NOT_MET");
+        public static final DisbandCause SUBREGION_REQUIREMENTS_NOT_MET = new DisbandCause("SUBREGION_REQUIREMENTS_NOT_MET");
+
         public static DisbandCause valueOf(String name) {
             return new DisbandCause(name.toUpperCase());
         }
