@@ -1,9 +1,18 @@
 performance: # Performance related settings, change with caution
+  # X/Z divisions: generally best practice is to try to go for multiples of 16 if possible. Optimally this would be some
+  # reasonable lower bound: you want to cover the smallest area possible while minimizing the number of min-divisions
+  # needed to cover an entire region
   min-division-x: 96
   min-division-z: 96
-  effect-tick-max-delay: 5 # The maximum number of ticks an effect can be delayed for ticking for performance
+  # The maximum number of ticks an effect can be delayed from ticking for performance: note that this does not affect
+  # actual scheduling, which is exact
+  effect-tick-max-delay: 5
+  # The maximum amount of ticks to defer a regional check for blcok consistancy (i.e. that block requirements are still
+  # met) after a block is broken. The higher, the better, albeit higher also means a greater delay before upkeep attempts
+  consistency-check-block-max-delay: 100
+
 protection:
-  protect-flint-and-steel: false  
+  protect-flint-and-steel: false # Affected by the INTERACT protection
   protect-interact: # Affected by the INTERACT protection
   - ACACIA_DOOR
   - ACACIA_FENCE_GATE

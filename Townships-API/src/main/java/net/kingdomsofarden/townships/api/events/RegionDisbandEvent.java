@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 
 /**
  * Is called when a region is about to disband. <br>
- * <b>Important:</b> Does not respect cancellation state when region is disbanding due to failure to meet requirements
+ * <b>Important:</b> Cannot cancel when region is disbanding due to failure to meet requirements
  */
 public class RegionDisbandEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
@@ -81,6 +81,10 @@ public class RegionDisbandEvent extends Event {
     }
 
     public void setCancelled(boolean cancelled) {
+        if (cancelled && (cause.equals(DisbandCause.BLOCK_REQUIREMENTS_NOT_MET)
+                || cause.equals(DisbandCause.SUBREGION_REQUIREMENTS_NOT_MET))) {
+            throw new UnsupportedOperationException("Cannot cancel requirement failure disbands");
+        }
         this.cancelled = cancelled;
     }
 }

@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
+import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
@@ -15,7 +16,10 @@ import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
+import net.kingdomsofarden.townships.tasks.RegionBlockCheckTask;
+import net.kingdomsofarden.townships.tasks.RegionSubregionCheckTask;
 import net.kingdomsofarden.townships.util.LocationSerializer;
+import net.kingdomsofarden.townships.util.MetaKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -154,6 +158,13 @@ public class TownshipsRegion implements Region {
         }
         economyProviders = new EconomyProvider[0];
         itemProviders = new ItemProvider[0];
+        if (((ConfigurationSection)requirements.getBackingImplementation()).contains("block-requirements")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionBlockCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        }
+        if (((ConfigurationSection)requirements.getBackingImplementation()).contains("region-types-min")
+                || ((ConfigurationSection)requirements.getBackingImplementation()).contains("region-tiers-min")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        }
     }
 
     @Override
@@ -251,6 +262,7 @@ public class TownshipsRegion implements Region {
         for (int tierNum : maxTierInRegion.keySet()) {
             maxTierReqSection.set(tierNum + "", maxTierInRegion.get(tierNum));
         }
+
     }
 
     @Override

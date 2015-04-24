@@ -7,6 +7,7 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
+import net.kingdomsofarden.townships.listeners.RegionalConsistancyListener;
 import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import net.kingdomsofarden.townships.storage.YAMLStorage;
@@ -38,6 +39,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Register Events
         regionalUpdateListener = new RegionalUpdateListener(this);
         Bukkit.getPluginManager().registerEvents(regionalUpdateListener, this);
+        Bukkit.getPluginManager().registerEvents(new RegionalConsistancyListener(), this);
 
         // Start tasks
         Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);

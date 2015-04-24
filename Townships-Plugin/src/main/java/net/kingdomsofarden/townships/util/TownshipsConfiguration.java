@@ -46,6 +46,7 @@ public class TownshipsConfiguration extends YAMLDataSection implements Configura
             Constants.ACCESS_TYPES.add(Material.valueOf(mat.toUpperCase()));
         }
         Constants.PROTECT_FIRE = config.getBoolean("protection.protect-flint-and-steel", false);
+        Constants.BLOCK_CHECK_DELAY = config.getInt("consistency-check-block-max-delay", 100);
     }
 
     @Override

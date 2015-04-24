@@ -12,4 +12,5 @@ public class MetaKeys {
     public static final String POWER_SHIELD_RESET = "POWER_SHIELD_RESET";
 
     public static final String REQUIREMENT_BLOCK = "BLOCK_REQUIREMENT";
+    public static final String REQUIREMENT_REGION = "REGION_REQUIREMENT";
 }
