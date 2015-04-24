@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.listeners;
 
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.tasks.RegionBlockCheckTask;
 import net.kingdomsofarden.townships.util.MetaKeys;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,7 @@ public class RegionalConsistancyListener implements Listener {
         Location loc = event.getBlock().getLocation();
         for (Region r : Townships.getRegions().getBoundingRegions(loc)) {
             if (r.getMetadata().containsKey(MetaKeys.REQUIREMENT_BLOCK)) {
+                RegionBlockCheckTask task = (RegionBlockCheckTask) r.getMetadata().get(MetaKeys.REQUIREMENT_BLOCK);
 
             }
         }

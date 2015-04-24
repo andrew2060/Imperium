@@ -21,6 +21,7 @@ public class RegionBlockCheckTask implements Runnable {
         if (data == null) {
             throw new IllegalStateException("Supplied region does not have a corresponding type configuration!");
         }
+        reqs = new HashMap<Material, Integer>();
         StoredDataSection requirements = data.getSection("requirements");
         StoredDataSection blockReqSection = requirements.getSection("block-requirements");
         for (String matName : blockReqSection.getKeys(false)) {
@@ -47,6 +48,12 @@ public class RegionBlockCheckTask implements Runnable {
                 RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
                 Bukkit.getPluginManager().callEvent(event);
             }
+        }
+    }
+
+    public void schedule(Material mat) {
+        if (reqs.containsKey(mat)) {
+
         }
     }
 }
