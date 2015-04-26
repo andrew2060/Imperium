@@ -32,6 +32,10 @@ public final class AccessType {
      * Administrative Access: Manage regional finances, i.e. paying for upkeep
      */
     public static final AccessType TREASURER = new AccessType("TREASURER");
+    /**
+     * Administrative Access: Manage regional diplomacy with other regions
+     */
+    public static final AccessType DIPLOMAT = new AccessType("DIPLOMAT");
 
 
     public static AccessType valueOf(String name) {

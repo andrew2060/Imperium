@@ -6,6 +6,7 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -34,6 +35,11 @@ public interface Region {
      * @return A unique name for this region, may not be present
      */
     Optional<String> getName();
+
+    /**
+     * @return A map of String, Relation value pairs matching a region name to the relation this region currently holds with it
+     */
+    Map<String, RelationState> getRelations();
 
     /**
      * @param group The group to get

@@ -47,4 +47,13 @@ public class I18N {
     public static final String MAX_REGION_TYPE = "A larger number of a certain region type is within this selection than is allowed for the region that is being created";
     public static final String MAX_REGION_TIER = "A larger number of a certain region tier is within this selection than is allowed for the region that is being created";
     public static final String ACCESS_NOT_PRESENT = "The access you are attempting to modify is not present";
+    public static final String NO_MATCHING_RELATION_STATE = "The requested relation $0 is not a valid relation";
+    public static final String NO_PERMISSION_DIPLOMACY = "You lack the necessary permissions to act as a diplomat for this region";
+    public static final String CANNOT_RELATION_SELF = "You cannot conduct diplomacy with yourself!";
+    public static final String CANNOT_RELATION_PARENT = "You cannot conduct diplomacy with an entity you are a part of";
+    public static final String CANNOT_RELATION_CHILD = "You cannot conduct diplomacy with a part of yourself";
+    public static final String SAME_RELATION = "You already have that relation set (or have offered that relation) for $0";
+    public static final String NO_BETRAYAL = "You are currently in an alliance with (or have a pending alliance with) $0" +
+            ", which you must rescind before declaring war";
+    public static final String NO_ALLIANCE_WAR = "You cannot offer alliance to an entity that you are at war with";
 }

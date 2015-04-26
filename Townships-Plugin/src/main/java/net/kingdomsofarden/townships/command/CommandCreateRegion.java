@@ -244,7 +244,7 @@ public class CommandCreateRegion implements Command {
             if (regionTierMinReq.containsKey(tier)) {
                 int amt = regionTierMinReq.get(tier) - 1;
                 if (amt < 0) {
-                    Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TYPE);
+                    Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TIER);
                     return true;
                 } else {
                     regionTierMaxReq.put(tier, amt);

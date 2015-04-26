@@ -56,3 +56,7 @@ protection:
   - JUKEBOX
   - TRAPPED_CHEST
   - WORKBENCH
+region-relations:
+  minimum-declarable-tier: 2      # Minimum regional tier to have relationships with other regions, cannot be disabled
+  maximum-tier-difference: -1     # Maximum difference of two regional tiers to declare some relationship, -1 to disable
+  relation-change-delay: 86400000 # Time before a relation change is put into effect, can be cancelled before then

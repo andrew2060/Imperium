@@ -292,7 +292,7 @@ public class TownshipsRegion implements Region {
         if (citizen.isRoot()) {
             return true;
         } else {
-            for (AccessType access :accessByCitizenUid.get(citizen.getUid())) {
+            for (AccessType access : accessByCitizenUid.get(citizen.getUid())) {
                 if (access.hasAccess(type)) {
                     return true;
                 }
