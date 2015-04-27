@@ -23,7 +23,7 @@ public final class AccessType {
     /**
      * Administrative Access: Grants all administrative roles by default as well as grants region destruction rights
      */
-    public static final AccessType GOVERNOR = new AccessType("GOVERNOR", AccessType.ZONING, AccessType.TREASURER);
+    public static final AccessType GOVERNOR = new AccessType("GOVERNOR", AccessType.ZONING, AccessType.TREASURER, AccessType.DIPLOMAT);
     /**
      * Administrative Access: Grants region creation rights for lower tiered regions, as well as treasurer rights
      */
