@@ -42,6 +42,11 @@ public interface Region {
     Map<String, RelationState> getRelations();
 
     /**
+     * @return A map of Region Names to Relation States held by other relationable regions toward this region
+     */
+    Map<String, RelationState> getExternRelations();
+
+    /**
      * @param group The group to get
      * @return A collection of the UUID of citizens that hold the given role within a region. Note that this collection
      * is not comprehensive as role is also inherited from higher tiered regions that have this region within its borders

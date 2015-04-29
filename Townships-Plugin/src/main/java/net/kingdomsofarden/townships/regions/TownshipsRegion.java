@@ -11,6 +11,7 @@ import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
@@ -69,6 +70,8 @@ public class TownshipsRegion implements Region {
 
     private boolean valid;
     private Map<String, Object> metadata;
+    private Map<String, RelationState> relations;
+    private Map<String, RelationState> externRelations;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -165,6 +168,9 @@ public class TownshipsRegion implements Region {
                 || ((ConfigurationSection)requirements.getBackingImplementation()).contains("region-tiers-min")) {
             metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
+        relations = new HashMap<String, RelationState>();
+        externRelations = new HashMap<String, RelationState>();
+        // TODO load/save relations
     }
 
     @Override
@@ -180,6 +186,16 @@ public class TownshipsRegion implements Region {
     @Override
     public Optional<String> getName() {
         return Optional.fromNullable(name);
+    }
+
+    @Override
+    public Map<String, RelationState> getRelations() {
+        return relations;
+    }
+
+    @Override
+    public Map<String, RelationState> getExternRelations() {
+        return externRelations;
     }
 
     @Override

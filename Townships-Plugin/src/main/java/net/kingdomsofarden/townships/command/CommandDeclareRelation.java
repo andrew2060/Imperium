@@ -124,7 +124,8 @@ public class CommandDeclareRelation implements Command {
             return true; // Silent quit
         }
         declarer.getRelations().put(declaree.getName().get(), state);
-        // TODO remove fees/requirements and actually set the relation
+        declaree.getExternRelations().put(declarer.getName().get(), state);
+        // TODO remove fees/requirements
         return true;
     }
 
