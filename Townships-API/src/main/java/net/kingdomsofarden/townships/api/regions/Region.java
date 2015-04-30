@@ -37,14 +37,14 @@ public interface Region {
     Optional<String> getName();
 
     /**
-     * @return A map of String, Relation value pairs matching a region name to the relation this region currently holds with it
+     * @return A map of Region, Relation value pairs matching a region to the relation this region currently holds with it
      */
-    Map<String, RelationState> getRelations();
+    Map<Region, RelationState> getRelations();
 
     /**
-     * @return A map of Region Names to Relation States held by other relationable regions toward this region
+     * @return A map of Region to Relation States held by other relationable regions toward this region
      */
-    Map<String, RelationState> getExternRelations();
+    Map<Region, RelationState> getExternRelations();
 
     /**
      * @param group The group to get

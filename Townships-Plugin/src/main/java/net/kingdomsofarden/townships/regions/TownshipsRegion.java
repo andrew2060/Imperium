@@ -71,8 +71,8 @@ public class TownshipsRegion implements Region {
 
     private boolean valid;
     private Map<String, Object> metadata;
-    private Map<String, RelationState> relations;
-    private Map<String, RelationState> externRelations;
+    private Map<Region, RelationState> relations;
+    private Map<Region, RelationState> externRelations;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -169,8 +169,8 @@ public class TownshipsRegion implements Region {
                 || ((ConfigurationSection)requirements.getBackingImplementation()).contains("region-tiers-min")) {
             metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
-        relations = new HashMap<String, RelationState>();
-        externRelations = new HashMap<String, RelationState>();
+        relations = new HashMap<Region, RelationState>();
+        externRelations = new HashMap<Region, RelationState>();
         StoredDataSection diplomacy = config.getSection("diplomacy");
         StoredDataSection selfDiplomacy = diplomacy.getSection("self");
         StoredDataSection externDiplomacy = diplomacy.getSection("others");
@@ -181,7 +181,7 @@ public class TownshipsRegion implements Region {
             if (r == null) {
                 continue; // TODO log
             }
-            relations.put(r.getName().get(), state);
+            relations.put(r, state);
         }
         for (String regionUid : externDiplomacy.getKeys(false)) {
             UUID uid = UUID.fromString(regionUid);
@@ -190,7 +190,7 @@ public class TownshipsRegion implements Region {
             if (r == null) {
                 continue; // TODO log
             }
-            externRelations.put(r.getName().get(), state);
+            externRelations.put(r, state);
         }
     }
 
@@ -210,12 +210,12 @@ public class TownshipsRegion implements Region {
     }
 
     @Override
-    public Map<String, RelationState> getRelations() {
+    public Map<Region, RelationState> getRelations() {
         return relations;
     }
 
     @Override
-    public Map<String, RelationState> getExternRelations() {
+    public Map<Region, RelationState> getExternRelations() {
         return externRelations;
     }
 
@@ -306,11 +306,11 @@ public class TownshipsRegion implements Region {
         StoredDataSection diplomacy = data.getSection("diplomacy");
         StoredDataSection selfDiplomacy = diplomacy.getSection("self");
         StoredDataSection externDiplomacy = diplomacy.getSection("others");
-        for (Entry<String, RelationState> e : relations.entrySet()) {
-            selfDiplomacy.set(Townships.getRegions().get(e.getKey()).get().getUid().toString(), e.getValue().toString());
+        for (Entry<Region, RelationState> e : relations.entrySet()) {
+            selfDiplomacy.set(e.getKey().getUid().toString(), e.getValue().toString());
         }
-        for (Entry<String, RelationState> e : externRelations.entrySet()) {
-            externDiplomacy.set(Townships.getRegions().get(e.getKey()).get().getUid().toString(), e.getValue().toString());
+        for (Entry<Region, RelationState> e : externRelations.entrySet()) {
+            externDiplomacy .set(e.getKey().getUid().toString(), e.getValue().toString());
         }
 
     }
@@ -509,5 +509,20 @@ public class TownshipsRegion implements Region {
     public boolean removeAccess(UUID uid, AccessType access) {
         return accessByCitizenUid.remove(uid, access);
     }
+
+    @Override
+    public int hashCode() {
+        return regionUid.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof UUID) {
+            return regionUid.equals(o);
+        } else {
+            return o instanceof Region && ((Region) o).getUid().equals(regionUid);
+        }
+    }
+
 
 }

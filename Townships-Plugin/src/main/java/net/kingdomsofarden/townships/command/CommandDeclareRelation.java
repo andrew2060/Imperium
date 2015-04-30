@@ -123,8 +123,8 @@ public class CommandDeclareRelation implements Command {
         if (event.isCancelled()) {
             return true; // Silent quit
         }
-        declarer.getRelations().put(declaree.getName().get(), state);
-        declaree.getExternRelations().put(declarer.getName().get(), state);
+        declarer.getRelations().put(declaree, state);
+        declaree.getExternRelations().put(declarer, state);
         // TODO remove fees/requirements
         return true;
     }
