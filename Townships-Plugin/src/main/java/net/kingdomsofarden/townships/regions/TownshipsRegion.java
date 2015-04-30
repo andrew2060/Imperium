@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -170,7 +171,27 @@ public class TownshipsRegion implements Region {
         }
         relations = new HashMap<String, RelationState>();
         externRelations = new HashMap<String, RelationState>();
-        // TODO load/save relations
+        StoredDataSection diplomacy = config.getSection("diplomacy");
+        StoredDataSection selfDiplomacy = diplomacy.getSection("self");
+        StoredDataSection externDiplomacy = diplomacy.getSection("others");
+        for (String regionUid : selfDiplomacy.getKeys(false)) {
+            UUID uid = UUID.fromString(regionUid);
+            RelationState state = RelationState.valueOf(diplomacy.get(regionUid, "PEACE"));
+            Region r = Townships.getRegions().get(uid).orNull();
+            if (r == null) {
+                continue; // TODO log
+            }
+            relations.put(r.getName().get(), state);
+        }
+        for (String regionUid : externDiplomacy.getKeys(false)) {
+            UUID uid = UUID.fromString(regionUid);
+            RelationState state = RelationState.valueOf(diplomacy.get(regionUid, "PEACE"));
+            Region r = Townships.getRegions().get(uid).orNull();
+            if (r == null) {
+                continue; // TODO log
+            }
+            externRelations.put(r.getName().get(), state);
+        }
     }
 
     @Override
@@ -269,6 +290,8 @@ public class TownshipsRegion implements Region {
         for (Effect effect : effects.values()) {
             effect.onUnload(Townships.getInstance(), this, effectSection.getSection(effect.getName()));
         }
+
+        // Requirements
         StoredDataSection requirements = data.getSection("requirements");
         StoredDataSection maxRegionReqSection = requirements.getSection("region-types-max");
         for (String type : maxTypeInRegion.keySet()) {
@@ -277,6 +300,17 @@ public class TownshipsRegion implements Region {
         StoredDataSection maxTierReqSection = requirements.getSection("region-tiers-max");
         for (int tierNum : maxTierInRegion.keySet()) {
             maxTierReqSection.set(tierNum + "", maxTierInRegion.get(tierNum));
+        }
+
+        // Diplomacy
+        StoredDataSection diplomacy = data.getSection("diplomacy");
+        StoredDataSection selfDiplomacy = diplomacy.getSection("self");
+        StoredDataSection externDiplomacy = diplomacy.getSection("others");
+        for (Entry<String, RelationState> e : relations.entrySet()) {
+            selfDiplomacy.set(Townships.getRegions().get(e.getKey()).get().getUid().toString(), e.getValue().toString());
+        }
+        for (Entry<String, RelationState> e : externRelations.entrySet()) {
+            externDiplomacy.set(Townships.getRegions().get(e.getKey()).get().getUid().toString(), e.getValue().toString());
         }
 
     }
