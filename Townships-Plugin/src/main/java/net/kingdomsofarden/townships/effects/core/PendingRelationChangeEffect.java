@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.effects.core;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
+import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.events.RegionRelationChangeEvent;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -9,6 +10,8 @@ import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Bukkit;
+
+import java.util.UUID;
 
 public class PendingRelationChangeEffect implements TickableEffect {
 
@@ -75,13 +78,14 @@ public class PendingRelationChangeEffect implements TickableEffect {
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         time = Long.valueOf(data.get("start-time", "0"));
         change = RelationState.valueOf(data.get("relation", "PEACE"));
-        target = r;
+        target = Townships.getRegions().get(UUID.fromString(data.get("region", null))).orNull();
     }
 
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         data.set("start-time", time);
         data.set("relation", change.name());
+        data.set("region", target.getUid());
     }
 
     @Override
