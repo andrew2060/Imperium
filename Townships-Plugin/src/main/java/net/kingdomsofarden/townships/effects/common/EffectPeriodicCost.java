@@ -113,20 +113,8 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
-        lastTick = 0;
-        period = data.get("period", new Serializer<Long>() {
-            @Override
-            public String serialize(Long obj) {
-                return obj + "";
-            }
-
-            @Override
-            public Long deserialize(String input) {
-                return Long.valueOf(input);
-            }
-        }, Long.MAX_VALUE);
+        super.onLoad(plugin, r, data);
         StoredDataSection subSection = data.getSection("cost");
-        region = r;
         resources = new HashMap<Material, Integer>();
         for (String entry : subSection.getList("resources")) {
             String[] parse = entry.split(" ");
@@ -153,7 +141,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
 
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
-        data.set("period", period);
+        super.onUnload(plugin, region, data);
         StoredDataSection subSection = data.getSection("cost");
         if (cost != 0.00) {
             subSection.set("money", cost);
