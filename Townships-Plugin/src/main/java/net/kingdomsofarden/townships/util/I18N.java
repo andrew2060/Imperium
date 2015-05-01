@@ -56,4 +56,9 @@ public class I18N {
     public static final String NO_BETRAYAL = "You are currently in an alliance with (or have a pending alliance with) $0" +
             ", which you must rescind before declaring war";
     public static final String NO_ALLIANCE_WAR = "You cannot offer alliance to an entity that you are at war with";
+    public static final String WAR_STARTED = ChatColor.YELLOW + "Warring has begun between $0 and $1. Unrestricted fighting may now occur without repercussions!";
+    public static final String ALLIANCE_STARTED = ChatColor.GOLD + "$0 and $1 have entered an alliance! A declaration of war on one of its members may be looked upon unfavorably!";
+
+    public static final String ALLIANCE_CANCELED = "$0 and $1 are no longer allied!";
+    public static final String WAR_ENDED = "Peace has returned between $0 and $1!";
 }

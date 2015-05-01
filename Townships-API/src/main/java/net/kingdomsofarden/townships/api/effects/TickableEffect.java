@@ -8,15 +8,9 @@ import net.kingdomsofarden.townships.api.regions.Region;
 public interface TickableEffect extends Effect {
 
     /**
-     * @return The time in milliseconds for the last tick of this effect, or -1 if not ticked yet
+     * @return The time in milliseconds for the first tick of this effect, or -1 to start immediately
      */
-    long lastTick();
-
-    /**
-     * @return The delay in milliseconds for which to schedule the next tick: if dynamic, this will be called right after a tick
-     * to determine when to execute the next tick
-     */
-    long period();
+    long startTime();
 
     /**
      * Called when a region performs a tick on its effects

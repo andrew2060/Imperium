@@ -26,12 +26,12 @@ public class EffectTaskManager implements Runnable {
     public EffectTaskManager(int width) {
         cooldownHeap = new EffectHeap();
         taskStacks = new EffectTaskStack[width];
-        minSizeHeap = new int[width];
-        for (int i = 0; i < width; i++) {
-            minSizeHeap[i] = i;
-        }
         sentinel = 0;
         tickDelay = width;
+        minSizeHeap = new int[tickDelay];
+        for (int i = 0; i < tickDelay; i++) {
+            minSizeHeap[i] = i;
+        }
         toRemove = new HashSet<TickableEffect>();
     }
 

@@ -18,4 +18,6 @@ public class Constants {
     public static Collection<Material> ACCESS_TYPES;
 
     public static boolean PROTECT_FIRE;
+
+    public static long RELATION_DELAY;
 }

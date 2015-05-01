@@ -10,7 +10,7 @@ public abstract class EffectPeriodic implements TickableEffect {
     protected Region region;
 
     @Override
-    public long lastTick() {
+    public long startTime() {
         return lastTick;
     }
 

@@ -14,7 +14,7 @@ public class EffectTask {
     public EffectTask(Region region, TickableEffect effect) {
         this.region = region;
         this.effect = effect;
-        this.nextTick = effect.lastTick();
+        this.nextTick = effect.startTime();
         this.reschedule = true;
     }
 

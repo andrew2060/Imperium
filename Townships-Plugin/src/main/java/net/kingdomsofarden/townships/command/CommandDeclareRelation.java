@@ -6,10 +6,13 @@ import net.kingdomsofarden.townships.api.events.RegionRelationChangeEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.relations.RelationState;
+import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
+import net.kingdomsofarden.townships.util.YAMLDataSection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class CommandDeclareRelation implements Command {
@@ -126,11 +129,16 @@ public class CommandDeclareRelation implements Command {
         declarer.getRelations().put(declaree, state);
         declaree.getExternRelations().put(declarer, state);
         // TODO remove fees/requirements
+        YAMLDataSection section = new YAMLDataSection(new YamlConfiguration());
+        long time = System.currentTimeMillis() + Constants.RELATION_DELAY;
+        section.set("start-time", time);
+        section.set("relation", state.getBaseType().name());
+        Townships.getEffectManager().loadEffect("pending-relation-change", declarer, section);
         return true;
     }
 
     @Override
     public String getUsage() {
-        return null;
+        return "town declare relation <relation> ";
     }
 }
