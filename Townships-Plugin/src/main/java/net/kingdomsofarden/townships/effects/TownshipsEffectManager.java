@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.EffectManager;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
+import net.kingdomsofarden.townships.effects.core.PendingRelationChangeEffect;
 import net.kingdomsofarden.townships.util.Constants;
 
 import java.io.BufferedReader;
@@ -44,6 +45,12 @@ public class TownshipsEffectManager implements EffectManager {
         effects = new HashMap<String, Class<? extends Effect>>();
         taskManager = new EffectTaskManager(Constants.EFFECT_SPREAD_DELAY);
         loadEffects(effectsDir);
+        loadCoreEffects();
+    }
+
+    // Enables dynamic registration by adding entries here
+    private void loadCoreEffects() {
+        effects.put(new PendingRelationChangeEffect().getName().toLowerCase(), PendingRelationChangeEffect.class);
     }
 
     public EffectTaskManager getEffectTaskManager() {
