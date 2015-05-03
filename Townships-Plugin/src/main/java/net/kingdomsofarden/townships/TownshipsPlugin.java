@@ -12,10 +12,14 @@ import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
 import net.kingdomsofarden.townships.storage.YAMLStorage;
 import net.kingdomsofarden.townships.util.TownshipsConfiguration;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
+
+    public static Economy economy;
 
     private TownshipsRegionManager regionManager;
     private TownshipsEffectManager effectManager;
@@ -36,6 +40,11 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         regionManager = new TownshipsRegionManager(this);
         storage.loadAllRegions(regionManager);
 
+        // Load Vault
+        if (!loadEconomy()) {
+            // TODO DEBUG
+        }
+
         // Register Events
         regionalUpdateListener = new RegionalUpdateListener(this);
         Bukkit.getPluginManager().registerEvents(regionalUpdateListener, this);
@@ -43,6 +52,15 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
 
         // Start tasks
         Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);
+    }
+
+    private boolean loadEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
+                .getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+        return (economy != null);
     }
 
     @Override
