@@ -15,7 +15,8 @@ public class CurrencyTaxItem implements TaxItem {
     public boolean tax(Region taxer, Region taxed) {
         EconomyProvider selected = null;
         for (EconomyProvider provider : taxer.getEconomyProviders()) {
-            if (provider.getIdentifier().equals("tax-accot"))
+            if (provider.getIdentifier().equals("tax-account")) {
+
             }
         }
 
