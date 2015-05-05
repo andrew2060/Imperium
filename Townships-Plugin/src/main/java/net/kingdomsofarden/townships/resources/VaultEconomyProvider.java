@@ -4,6 +4,7 @@ import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 import org.bukkit.Bukkit;
 
 import java.util.UUID;
@@ -31,7 +32,10 @@ public class VaultEconomyProvider implements EconomyProvider {
 
     @Override
     public boolean withdraw(double amount) {
-        return TownshipsPlugin.economy.bankWithdraw(accountUid.toString(), amount).transactionSuccess();
+        if (TownshipsPlugin.economy.bankHas(accountUid.toString(), amount).type.equals(ResponseType.SUCCESS))
+            return TownshipsPlugin.economy.bankWithdraw(accountUid.toString(), amount).transactionSuccess();
+        else
+            return false;
     }
 
     @Override

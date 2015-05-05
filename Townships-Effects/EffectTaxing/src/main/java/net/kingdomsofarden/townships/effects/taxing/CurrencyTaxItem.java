@@ -16,10 +16,13 @@ public class CurrencyTaxItem implements TaxItem {
         EconomyProvider selected = null;
         for (EconomyProvider provider : taxer.getEconomyProviders()) {
             if (provider.getIdentifier().equals("tax-account")) {
-
+                if (!provider.withdraw(amount)) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 }
