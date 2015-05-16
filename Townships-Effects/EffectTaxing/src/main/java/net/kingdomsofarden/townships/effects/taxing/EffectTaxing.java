@@ -7,6 +7,7 @@ import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class EffectTaxing extends EffectPeriodic {
 
@@ -46,16 +47,33 @@ public class EffectTaxing extends EffectPeriodic {
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+        super.onLoad(plugin, region, data);
         taxes = new HashMap<String, TaxItem>();
         outstanding = new HashMap<String, TaxItem>();
         StoredDataSection section = data.getSection("taxes");
         for (String key : section.getKeys(false)) {
-
+            StoredDataSection subSection = section.getSection(key);
+            TaxItem item = new CompositeTaxItem(subSection);
+            taxes.put(key.toLowerCase(), item);
+        }
+        section = data.getSection("outstanding");
+        for (String key : section.getKeys(false)) {
+            StoredDataSection subSection = section.getSection(key);
+            TaxItem item = new CompositeTaxItem(subSection);
+            outstanding.put(key, item);
         }
     }
 
     @Override
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
-
+        super.onUnload(plugin, region, data);
+        StoredDataSection section = data.getSection("taxes");
+        for (Entry<String, TaxItem> entry : taxes.entrySet()) {
+            entry.getValue().save(section.getSection(entry.getKey()));
+        }
+        section = data.getSection("outstanding");
+        for (Entry<String, TaxItem> entry : taxes.entrySet()) {
+            entry.getValue().save(section.getSection(entry.getKey()));
+        }
     }
 }

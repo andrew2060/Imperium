@@ -117,4 +117,13 @@ public class CompositeTaxItem implements TaxItem {
     public Map<Material, Integer> getItems() {
         return items;
     }
+
+    @Override
+    public void save(StoredDataSection section) {
+        StoredDataSection data = section.getSection("items");
+        for (Entry<Material, Integer> e : items.entrySet()) {
+            data.set(e.getKey().name(), e.getValue());
+        }
+        section.set("money", amount);
+    }
 }
