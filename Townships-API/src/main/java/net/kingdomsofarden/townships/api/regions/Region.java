@@ -176,4 +176,6 @@ public interface Region {
      * @return Whether the given Citizen is a Citizen of this (super) region
      */
     boolean isCitizen(Citizen player);
+
+    Collection<Citizen> getCitizens();
 }

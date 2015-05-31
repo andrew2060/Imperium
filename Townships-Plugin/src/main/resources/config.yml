@@ -1,3 +1,4 @@
+
 performance: # Performance related settings, change with caution
   # X/Z divisions: generally best practice is to try to go for multiples of 16 if possible. Optimally this would be some
   # reasonable lower bound: you want to cover the smallest area possible while minimizing the number of min-divisions
@@ -10,7 +11,6 @@ performance: # Performance related settings, change with caution
   # The maximum amount of ticks to defer a regional check for blcok consistancy (i.e. that block requirements are still
   # met) after a block is broken. The higher, the better, albeit higher also means a greater delay before upkeep attempts
   consistency-check-block-max-delay: 100
-
 protection:
   protect-flint-and-steel: false # Affected by the INTERACT protection
   protect-interact: # Affected by the INTERACT protection
@@ -60,3 +60,5 @@ region-relations:
   minimum-declarable-tier: 2      # Minimum regional tier to have relationships with other regions, cannot be disabled
   maximum-tier-difference: -1     # Maximum difference of two regional tiers to declare some relationship, -1 to disable
   relation-change-delay: 86400000 # Time before a relation change is put into effect, can be cancelled before then
+miscellaneous:
+  year-length: 438300000 # The length of a townships year, in milliseconds. 438300000 translates to 365 ingame days

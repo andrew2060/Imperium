@@ -54,4 +54,14 @@ public interface BoundingBox {
      * @return A mapping of remainder block type/amount not found
      */
     Map<Material,Integer> checkForBlocks(Map<Material, Integer> blocks);
+
+    /**
+     * @return The 2-dimensional area of this bounding box
+     */
+    int size2d();
+
+    /**
+     * @return The block volume of this bounding box
+     */
+    int volume();
 }
