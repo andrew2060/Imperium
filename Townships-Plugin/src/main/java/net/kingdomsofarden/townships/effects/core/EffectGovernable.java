@@ -1,4 +1,4 @@
-package net.kingdomsofarden.townshipseffects.governable;
+package net.kingdomsofarden.townships.effects.core;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
@@ -23,10 +23,24 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         return "governable";
     }
 
+    public int getCurrentPop() {
+        return curr.pop;
+    }
+
+    public int getCurrLand() {
+        return curr.land;
+    }
+
+    public double getProd() {
+        long prop = System.currentTimeMillis() % Constants.YEAR_LENGTH;
+        double ratio = ((double)prop)/Constants.YEAR_LENGTH;
+        return curr.prod  + last.prod * (1-ratio);
+    }
+
     class Stats {
         private int pop = 0;
         private int land = 0;
-        private int prod = 0;
+        private int prod = 0; // TODO events for this
 
         private double gnp = 0;
         private double exp = 0;

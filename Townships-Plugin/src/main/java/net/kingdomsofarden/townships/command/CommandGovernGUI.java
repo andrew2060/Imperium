@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.effects.core.EffectGovernable;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import net.md_5.bungee.api.ChatColor;
@@ -52,6 +53,10 @@ public class CommandGovernGUI implements Command {
             Messaging.sendFormattedMessage(sender, I18N.PLAYER_ONLY_COMMAND);
             return true;
         }
+        if (!region.hasEffect("governable")) {
+            Messaging.sendFormattedMessage(sender, I18N.SUPER_REGION_REQUIRED);
+            return true;
+        }
         switch (args.length) {
             case 1: return displayGeneral(sender, args, region);
             case 2:
@@ -90,15 +95,16 @@ public class CommandGovernGUI implements Command {
         }
         String title = "======= " + region.getType() + "Demographics: " + region.getName().get() + " =======\n";
         String dem = Messaging.format(I18N.DEMOGRAPHICS, region.getName().get());
-
+        EffectGovernable effect = region.getEffect("governable");
+        effect.updateImmed();
         ComponentBuilder page;
         switch (num) {
             default:
                 page = new ComponentBuilder(title).color(ChatColor.YELLOW)
                         .append("\n=== General Information ===\n").color(ChatColor.GREEN)
-                        .append("Population: ").color(ChatColor.AQUA).append()
-                        .append("Land: ").color(ChatColor.AQUA).append()
-                        .append("Raw Production: ").color(ChatColor.AQUA).append()
+                        .append("Population: ").color(ChatColor.AQUA).append(effect.getCurrentPop() + " Citizens\n")
+                        .append("Land: ").color(ChatColor.AQUA).append(effect.getCurrLand() + " m^2\n")
+                        .append("Raw Production: ").color(ChatColor.AQUA).append(effect.getProd() + " units/year\n")
                         .append("Internal Trade Index: ").color(ChatColor.AQUA).append();
                 break;
             case 2:

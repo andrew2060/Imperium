@@ -63,4 +63,5 @@ public class I18N {
     public static final String WAR_ENDED = "Peace has returned between $0 and $1!";
     public static final String DEMOGRAPHICS = "Show population and fiscal statistics for $0";
     public static final String DIPLOMACY = "Manage $0's relations with other entities";
+    public static final String SUPER_REGION_REQUIRED = "This region is not governable!";
 }
