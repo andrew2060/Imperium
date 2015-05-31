@@ -171,5 +171,9 @@ public interface Region {
     boolean addAccess(UUID uid, AccessType access);
     boolean removeAccess(UUID uid, AccessType access);
 
-
+    /**
+     * @param player The player to check
+     * @return Whether the given Citizen is a Citizen of this (super) region
+     */
+    boolean isCitizen(Citizen player);
 }
