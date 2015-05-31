@@ -4,6 +4,7 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
+import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -52,13 +53,15 @@ public class EffectIncomeTax implements Effect, Listener {
 
     @EventHandler(priority= EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerDepositTransaction(PlayerEconomyTransactionEvent event) {
-        Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-        if (region.isCitizen(c)) {
-            double amount = event.getAmount();
-            double taxed = amount * tax;
-            amount -= taxed;
-            event.setAmount(amount);
-            region.getEconomyProviders()[0].deposit(amount);
+        if (event.getType().equals(TransactionType.DEPOSIT)) {
+            Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());
+            if (region.isCitizen(c)) {
+                double amount = event.getAmount();
+                double taxed = amount * tax;
+                amount -= taxed;
+                event.setAmount(amount);
+                region.getEconomyProviders()[0].deposit(amount);
+            }
         }
     }
 }
