@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.api.events;
 
 import net.kingdomsofarden.townships.api.regions.Region;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -8,7 +9,7 @@ import org.bukkit.event.HandlerList;
  * Is called when a region is about to disband. <br>
  * <b>Important:</b> Cannot cancel when region is disbanding due to failure to meet requirements
  */
-public class RegionDisbandEvent extends Event {
+public class RegionDisbandEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final DisbandCause cause;
     private boolean cancelled;

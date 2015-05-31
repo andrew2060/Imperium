@@ -1,5 +1,8 @@
 package net.kingdomsofarden.townships;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.configuration.Configuration;
@@ -7,6 +10,8 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
+import net.kingdomsofarden.townships.instrumentation.InstrumentationManager;
+import net.kingdomsofarden.townships.instrumentation.agents.VaultTransactionAgent;
 import net.kingdomsofarden.townships.listeners.RegionalConsistancyListener;
 import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
@@ -16,6 +21,8 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
 
 public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
 
@@ -43,6 +50,19 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Load Vault
         if (!loadEconomy()) {
             // TODO DEBUG
+        }
+
+        // Do ASM Stuff with Vault
+        try {
+            InstrumentationManager.attachAgentToJVM(VaultTransactionAgent.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AttachNotSupportedException e) {
+            e.printStackTrace();
+        } catch (AgentLoadException e) {
+            e.printStackTrace();
+        } catch (AgentInitializationException e) {
+            e.printStackTrace();
         }
 
         // Register Events

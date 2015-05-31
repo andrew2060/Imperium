@@ -36,6 +36,10 @@ public final class AccessType {
      * Administrative Access: Manage regional diplomacy with other regions
      */
     public static final AccessType DIPLOMAT = new AccessType("DIPLOMAT");
+    /**
+     * Administrative Access: Manage citizen acceptance/rejection/removal
+     */
+    public static final AccessType IMMIGRATION = new AccessType("IMMIGRATION");
 
 
     public static AccessType valueOf(String name) {

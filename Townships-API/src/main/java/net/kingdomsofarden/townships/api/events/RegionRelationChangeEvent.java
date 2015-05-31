@@ -2,10 +2,11 @@ package net.kingdomsofarden.townships.api.events;
 
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.relations.RelationState;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class RegionRelationChangeEvent extends Event {
+public class RegionRelationChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
     private Region origin;
