@@ -16,9 +16,8 @@ public class VaultEconomyProvider implements EconomyProvider {
     private int priority;
     private String identifier;
 
-    public VaultEconomyProvider(UUID accountUid, Region region, int priority, String identifier) {
+    public VaultEconomyProvider(UUID accountUid, Region region, String identifier) {
         this.accountUid = accountUid;
-        this.priority = priority;
         this.identifier = identifier;
         if (!TownshipsPlugin.economy.getBanks().contains(accountUid.toString())) {
             TownshipsPlugin.economy.createBank(accountUid.toString(), Bukkit.getOfflinePlayer(region.getRole(RoleGroup.ROOT).iterator().next())); // Guaranteed to always have one
@@ -48,8 +47,4 @@ public class VaultEconomyProvider implements EconomyProvider {
         return TownshipsPlugin.economy.bankDeposit(accountUid.toString(), amount).amount;
     }
 
-    @Override
-    public int getPriority() {
-        return priority;
-    }
 }

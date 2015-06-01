@@ -1,4 +1,4 @@
-package net.kingdomsofarden.townships.effects.incometax;
+package net.kingdomsofarden.townships.effects.core;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
@@ -7,7 +7,9 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
+import net.kingdomsofarden.townships.resources.VaultEconomyProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,6 +39,9 @@ public class EffectIncomeTax implements Effect, Listener {
         } catch (NumberFormatException e) {
             tax = 0;
         }
+        if (!this.region.getEconomyProviders().containsKey(EconomyProvider.TREASURY)) {
+            this.region.getEconomyProviders().put(EconomyProvider.TREASURY, new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
+        }
         Bukkit.getPluginManager().registerEvents(this, (Plugin) plugin.getBackingImplementation());
     }
 
@@ -60,8 +65,12 @@ public class EffectIncomeTax implements Effect, Listener {
                 double taxed = amount * tax;
                 amount -= taxed;
                 event.setAmount(amount);
-                region.getEconomyProviders()[0].deposit(amount);
+                region.getEconomyProviders().get(EconomyProvider.TREASURY).deposit(amount);
             }
         }
+    }
+
+    public double getAmount() {
+        return tax;
     }
 }

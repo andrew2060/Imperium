@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 public class PhysicalChestItemProvider implements ItemProvider {
 
     protected Location chestLocation;
-    protected int priority;
 
     @Override
     public int getAmount(Material mat) {
@@ -87,11 +86,6 @@ public class PhysicalChestItemProvider implements ItemProvider {
             rem += remaining.getValue().getAmount();
         }
         return max - rem;
-    }
-
-    @Override
-    public int getPriority() {
-        return priority;
     }
 
 }

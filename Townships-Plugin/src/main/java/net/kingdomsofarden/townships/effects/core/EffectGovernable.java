@@ -7,8 +7,10 @@ import net.kingdomsofarden.townships.api.events.BankEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
+import net.kingdomsofarden.townships.resources.VaultEconomyProvider;
 import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,6 +37,21 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         long prop = System.currentTimeMillis() % Constants.YEAR_LENGTH;
         double ratio = ((double)prop)/Constants.YEAR_LENGTH;
         return curr.prod  + last.prod * (1-ratio);
+    }
+
+    public double getGnp() {
+        long rem = System.currentTimeMillis() % Constants.YEAR_LENGTH;
+        double ratio = ((double)rem)/Constants.YEAR_LENGTH;
+        return curr.gnp + last.gnp * (1-ratio);
+    }
+
+    public double getExp() {
+        long rem = System.currentTimeMillis() % Constants.YEAR_LENGTH;
+        double ratio = ((double)rem)/Constants.YEAR_LENGTH;
+        return curr.exp + last.exp * (1-ratio);    }
+
+    public double getNNI() {
+        return getGnp() - getExp();
     }
 
     class Stats {
@@ -83,6 +100,9 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         curr.prod = Integer.valueOf(data.get("curr.prod", "0"));
         curr.gnp = Double.valueOf(data.get("curr.gnp", "0"));
         curr.exp = Double.valueOf(data.get("curr.exp", "0"));
+        if (!region.getEconomyProviders().containsKey(EconomyProvider.TREASURY)) {
+            region.getEconomyProviders().put(EconomyProvider.TREASURY, new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
+        }
     }
 
     public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {

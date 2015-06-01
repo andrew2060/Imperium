@@ -125,9 +125,9 @@ public interface Region {
 
     void removeItemProvider(ItemProvider provider);
 
-    EconomyProvider[] getEconomyProviders();
+    Map<String, EconomyProvider> getEconomyProviders();
 
-    ItemProvider[] getItemProviders();
+    Map<String, ItemProvider>  getItemProviders();
 
     /**
      * @return The region's validity, i.e. whether it is currently considered a valid region (may not be true if, for

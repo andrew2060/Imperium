@@ -1,11 +1,14 @@
 package net.kingdomsofarden.townships.command;
 
+import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.effects.core.EffectGovernable;
+import net.kingdomsofarden.townships.effects.core.EffectIncomeTax;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import net.md_5.bungee.api.ChatColor;
@@ -86,7 +89,7 @@ public class CommandGovernGUI implements Command {
     }
 
     private boolean processDemographics(CommandSender sender, String[] args, Region region) {
-        int num = 0;
+        int num = 1;
         if (args.length == 3) {
             try {
                 num = Integer.valueOf(args[2]);
@@ -94,32 +97,43 @@ public class CommandGovernGUI implements Command {
             }
         }
         String title = "======= " + region.getType() + "Demographics: " + region.getName().get() + " =======\n";
-        String dem = Messaging.format(I18N.DEMOGRAPHICS, region.getName().get());
         EffectGovernable effect = region.getEffect("governable");
         effect.updateImmed();
         ComponentBuilder page;
         switch (num) {
             default:
+                EconomyProvider provider = region.getEconomyProviders().get(EconomyProvider.TREASURY);
                 page = new ComponentBuilder(title).color(ChatColor.YELLOW)
-                        .append("\n=== General Information ===\n").color(ChatColor.GREEN)
-                        .append("Population: ").color(ChatColor.AQUA).append(effect.getCurrentPop() + " Citizens\n")
-                        .append("Land: ").color(ChatColor.AQUA).append(effect.getCurrLand() + " m^2\n")
-                        .append("Raw Production: ").color(ChatColor.AQUA).append(effect.getProd() + " units/year\n")
-                        .append("Internal Trade Index: ").color(ChatColor.AQUA).append();
+                        .append("=== General Information ===").color(ChatColor.GREEN).append("\n")
+                        .append("Population: ").color(ChatColor.AQUA).append(effect.getCurrentPop() + " Citizens").append("\n")
+                        .append("Land: ").color(ChatColor.AQUA).append(effect.getCurrLand() + " m^2").append("\n")
+                        .append("Raw Production: ").color(ChatColor.AQUA).append(effect.getProd() + " units per year").append("\n")
+                        .append("Treasury: ").color(ChatColor.AQUA).append(provider.getBalance()
+                                + TownshipsPlugin.economy.currencyNamePlural()).append("\n");
                 break;
-            case 2:
+            case 2: {
+                EffectIncomeTax incomeTaxEffect = region.getEffect("income-tax");
                 page = new ComponentBuilder(title).color(ChatColor.YELLOW)
                         .append("\n=== Fiscal Information ===\n").color(ChatColor.GREEN)
-                        .append("Treasury: ").color(ChatColor.AQUA).append()
-                        .append("Income Tax Rate: ").color(ChatColor.AQUA).append()
-                        .append("Gross National Product: ").color(ChatColor.AQUA).append()
-                        .append("Expenditures: ").color(ChatColor.AQUA).append()
-                        .append("Net National Income: ").color(ChatColor.AQUA).append();
+                        .append("Income Tax Rate: ").color(ChatColor.AQUA).append(incomeTaxEffect != null ?
+                                incomeTaxEffect.getAmount() * 100 + "%" : "0%").append("\n")
+                        .append("Gross National Product: ").color(ChatColor.AQUA).append(effect.getGnp()
+                                + TownshipsPlugin.economy.currencyNamePlural() + " per year").append("\n")
+                        .append("Expenditures: ").color(ChatColor.AQUA).append(effect.getExp()
+                                + TownshipsPlugin.economy.currencyNamePlural() + " per year").append("\n")
+                        .append("Net National Income: ").color(ChatColor.AQUA).append(effect.getNNI()
+                                + TownshipsPlugin.economy.currencyNamePlural() + " per year").append("\n");
                 break;
+            }
+        }
+        if (num > 1) {
+            page.append("[<<]").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "govern " + region.getName().get() + " " + (num - 1)));
+        }
+        if (num < 2) { // Future proofing if we are adding more pages
+            page.append("[>>]").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "govern " + region.getName().get() + " " + (num + 1)));
         }
         ((Player)sender).spigot().sendMessage(page.create());
-
-
+        return true;
     }
 
     private boolean displayGeneral(CommandSender sender, String[] args, Region region) {
@@ -136,7 +150,8 @@ public class CommandGovernGUI implements Command {
             msgBuilder.append("Governance")
                     .event(new HoverEvent(Action.SHOW_TEXT,
                             new ComponentBuilder("Manage access roles").color(ChatColor.GREEN).create()))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "govern " + args[0] + "access"));
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "govern " + args[0] + "access"))
+                    .append("\n");
         }
         if (region.hasAccess(c, AccessType.IMMIGRATION)) {
             msgBuilder.append("Immigration and Naturalization")

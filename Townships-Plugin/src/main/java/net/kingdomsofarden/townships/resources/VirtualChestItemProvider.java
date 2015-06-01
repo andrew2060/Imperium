@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 public class VirtualChestItemProvider implements ItemProvider {
 
     protected Inventory inventory;
-    protected int priority;
 
     @Override
     public int getAmount(Material mat) {
@@ -62,8 +61,4 @@ public class VirtualChestItemProvider implements ItemProvider {
         return max - rem;
     }
 
-    @Override
-    public int getPriority() {
-        return priority;
-    }
 }
