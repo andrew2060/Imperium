@@ -10,34 +10,32 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public class AreaBoundingBox implements CuboidBoundingBox {
-
+public class DynamicCuboidBoundingBox implements CuboidBoundingBox {
     private final int minX;
-    private final int maxX;
-    private final int minZ;
-    private final int maxZ;
     private final int minY;
+    private final int minZ;
+    private final int maxX;
     private final int maxY;
-    private World world;
-    private Collection<Integer[]> vertices;
+    private final int maxZ;
+    private ArrayList<Integer[]> vertices;
 
-    public AreaBoundingBox(World world, int minX, int maxX, int minZ, int maxZ) {
+
+    public DynamicCuboidBoundingBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         this.minX = minX;
-        this.maxX = maxX;
+        this.minY = minY;
         this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
         this.maxZ = maxZ;
-        this.minY = Integer.MIN_VALUE;
-        this.maxY = Integer.MAX_VALUE;
-        this.world = world;
         this.vertices = new ArrayList<Integer[]>(8);
-        vertices.add(new Integer[] {minX, minY, minZ});
-        vertices.add(new Integer[] {minX, maxY, minZ});
-        vertices.add(new Integer[] {minX, minY, maxZ});
-        vertices.add(new Integer[] {minX, maxY, maxZ});
-        vertices.add(new Integer[] {maxX, minY, minZ});
-        vertices.add(new Integer[] {maxX, maxY, minZ});
-        vertices.add(new Integer[] {maxX, minY, maxZ});
-        vertices.add(new Integer[] {maxX, maxY, maxZ});
+        this.vertices.add(new Integer[] {minX, minY, minZ});
+        this.vertices.add(new Integer[] {minX, maxY, minZ});
+        this.vertices.add(new Integer[] {minX, minY, maxZ});
+        this.vertices.add(new Integer[] {minX, maxY, maxZ});
+        this.vertices.add(new Integer[] {maxX, minY, minZ});
+        this.vertices.add(new Integer[] {maxX, maxY, minZ});
+        this.vertices.add(new Integer[] {maxX, minY, maxZ});
+        this.vertices.add(new Integer[] {maxX, maxY, maxZ});
     }
 
     @Override
@@ -72,21 +70,19 @@ public class AreaBoundingBox implements CuboidBoundingBox {
 
     @Override
     public boolean isInBounds(Location loc) {
-        return loc.getWorld().equals(world) && isInBounds(loc.getX(), loc.getY(), loc.getZ());
+        return isInBounds(loc.getX(), loc.getY(), loc.getZ());
     }
 
     @Override
     public boolean isInBounds(double x, double y, double z) {
-        return (minX <= x) && (x <= maxX) && (minY <= y) && (y <= maxY) && (minZ <= z) && (z <= maxZ);
+        return (getMinX() <= x) && (x <= getMaxX()) && (getMinY() <= y)
+                && (y <= getMaxY()) && (getMinZ() <= z) && (z <= getMaxZ());
     }
 
     @Override
     public boolean intersects(BoundingArea box) {
-        if (!box.getWorld().equals(this.world)) {
-            return false;
-        }
         for (Integer[] vertex : box.getVertices()) {
-            if (isInBounds(vertex[0], vertex[1], vertex[2])) {
+            if (box.isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return true;
             }
         }
@@ -100,7 +96,7 @@ public class AreaBoundingBox implements CuboidBoundingBox {
 
     @Override
     public World getWorld() {
-        return world;
+        throw new UnsupportedOperationException("Cannot get world in a dynamic bounding box");
     }
 
     @Override
@@ -110,21 +106,21 @@ public class AreaBoundingBox implements CuboidBoundingBox {
                 return false;
             }
         }
-        return true;
+        return true; // TODO not correct
     }
 
     @Override
     public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
-        return null; //TODO
+        return null;
     }
 
     @Override
     public int size2d() {
-        return (maxZ - minZ) * (maxX - minX);
+        return (maxX - minX) * (maxZ - minZ);
     }
 
     @Override
     public int volume() {
-        return (maxZ - minZ) * (maxX - minX) * (maxY - minY);
+        return size2d() * (maxY - minY);
     }
 }

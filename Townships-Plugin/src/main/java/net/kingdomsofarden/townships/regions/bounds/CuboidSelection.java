@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -34,7 +34,7 @@ public class CuboidSelection implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean intersects(BoundingBox box) {
+    public boolean intersects(BoundingArea box) {
         if (!box.getWorld().equals(getWorld())) {
             return false;
         }
@@ -144,12 +144,12 @@ public class CuboidSelection implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean encapsulates(BoundingBox other) {
+    public boolean encapsulates(BoundingArea other) {
         for (Integer[] vertex : other.getVertices()) {
              if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                  return false;
              }
         }
-        return true;
+        return true; // TODO not correct
     }
 }

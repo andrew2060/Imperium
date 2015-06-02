@@ -1,12 +1,14 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class AxisAlignedBoundingBox implements CuboidBoundingBox {
     private ArrayList<Integer[]> vertices;
@@ -51,7 +53,7 @@ public class AxisAlignedBoundingBox implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean intersects(BoundingBox box) {
+    public boolean intersects(BoundingArea box) {
         if (!box.getWorld().equals(world)) {
             return false;
         }
@@ -74,13 +76,28 @@ public class AxisAlignedBoundingBox implements CuboidBoundingBox {
     }
 
     @Override
-    public boolean encapsulates(BoundingBox other) {
+    public boolean encapsulates(BoundingArea other) {
         for (Integer[] vertex : other.getVertices()) {
             if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+        return null; // TODO
+    }
+
+    @Override
+    public int size2d() {
+        return (maxZ - minZ) * (maxX - minX);
+    }
+
+    @Override
+    public int volume() {
+        return (maxZ - minZ) * (maxX - minX) * (maxY - minY);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
-public interface CuboidBoundingBox extends BoundingBox {
+public interface CuboidBoundingBox extends BoundingArea {
     // Bounding Methods TODO Javadocs
     int getMinX();
     int getMaxX();

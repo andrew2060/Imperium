@@ -1,20 +1,28 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
-public class CompositeBoundingBox implements BoundingBox {
+public class CompositeBufferedBoundingArea implements BoundingArea {
 
-    private BoundingBox[] bounds; // Relatively static expected size
+    private BoundingArea[] bounds; // Relatively static expected size
     private World world;
+    private Collection<Region> regions;
+
+    public void reconstruct() {
+
+    }
 
     @Override
     public boolean isInBounds(Location loc) {
-        for (BoundingBox sub : bounds) {
+        for (BoundingArea sub : bounds) {
             if (sub.isInBounds(loc)) {
                 return true;
             }
@@ -24,7 +32,7 @@ public class CompositeBoundingBox implements BoundingBox {
 
     @Override
     public boolean isInBounds(double x, double y, double z) {
-        for (BoundingBox sub : bounds) {
+        for (BoundingArea sub : bounds) {
             if (sub.isInBounds(x, y, z)) {
                 return true;
             }
@@ -33,8 +41,8 @@ public class CompositeBoundingBox implements BoundingBox {
     }
 
     @Override
-    public boolean intersects(BoundingBox box) {
-        for (BoundingBox sub : bounds) {
+    public boolean intersects(BoundingArea box) {
+        for (BoundingArea sub : bounds) {
             if (sub.intersects(box)) {
                 return true;
             }
@@ -45,7 +53,7 @@ public class CompositeBoundingBox implements BoundingBox {
     @Override
     public Collection<Integer[]> getVertices() {
         LinkedList<Integer[]> ret = new LinkedList<Integer[]>();
-        for (BoundingBox box : bounds) {
+        for (BoundingArea box : bounds) {
             ret.addAll(box.getVertices());
         }
         return ret;
@@ -57,12 +65,27 @@ public class CompositeBoundingBox implements BoundingBox {
     }
 
     @Override
-    public boolean encapsulates(BoundingBox other) {
-        for (BoundingBox box : bounds) {
+    public boolean encapsulates(BoundingArea other) {
+        for (BoundingArea box : bounds) {
             if (box.encapsulates(other)) {
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+        return null;
+    }
+
+    @Override
+    public int size2d() {
+        return 0;
+    }
+
+    @Override
+    public int volume() {
+        return 0;
     }
 }

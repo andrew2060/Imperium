@@ -7,7 +7,7 @@ import org.bukkit.World;
 import java.util.Collection;
 import java.util.Map;
 
-public interface BoundingBox {
+public interface BoundingArea {
 
     /**
      * @param loc The location to check
@@ -29,7 +29,7 @@ public interface BoundingBox {
      * @param box The other bounding box to check
      * @return True if this bounding box interacts with the parameter bounding box at some point
      */
-    boolean intersects(BoundingBox box);
+    boolean intersects(BoundingArea box);
 
     /**
      * @return A sorted collection of vertices using Double[] {x, y, z} representation
@@ -46,7 +46,7 @@ public interface BoundingBox {
      * @param other The other bounding box to check
      * @return True if this bounding box completely encapsulates the other
      */
-    boolean encapsulates(BoundingBox other);
+    boolean encapsulates(BoundingArea other);
 
     /**
      * Checks the given region for the parameter blocks

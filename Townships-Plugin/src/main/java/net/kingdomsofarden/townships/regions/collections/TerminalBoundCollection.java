@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
@@ -140,7 +140,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox bounds, TreeSet<Region> col) {
+    public void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col) {
         for (Region r : contents) {
             if (bounds.intersects(r.getBounds()) && !bounds.equals(r.getBounds())) {
                 col.add(r);

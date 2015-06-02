@@ -20,7 +20,7 @@ public class EffectTaxpayer implements Effect {
 
     @Override
     public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
-        region.addEconomyProvider(new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
+        region.getEconomyProviders().put(EconomyProvider.TREASURY, new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
         this.region = region;
     }
 

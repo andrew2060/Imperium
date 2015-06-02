@@ -5,6 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
@@ -178,4 +179,9 @@ public interface Region {
     boolean isCitizen(Citizen player);
 
     Collection<Citizen> getCitizens();
+
+    /**
+     * @return The ZOC that this region exerts, used in buffered composite bounding box calculations
+     */
+    BoundingArea getZOC();
 }

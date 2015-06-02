@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
@@ -191,7 +191,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox b, TreeSet<Region> coll) {
+    public void getIntersectingRegions(BoundingArea b, TreeSet<Region> coll) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -232,7 +232,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    private void getIntersections(BoundingBox b, int i, boolean negative, TreeSet<Region> add) {
+    private void getIntersections(BoundingArea b, int i, boolean negative, TreeSet<Region> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         if (coll[i] != null) {
             coll[i].getIntersectingRegions(b, add);
@@ -321,11 +321,11 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean remove(Object o) {
-        BoundingBox b;
+        BoundingArea b;
         if (o instanceof Region) {
             b = ((Region) o).getBounds();
-        } else if (o instanceof BoundingBox) {
-            b = (BoundingBox) o;
+        } else if (o instanceof BoundingArea) {
+            b = (BoundingArea) o;
         } else {
             return false;
         }
@@ -382,7 +382,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    private boolean remove(BoundingBox bound, int i, boolean negative) {
+    private boolean remove(BoundingArea bound, int i, boolean negative) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         return !(i >= coll.length || coll[i] == null) && coll[i].remove(bound);
     }

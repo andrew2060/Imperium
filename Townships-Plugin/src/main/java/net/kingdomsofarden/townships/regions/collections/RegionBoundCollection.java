@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.regions.collections;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import org.bukkit.Location;
@@ -72,7 +72,7 @@ public abstract class RegionBoundCollection implements Area {
      * @param b A bounding box to check
      * @return True if some portion of b falls within the area managed by this collection
      */
-    protected boolean isInBounds(BoundingBox b) {
+    protected boolean isInBounds(BoundingArea b) {
         return getBoundingBox().intersects(b);
     }
 
@@ -91,5 +91,5 @@ public abstract class RegionBoundCollection implements Area {
 
     public abstract Optional<Area> getBoundingArea(int x, int z);
 
-    public abstract void getIntersectingRegions(BoundingBox bounds, TreeSet<Region> col);
+    public abstract void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col);
 }

@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
 import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
@@ -131,7 +131,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public void getIntersectingRegions(BoundingBox b, TreeSet<Region> col) {
+    public void getIntersectingRegions(BoundingArea b, TreeSet<Region> col) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
@@ -254,11 +254,11 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override
     public boolean remove(Object o) {
-        BoundingBox b;
+        BoundingArea b;
         if (o instanceof Region) {
             b = ((Region) o).getBounds();
-        } else if (o instanceof BoundingBox) {
-            b = (BoundingBox) o;
+        } else if (o instanceof BoundingArea) {
+            b = (BoundingArea) o;
         } else {
             return false;
         }

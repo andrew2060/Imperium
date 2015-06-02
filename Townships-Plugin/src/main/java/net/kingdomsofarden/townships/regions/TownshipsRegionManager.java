@@ -7,7 +7,7 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
 import org.bukkit.Location;
@@ -205,7 +205,7 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override
-    public TreeSet<Region> getIntersectingRegions(BoundingBox bounds) {
+    public TreeSet<Region> getIntersectingRegions(BoundingArea bounds) {
         UUID world = bounds.getWorld().getUID();
         if (maps.containsKey(world)) {
             TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
