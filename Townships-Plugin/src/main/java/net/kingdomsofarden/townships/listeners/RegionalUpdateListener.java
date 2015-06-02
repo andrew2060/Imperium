@@ -22,25 +22,23 @@ public class RegionalUpdateListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    @EventHandler public void onPlayerJoin(PlayerJoinEvent event) {
         Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
-        c.setCurrentArea(plugin.getRegions().getBoundingArea(event.getPlayer().getLocation()).orNull());
+        c.setCurrentArea(
+            plugin.getRegions().getBoundingArea(event.getPlayer().getLocation()).orNull());
     }
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    @EventHandler public void onPlayerQuit(PlayerQuitEvent event) {
         Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         c.setCurrentArea(null);
     }
 
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
+    @EventHandler public void onPlayerDeath(PlayerDeathEvent event) {
         Citizen c = plugin.getCitizens().getCitizen(event.getEntity().getUniqueId());
         c.setCurrentArea(null);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled =  true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         c.setCurrentArea(plugin.getRegions().getBoundingArea(event.getRespawnLocation()).orNull());
@@ -57,10 +55,10 @@ public class RegionalUpdateListener implements Listener {
             double xTo;
             double zFrom;
             double zTo;
-            xFrom = from.getX()/Constants.MIN_DIV_X;
-            xTo = to.getX()/Constants.MIN_DIV_X;
-            zFrom = from.getZ()/Constants.MIN_DIV_Z;
-            zTo = to.getZ()/Constants.MIN_DIV_Z;
+            xFrom = from.getX() / Constants.MIN_DIV_X;
+            xTo = to.getX() / Constants.MIN_DIV_X;
+            zFrom = from.getZ() / Constants.MIN_DIV_Z;
+            zTo = to.getZ() / Constants.MIN_DIV_Z;
             if (xFrom != xTo || zFrom != zTo) {
                 c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
             }

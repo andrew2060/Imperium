@@ -49,12 +49,12 @@ public class TownshipsConfiguration extends YAMLDataSection implements Configura
         Constants.BLOCK_CHECK_DELAY = config.getInt("consistency-check-block-max-delay", 100);
     }
 
-    @Override
-    public Optional<StoredDataSection> getRegionConfiguration(String name) {
+    @Override public Optional<StoredDataSection> getRegionConfiguration(String name) {
         if (!regionDefaults.containsKey(name.toLowerCase())) {
             return Optional.absent();
         }
-        StoredDataSection data = new YAMLDataSection(YamlConfiguration.loadConfiguration(regionDefaults.get(name.toLowerCase())));
+        StoredDataSection data = new YAMLDataSection(
+            YamlConfiguration.loadConfiguration(regionDefaults.get(name.toLowerCase())));
         data.set("name", name);
         return Optional.of(data);
     }

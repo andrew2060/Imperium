@@ -5,7 +5,7 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
-import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -31,30 +31,27 @@ public abstract class RegionBoundCollection implements Area {
 
 
 
-    @Override
-    public int[] getBounds() {
+    @Override public int[] getBounds() {
         return new int[] {minX, maxX, minZ, maxZ};
     }
 
-    @Override
-    public CuboidBoundingBox getBoundingBox() {
+    @Override public CuboidBoundingBox getBoundingBox() {
         return bounds;
     }
 
-    @Override
-    public boolean add(Region region) {
+    @Override public boolean add(Region region) {
         return add(region.getBounds());
     }
 
-    protected abstract boolean add(RegionBoundingBox bound);
+    public abstract boolean add(RegionBoundingArea bound);
 
-    @Override
-    public boolean addAll(Collection<? extends Region> c) {
+    @Override public boolean addAll(Collection<? extends Region> c) {
         boolean ret = false;
         // Check bounds
         for (Region r : c) {
             if (!isInBounds(r.getBounds())) {
-                throw new IllegalArgumentException("A specified region " + r + " was not contained in some part of this " +
+                throw new IllegalArgumentException(
+                    "A specified region " + r + " was not contained in some part of this " +
                         "collection's bounds");
             }
             if (add(r.getBounds())) {
@@ -80,8 +77,7 @@ public abstract class RegionBoundCollection implements Area {
         return l <= x && x <= u;
     }
 
-    @Override
-    public Collection<Region> getContents() {
+    @Override public Collection<Region> getContents() {
         Set<Region> ret = new HashSet<Region>();
         constructContainedRegions(ret);
         return ret;
@@ -89,7 +85,13 @@ public abstract class RegionBoundCollection implements Area {
 
     protected abstract void constructContainedRegions(Set<Region> regions);
 
+    protected abstract void constructContainedRegions(HashSet<RegionBoundingArea> bounds);
+
     public abstract Optional<Area> getBoundingArea(int x, int z);
 
     public abstract void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col);
+
+    public abstract Collection<RegionBoundingArea> getContainedBounds();
+
+    public abstract Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea grow);
 }

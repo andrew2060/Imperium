@@ -18,6 +18,10 @@ public class BankEconomyTransactionEvent extends EconomyTransactionEvent impleme
         this.cancelled = false;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public double getAmount() {
         return amount;
     }
@@ -30,23 +34,15 @@ public class BankEconomyTransactionEvent extends EconomyTransactionEvent impleme
         return type;
     }
 
-
     public HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-
-    @Override
-    public boolean isCancelled() {
+    @Override public boolean isCancelled() {
         return cancelled;
     }
 
-    @Override
-    public void setCancelled(boolean b) {
+    @Override public void setCancelled(boolean b) {
         this.cancelled = b;
     }
 

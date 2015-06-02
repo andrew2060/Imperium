@@ -13,11 +13,16 @@ public class PlayerEconomyTransactionEvent extends EconomyTransactionEvent imple
     private boolean cancelled;
     private TransactionType type;
 
-    public PlayerEconomyTransactionEvent(OfflinePlayer player, double amount, TransactionType type) {
+    public PlayerEconomyTransactionEvent(OfflinePlayer player, double amount,
+        TransactionType type) {
         this.player = player;
         this.amount = amount;
         this.type = type;
         this.cancelled = false;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public OfflinePlayer getPlayer() {
@@ -40,18 +45,11 @@ public class PlayerEconomyTransactionEvent extends EconomyTransactionEvent imple
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-
-    @Override
-    public boolean isCancelled() {
+    @Override public boolean isCancelled() {
         return cancelled;
     }
 
-    @Override
-    public void setCancelled(boolean b) {
+    @Override public void setCancelled(boolean b) {
         this.cancelled = b;
     }
 }

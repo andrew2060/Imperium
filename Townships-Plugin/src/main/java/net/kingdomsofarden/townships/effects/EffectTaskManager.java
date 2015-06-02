@@ -3,19 +3,17 @@ package net.kingdomsofarden.townships.effects;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Region;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Handles scheduling and load balancing for Region ticking
  */
 public class EffectTaskManager implements Runnable {
     private EffectTaskStack[] taskStacks;
-    private int[] minSizeHeap; //Tracks the task stack with the smallest load, we keep this seperate due to consistancy
-    private HashMap<UUID, Integer> heapMapping; // Tracks the stack to which a region with a given UID belongs
+    private int[] minSizeHeap;
+        //Tracks the task stack with the smallest load, we keep this seperate due to consistancy
+    private HashMap<UUID, Integer> heapMapping;
+        // Tracks the stack to which a region with a given UID belongs
     private EffectHeap cooldownHeap;
     private HashSet<TickableEffect> toRemove;
     private int tickDelay;
@@ -37,8 +35,9 @@ public class EffectTaskManager implements Runnable {
 
     /**
      * Schedules the effect for ticking
+     *
      * @param tickableEffect The effect to tick
-     * @param scheduling The Region that is scheduling this effect
+     * @param scheduling     The Region that is scheduling this effect
      */
     public void schedule(TickableEffect tickableEffect, Region scheduling) {
         if (toRemove.contains(tickableEffect)) { // Cancel removal if we subsequently schedule again
@@ -52,6 +51,7 @@ public class EffectTaskManager implements Runnable {
      * Schedules the effect for removal before its next tick
      * Note: double check that the effect you are scheduling for removal is actually scheduled in the first place, otherwise
      * memory leakage will occur (this check is not performed automatically due to performance concerns)
+     *
      * @param effect The effect to unschedule
      */
     public void unschedule(TickableEffect effect) {
@@ -135,7 +135,8 @@ public class EffectTaskManager implements Runnable {
             double childLoad = taskStacks[leftIdx] == null ? -1 : taskStacks[leftIdx].getLoad();
             if (childIdx + 1 < minSizeHeap.length) { // Two children, compare
                 int rightIdx = minSizeHeap[childIdx + 1];
-                double rightLoad = taskStacks[rightIdx] == null ? -1 : taskStacks[rightIdx].getLoad();
+                double rightLoad =
+                    taskStacks[rightIdx] == null ? -1 : taskStacks[rightIdx].getLoad();
                 if (rightLoad < childLoad) { // Check smaller of two to parent
                     childIdx++;
                     childLoad = rightLoad;

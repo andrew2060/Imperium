@@ -31,11 +31,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(PlayerMoveEvent.class)
+@RunWith(PowerMockRunner.class) @PrepareForTest(PlayerMoveEvent.class)
 public class RegionalUpdateListenerTest {
-    @Test
-    public void testOnPlayerMove() {
+    @Test public void testOnPlayerMove() {
         System.out.println("Beginning Player Movement Listener Updates Test");
         // Set up mocking
         TownshipsPlugin mockPlugin = mock(TownshipsPlugin.class);
@@ -61,12 +59,15 @@ public class RegionalUpdateListenerTest {
                 int regions = rand.nextInt(10) + 1;
                 for (int i = 0; i < regions; i++) {
                     Region r = mock(TownshipsRegion.class);
-                    Location genCenter = new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0, z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);
+                    Location genCenter =
+                        new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0,
+                            z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);
                     int modifyX = rand.nextInt(10) + 1;
                     int modifyZ = rand.nextInt(10) + 1;
                     Location pos1 = genCenter.clone().add(modifyX, 5, modifyZ);
                     Location pos2 = genCenter.clone().subtract(modifyX, 5, modifyZ);
-                    RegionAxisAlignedBoundingBox bounds = new RegionAxisAlignedBoundingBox(r, pos1, pos2);
+                    RegionAxisAlignedBoundingBox bounds =
+                        new RegionAxisAlignedBoundingBox(r, pos1, pos2);
                     when(r.getBounds()).thenReturn(bounds);
                     when(r.getName()).thenReturn(Optional.<String>absent());
                     when(r.getUid()).thenReturn(UUID.randomUUID());
@@ -79,7 +80,8 @@ public class RegionalUpdateListenerTest {
             for (int multZ = -9; multZ < 10; multZ++) {
                 for (int x = -1; x < 2; x++) {
                     for (int z = -1; z < 2; z++) {
-                        Location dest = new Location(mockWorld, Constants.MIN_DIV_X * x * multX, 0, Constants.MIN_DIV_Z * z * multZ);
+                        Location dest = new Location(mockWorld, Constants.MIN_DIV_X * x * multX, 0,
+                            Constants.MIN_DIV_Z * z * multZ);
                         for (int xMod = -1; x < 2; x++) {
                             for (int zMod = -1; z < 2; z++) {
                                 Location from = dest.clone().add(xMod, 0, zMod);
@@ -106,19 +108,23 @@ public class RegionalUpdateListenerTest {
 
     private void assertMatching(Area correct, Area generated) {
         assert (correct == null && generated == null) || (correct != null && generated != null) :
-                "Expected: " + (correct == null ? "null Actual: " + printBounds(generated.getBounds())
-                        : printBounds(correct.getBounds()) + " Actual: null");
+            "Expected: " + (correct == null ?
+                "null Actual: " + printBounds(generated.getBounds()) :
+                printBounds(correct.getBounds()) + " Actual: null");
 
         if (correct != null) {
             for (int i = 0; i < 4; i++) {
-                assert correct.getBounds()[i] == generated.getBounds()[i] : "Mismatch for bound "
-                        + i + ": Expected: " + correct.getBounds()[i] + " Actual: " + generated.getBounds()[i];
+                assert
+                    correct.getBounds()[i] == generated.getBounds()[i] :
+                    "Mismatch for bound " + i + ": Expected: " + correct.getBounds()[i]
+                        + " Actual: " + generated.getBounds()[i];
             }
         }
     }
 
     private String printBounds(int[] bounds) {
-        return new StringBuilder().append(bounds[0]).append(',').append(bounds[1]).append(',').append(bounds[2]).append(',').append(bounds[3]).toString();
+        return new StringBuilder().append(bounds[0]).append(',').append(bounds[1]).append(',')
+            .append(bounds[2]).append(',').append(bounds[3]).toString();
     }
 
 }

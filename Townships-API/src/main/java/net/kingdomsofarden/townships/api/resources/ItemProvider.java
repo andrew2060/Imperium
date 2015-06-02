@@ -11,6 +11,7 @@ public interface ItemProvider extends ResourceProvider {
 
     /**
      * Attempts to remove up to max amount of mat (depending on availability) from this provider
+     *
      * @param mat The material to remove
      * @param max The maximum amount to remove
      * @return The actual amount removed
@@ -19,8 +20,9 @@ public interface ItemProvider extends ResourceProvider {
 
     /**
      * Attempts to add amt of type into the ItemProvider
+     *
      * @param type The type to add
-     * @param amt The amount to add
+     * @param amt  The amount to add
      * @return The actual amount added
      */
     int add(Material type, int amt);

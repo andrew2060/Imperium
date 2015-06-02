@@ -14,7 +14,8 @@ public class RegionRelationChangeEvent extends Event implements Cancellable {
     private RelationState current;
     private RelationState relation;
 
-    public RegionRelationChangeEvent(Region declarer, Region declaree, RelationState current, RelationState relation) {
+    public RegionRelationChangeEvent(Region declarer, Region declaree, RelationState current,
+        RelationState relation) {
         this.origin = declarer;
         this.target = declaree;
         this.current = current;
@@ -22,12 +23,11 @@ public class RegionRelationChangeEvent extends Event implements Cancellable {
         this.cancelled = false;
     }
 
-    @Override
-    public HandlerList getHandlers() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    @Override public HandlerList getHandlers() {
         return handlers;
     }
 

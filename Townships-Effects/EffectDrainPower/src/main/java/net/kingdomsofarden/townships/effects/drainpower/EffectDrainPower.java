@@ -12,8 +12,7 @@ public class EffectDrainPower extends EffectPeriodicCost {
 
     private int drainAmount;
 
-    @Override
-    protected boolean onSuccessfulTick(Region region) {
+    @Override protected boolean onSuccessfulTick(Region region) {
         Map<String, Object> meta = region.getMetadata();
         if (!meta.containsKey(MetaKeys.POWER)) { // Doesn't have power meta, don't reschedule
             return false;
@@ -27,27 +26,23 @@ public class EffectDrainPower extends EffectPeriodicCost {
         return true;
     }
 
-    @Override
-    protected boolean onInsufficientResources(Region region) {
+    @Override protected boolean onInsufficientResources(Region region) {
         return true;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "regenerate-power";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {}
+    @Override public void onInit(ITownshipsPlugin plugin) {
+    }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onLoad(plugin, region, data);
         drainAmount = Integer.valueOf(data.get("amount", "0"));
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         data.set("amount", drainAmount);
     }

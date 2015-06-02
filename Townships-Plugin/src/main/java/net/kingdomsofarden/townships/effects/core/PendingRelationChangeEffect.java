@@ -19,15 +19,14 @@ public class PendingRelationChangeEffect implements TickableEffect {
     private RelationState change;
     private Region target;
 
-    @Override
-    public long startTime() {
+    @Override public long startTime() {
         return time < System.currentTimeMillis() ? -1 : time;
     }
 
-    @Override
-    public long onTick(Region region, long time) {
-        RegionRelationChangeEvent event = new RegionRelationChangeEvent(region, target, region.getRelations()
-                .get(target), change);
+    @Override public long onTick(Region region, long time) {
+        RegionRelationChangeEvent event =
+            new RegionRelationChangeEvent(region, target, region.getRelations().get(target),
+                change);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             switch (event.getRelation()) {
@@ -39,7 +38,8 @@ public class PendingRelationChangeEffect implements TickableEffect {
                     if (base.equals(RelationState.ALLIANCE_PENDING_PEACE)) {
                         Messaging.broadcastFormattedMessage(I18N.ALLIANCE_CANCELED, region, target);
                     } else {
-                        if (target.getRelations().getOrDefault(region, RelationState.PEACE).getBaseType().equals(RelationState.PEACE)) {
+                        if (target.getRelations().getOrDefault(region, RelationState.PEACE)
+                            .getBaseType().equals(RelationState.PEACE)) {
                             Messaging.broadcastFormattedMessage(I18N.WAR_ENDED, region, target);
                         }
                     }
@@ -65,31 +65,26 @@ public class PendingRelationChangeEffect implements TickableEffect {
         return Long.MAX_VALUE;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "pending-relation-change";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         time = Long.valueOf(data.get("start-time", "0"));
         change = RelationState.valueOf(data.get("relation", "PEACE"));
         target = Townships.getRegions().get(UUID.fromString(data.get("region", null))).orNull();
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         data.set("start-time", time);
         data.set("relation", change.name());
         data.set("region", target.getUid());
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return target;
     }
 }

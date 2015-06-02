@@ -4,11 +4,7 @@ import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.characters.CitizenManager;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TownshipsCitizenManager implements CitizenManager {
     // TODO
@@ -21,8 +17,7 @@ public class TownshipsCitizenManager implements CitizenManager {
         this.citizenMap = new HashMap<UUID, TownshipsCitizen>();
     }
 
-    @Override
-    public Citizen getCitizen(UUID id) {
+    @Override public Citizen getCitizen(UUID id) {
         TownshipsCitizen ret = citizenMap.get(id);
         if (ret == null) {
             ret = loadCitizen(id);
@@ -35,68 +30,55 @@ public class TownshipsCitizenManager implements CitizenManager {
         return null;
     }
 
-    @Override
-    public int size() {
+    @Override public int size() {
         return 0;
     }
 
-    @Override
-    public boolean isEmpty() {
+    @Override public boolean isEmpty() {
         return false;
     }
 
-    @Override
-    public boolean contains(Object o) {
+    @Override public boolean contains(Object o) {
         return false;
     }
 
-    @Override
-    public Iterator<Citizen> iterator() {
+    @Override public Iterator<Citizen> iterator() {
         return null;
     }
 
-    @Override
-    public Object[] toArray() {
+    @Override public Object[] toArray() {
         return new Object[0];
     }
 
-    @Override
-    public <T> T[] toArray(T[] a) {
+    @Override public <T> T[] toArray(T[] a) {
         return null;
     }
 
-    @Override
-    public boolean add(Citizen citizen) {
+    @Override public boolean add(Citizen citizen) {
         return false;
     }
 
-    @Override
-    public boolean remove(Object o) {
+    @Override public boolean remove(Object o) {
         return false;
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
+    @Override public boolean containsAll(Collection<?> c) {
         return false;
     }
 
-    @Override
-    public boolean addAll(Collection<? extends Citizen> c) {
+    @Override public boolean addAll(Collection<? extends Citizen> c) {
         return false;
     }
 
-    @Override
-    public boolean removeAll(Collection<?> c) {
+    @Override public boolean removeAll(Collection<?> c) {
         return false;
     }
 
-    @Override
-    public boolean retainAll(Collection<?> c) {
+    @Override public boolean retainAll(Collection<?> c) {
         return false;
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
 
     }
 }

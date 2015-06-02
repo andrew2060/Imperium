@@ -18,23 +18,19 @@ public class TownshipsCitizen implements Citizen {
     private Area currTerminalArea;
     private StoredDataSection effectSettings;
 
-    @Override
-    public StoredDataSection getStoredEffectSettings(Effect effect) {
+    @Override public StoredDataSection getStoredEffectSettings(Effect effect) {
         return effectSettings;
     }
 
-    @Override
-    public Collection<RoleGroup> getRoles(Region region) {
+    @Override public Collection<RoleGroup> getRoles(Region region) {
         return region.getRoles(this);
     }
 
-    @Override
-    public Area getCurrentArea() {
+    @Override public Area getCurrentArea() {
         return currTerminalArea;
     }
 
-    @Override
-    public void setCurrentArea(Area area) {
+    @Override public void setCurrentArea(Area area) {
         if (currTerminalArea != null) {
             currTerminalArea.getCitizensInArea().remove(this);
         }
@@ -44,13 +40,11 @@ public class TownshipsCitizen implements Citizen {
         }
     }
 
-    @Override
-    public UUID getUid() {
+    @Override public UUID getUid() {
         return uuid;
     }
 
-    @Override
-    public boolean isRoot() {
+    @Override public boolean isRoot() {
         return false; //TODO
     }
 }

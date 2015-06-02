@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class LocationSerializer implements Serializer<Location> {
-    @Override
-    public String serialize(Location obj) {
+    @Override public String serialize(Location obj) {
         StringBuilder sB = new StringBuilder();
         boolean first = true;
         for (Entry<String, Object> e : obj.serialize().entrySet()) {
@@ -25,8 +24,7 @@ public class LocationSerializer implements Serializer<Location> {
         return sB.toString();
     }
 
-    @Override
-    public Location deserialize(String input) {
+    @Override public Location deserialize(String input) {
         Map<String, Object> deserialized = new HashMap<String, Object>();
         for (String entry : input.split("::")) {
             String[] kv = entry.split(":");

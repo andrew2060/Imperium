@@ -16,35 +16,32 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class CommandDeclareRelation implements Command {
-    @Override
-    public String[] getIdentifiers() {
-        return new String[] {"region declare relation", "town declare relation", "nation declare relation"};
+    @Override public String[] getIdentifiers() {
+        return new String[] {"region declare relation", "town declare relation",
+            "nation declare relation"};
     }
 
-    @Override
-    public String getPermission() {
+    @Override public String getPermission() {
         return "townships.diplomacy";
     }
 
-    @Override
-    public int getMaxArguments() {
+    @Override public int getMaxArguments() {
         return 3;
     }
 
-    @Override
-    public int getMinArguments() {
+    @Override public int getMinArguments() {
         return 3;
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    @Override public boolean execute(CommandSender sender, String[] args) {
         boolean bypass = false;
         if (!(sender instanceof Player)) {
             bypass = true;
         }
         RelationState state = RelationState.valueOf(args[0].toUpperCase());
         if (state == null || !state.isDeclarable()) {
-            Messaging.sendFormattedMessage(sender, I18N.NO_MATCHING_RELATION_STATE, args[0].toUpperCase());
+            Messaging.sendFormattedMessage(sender, I18N.NO_MATCHING_RELATION_STATE,
+                args[0].toUpperCase());
             return true;
         }
         Region declarer = Townships.getRegions().get(args[1]).orNull();
@@ -57,7 +54,9 @@ public class CommandDeclareRelation implements Command {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[2]);
             return true;
         }
-        if (!bypass && !declarer.hasAccess(Townships.getCitizens().getCitizen(((Player)sender).getUniqueId()), AccessType.DIPLOMAT)) {
+        if (!bypass && !declarer
+            .hasAccess(Townships.getCitizens().getCitizen(((Player) sender).getUniqueId()),
+                AccessType.DIPLOMAT)) {
             Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_DIPLOMACY);
             return true;
         }
@@ -73,13 +72,16 @@ public class CommandDeclareRelation implements Command {
             Messaging.sendFormattedMessage(sender, I18N.CANNOT_RELATION_CHILD);
             return true;
         }
-        RelationState currRelation = declarer.getRelations().getOrDefault(declaree.getName(), RelationState.PEACE);
+        RelationState currRelation =
+            declarer.getRelations().getOrDefault(declaree.getName(), RelationState.PEACE);
         if (currRelation.getBaseType().equals(state)) {
-            Messaging.sendFormattedMessage(sender, I18N.SAME_RELATION, declaree.getName().get()); // Check parents
+            Messaging.sendFormattedMessage(sender, I18N.SAME_RELATION,
+                declaree.getName().get()); // Check parents
             return true;
         }
         // TODO verify fees requirements etc, look over is same type
-        RelationState currTargetRelation = declaree.getRelations().getOrDefault(declaree.getName(), RelationState.PEACE);
+        RelationState currTargetRelation =
+            declaree.getRelations().getOrDefault(declaree.getName(), RelationState.PEACE);
 
         RelationState baseSource = currRelation.getBaseType();
         RelationState baseTarget = currTargetRelation.getBaseType();
@@ -88,19 +90,22 @@ public class CommandDeclareRelation implements Command {
             case WAR:
                 if (baseTarget.equals(RelationState.ALLIANCE)) {
                     if (!currTargetRelation.equals(RelationState.ALLIANCE_OFFERED)) {
-                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL, declaree.getName().get());
+                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL,
+                            declaree.getName().get());
                         return true;
                     }
                 }
                 if (baseSource.equals(RelationState.ALLIANCE)) {
                     if (!currRelation.equals(RelationState.ALLIANCE_OFFERED)) {
-                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL, declaree.getName().get());
+                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL,
+                            declaree.getName().get());
                         return true;
                     }
                 }
                 if (baseTarget.equals(RelationState.PEACE)) {
                     if (currTargetRelation.equals(RelationState.ALLIANCE_PENDING_PEACE)) {
-                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL, declaree.getName().get());
+                        Messaging.sendFormattedMessage(sender, I18N.NO_BETRAYAL,
+                            declaree.getName().get());
                         return true;
                     }
                 }
@@ -119,7 +124,8 @@ public class CommandDeclareRelation implements Command {
                 }
                 break;
             case ALLIANCE:
-                if (currTargetRelation.getBaseType().equals(RelationState.WAR) || currRelation.getBaseType().equals(RelationState.WAR)) {
+                if (currTargetRelation.getBaseType().equals(RelationState.WAR) || currRelation
+                    .getBaseType().equals(RelationState.WAR)) {
                     Messaging.sendFormattedMessage(sender, I18N.NO_ALLIANCE_WAR);
                     return true;
                 }
@@ -134,7 +140,8 @@ public class CommandDeclareRelation implements Command {
                 break;
         }
 
-        RegionRelationChangeEvent event = new RegionRelationChangeEvent(declarer, declaree, currRelation, state);
+        RegionRelationChangeEvent event =
+            new RegionRelationChangeEvent(declarer, declaree, currRelation, state);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return true; // Silent quit
@@ -162,8 +169,7 @@ public class CommandDeclareRelation implements Command {
         return true;
     }
 
-    @Override
-    public String getUsage() {
+    @Override public String getUsage() {
         return "town declare relation <relation> ";
     }
 }

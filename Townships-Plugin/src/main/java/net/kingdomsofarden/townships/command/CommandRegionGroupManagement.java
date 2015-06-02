@@ -13,34 +13,30 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CommandRegionGroupManagement implements Command {
-    @Override
-    public String[] getIdentifiers() {
+    @Override public String[] getIdentifiers() {
         return new String[] {"region manage group", "town manage group"};
     }
 
-    @Override
-    public String getPermission() {
+    @Override public String getPermission() {
         return "townships.region.manage";
     }
 
-    @Override
-    public int getMaxArguments() {
+    @Override public int getMaxArguments() {
         return 4;
     }
 
-    @Override
-    public int getMinArguments() {
+    @Override public int getMinArguments() {
         return 4;
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    @Override public boolean execute(CommandSender sender, String[] args) {
         String type = args[0].toLowerCase();
         if (type.equals("add") || type.equals("remove")) {
             boolean addOp = type.equals("add");
             Region r = Townships.getRegions().get(args[1]).orNull();
             if (r == null) {
-                Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1].toLowerCase());
+                Messaging
+                    .sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1].toLowerCase());
                 return true;
             }
             if (sender instanceof Player) {
@@ -66,7 +62,8 @@ public class CommandRegionGroupManagement implements Command {
                     Messaging.sendFormattedMessage(sender, I18N.COMMAND_COMPLETED_SUCCESSFULLY);
                     return true;
                 } else {
-                    Messaging.sendFormattedMessage(sender, I18N.ROLE_NOT_PRESENT, p.getName(), group.toString(), r.getName().or(r.getUid().toString()));
+                    Messaging.sendFormattedMessage(sender, I18N.ROLE_NOT_PRESENT, p.getName(),
+                        group.toString(), r.getName().or(r.getUid().toString()));
                     return true;
                 }
             }
@@ -76,8 +73,7 @@ public class CommandRegionGroupManagement implements Command {
         }
     }
 
-    @Override
-    public String getUsage() {
+    @Override public String getUsage() {
         return "/region manage group <add|remove> <regionname> <rolename> <playername>";
     }
 }

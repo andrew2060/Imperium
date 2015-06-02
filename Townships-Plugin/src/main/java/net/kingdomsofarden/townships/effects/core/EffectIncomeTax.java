@@ -20,18 +20,15 @@ public class EffectIncomeTax implements Effect, Listener {
     private Region region;
     private double tax;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "income-tax";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
 
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
         tax = 0;
         try {
@@ -40,23 +37,22 @@ public class EffectIncomeTax implements Effect, Listener {
             tax = 0;
         }
         if (!this.region.getEconomyProviders().containsKey(EconomyProvider.TREASURY)) {
-            this.region.getEconomyProviders().put(EconomyProvider.TREASURY, new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
+            this.region.getEconomyProviders().put(EconomyProvider.TREASURY,
+                new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
         }
         Bukkit.getPluginManager().registerEvents(this, (Plugin) plugin.getBackingImplementation());
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         data.set("rate", tax);
         PlayerEconomyTransactionEvent.getHandlerList().unregister(this);
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 
-    @EventHandler(priority= EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerDepositTransaction(PlayerEconomyTransactionEvent event) {
         if (event.getType().equals(TransactionType.DEPOSIT)) {
             Citizen c = Townships.getCitizens().getCitizen(event.getPlayer().getUniqueId());

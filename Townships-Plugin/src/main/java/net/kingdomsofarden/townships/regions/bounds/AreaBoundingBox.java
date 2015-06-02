@@ -40,48 +40,40 @@ public class AreaBoundingBox implements CuboidBoundingBox {
         vertices.add(new Integer[] {maxX, maxY, maxZ});
     }
 
-    @Override
-    public int getMinX() {
+    @Override public int getMinX() {
         return minX;
     }
 
-    @Override
-    public int getMaxX() {
+    @Override public int getMaxX() {
         return maxX;
     }
 
-    @Override
-    public int getMinY() {
+    @Override public int getMinY() {
         return minY;
     }
 
-    @Override
-    public int getMaxY() {
+    @Override public int getMaxY() {
         return maxY;
     }
 
-    @Override
-    public int getMinZ() {
+    @Override public int getMinZ() {
         return minZ;
     }
 
-    @Override
-    public int getMaxZ() {
+    @Override public int getMaxZ() {
         return maxZ;
     }
 
-    @Override
-    public boolean isInBounds(Location loc) {
+    @Override public boolean isInBounds(Location loc) {
         return loc.getWorld().equals(world) && isInBounds(loc.getX(), loc.getY(), loc.getZ());
     }
 
-    @Override
-    public boolean isInBounds(double x, double y, double z) {
-        return (minX <= x) && (x <= maxX) && (minY <= y) && (y <= maxY) && (minZ <= z) && (z <= maxZ);
+    @Override public boolean isInBounds(double x, double y, double z) {
+        return (minX <= x) && (x <= maxX) && (minY <= y) && (y <= maxY) && (minZ <= z) && (z
+            <= maxZ);
     }
 
-    @Override
-    public boolean intersects(BoundingArea box) {
+    @Override public boolean intersects(BoundingArea box) {
         if (!box.getWorld().equals(this.world)) {
             return false;
         }
@@ -93,18 +85,15 @@ public class AreaBoundingBox implements CuboidBoundingBox {
         return box.encapsulates(this);
     }
 
-    @Override
-    public Collection<Integer[]> getVertices() {
+    @Override public Collection<Integer[]> getVertices() {
         return vertices;
     }
 
-    @Override
-    public World getWorld() {
+    @Override public World getWorld() {
         return world;
     }
 
-    @Override
-    public boolean encapsulates(BoundingArea other) {
+    @Override public boolean encapsulates(BoundingArea other) {
         for (Integer[] vertex : other.getVertices()) {
             if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return false;
@@ -113,18 +102,15 @@ public class AreaBoundingBox implements CuboidBoundingBox {
         return true;
     }
 
-    @Override
-    public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+    @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
         return null; //TODO
     }
 
-    @Override
-    public int size2d() {
+    @Override public int size2d() {
         return (maxZ - minZ) * (maxX - minX);
     }
 
-    @Override
-    public int volume() {
+    @Override public int volume() {
         return (maxZ - minZ) * (maxX - minX) * (maxY - minY);
     }
 }

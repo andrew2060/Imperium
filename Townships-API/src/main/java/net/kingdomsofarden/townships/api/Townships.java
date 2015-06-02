@@ -25,21 +25,24 @@ public final class Townships {
         return i.getCitizens();
     }
 
+    public static ITownshipsPlugin getInstance() {
+        return i;
+    }
+
     /**
      * Updates the currently running instance
+     *
      * @param instance The instance of the plugin
      */
     public static void setInstance(ITownshipsPlugin instance) {
         Townships.i = instance;
     }
 
-    public static ITownshipsPlugin getInstance() {
-        return i;
-    }
-
     public static EffectManager getEffectManager() {
         return i.getEffectManager();
     }
 
-    public static Configuration getConfiguration() { return i.getConfiguration(); }
+    public static Configuration getConfiguration() {
+        return i.getConfiguration();
+    }
 }

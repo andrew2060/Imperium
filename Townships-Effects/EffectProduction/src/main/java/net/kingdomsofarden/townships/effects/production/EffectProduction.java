@@ -18,8 +18,7 @@ public class EffectProduction extends EffectPeriodicCost {
     private HashMap<Material, Integer> production;
     private double econProduction;
 
-    @Override
-    protected boolean onSuccessfulTick(Region region) {
+    @Override protected boolean onSuccessfulTick(Region region) {
         for (Entry<Material, Integer> entry : production.entrySet()) {
             int amt = entry.getValue();
             for (ItemProvider provider : region.getItemProviders()) {
@@ -39,21 +38,18 @@ public class EffectProduction extends EffectPeriodicCost {
         return true;
     }
 
-    @Override
-    protected boolean onInsufficientResources(Region region) {
+    @Override protected boolean onInsufficientResources(Region region) {
         return true;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "production";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {}
+    @Override public void onInit(ITownshipsPlugin plugin) {
+    }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         production = new HashMap<Material, Integer>();
         StoredDataSection produce = data.getSection("produce");
@@ -66,8 +62,7 @@ public class EffectProduction extends EffectPeriodicCost {
         econProduction = Double.valueOf(produce.get("money", "0"));
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         StoredDataSection subSection = data.getSection("produce");
         subSection.set("money", econProduction);

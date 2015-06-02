@@ -17,28 +17,23 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 
 public class CommandRegionDisband implements Command {
-    @Override
-    public String[] getIdentifiers() {
+    @Override public String[] getIdentifiers() {
         return new String[] {"region disband, town disband, nation disband"};
     }
 
-    @Override
-    public String getPermission() {
+    @Override public String getPermission() {
         return "townships.region.create";
     }
 
-    @Override
-    public int getMaxArguments() {
+    @Override public int getMaxArguments() {
         return 1;
     }
 
-    @Override
-    public int getMinArguments() {
+    @Override public int getMinArguments() {
         return 1;
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    @Override public boolean execute(CommandSender sender, String[] args) {
         Optional<Region> toRemove;
         try {
             toRemove = Townships.getRegions().get(UUID.fromString(args[0]));
@@ -74,8 +69,7 @@ public class CommandRegionDisband implements Command {
         }
     }
 
-    @Override
-    public String getUsage() {
+    @Override public String getUsage() {
         return "/region disband <regionname|regionuid>";
     }
 }

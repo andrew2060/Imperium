@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.api.regions;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import org.bukkit.Location;
 
 import java.util.Collection;
@@ -27,6 +28,12 @@ public interface RegionManager extends Collection<Region> {
      * @return A collection of all regions that intersect this bounding box in some way
      */
     TreeSet<Region> getIntersectingRegions(BoundingArea bounds);
+
+    /**
+     * @param bounds The bounds to check
+     * @return A collection of bounding areas that intersect the given bounds
+     */
+    Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds);
 
     /**
      * @param name The name of the region, non case-sensitive

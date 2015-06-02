@@ -13,12 +13,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 public class RegionalConsistancyListener implements Listener {
-    @EventHandler(priority= EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Location loc = event.getBlock().getLocation();
         for (Region r : Townships.getRegions().getBoundingRegions(loc)) {
             if (r.getMetadata().containsKey(MetaKeys.REQUIREMENT_BLOCK)) {
-                RegionBlockCheckTask task = (RegionBlockCheckTask) r.getMetadata().get(MetaKeys.REQUIREMENT_BLOCK);
+                RegionBlockCheckTask task =
+                    (RegionBlockCheckTask) r.getMetadata().get(MetaKeys.REQUIREMENT_BLOCK);
                 task.schedule(event.getBlock().getType());
             }
         }
@@ -26,9 +27,11 @@ public class RegionalConsistancyListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRegionDisband(RegionDisbandEvent event) {
-        for (Region r : Townships.getRegions().getIntersectingRegions(event.getRegion().getBounds())) {
+        for (Region r : Townships.getRegions()
+            .getIntersectingRegions(event.getRegion().getBounds())) {
             if (r.getMetadata().containsKey(MetaKeys.REQUIREMENT_REGION)) {
-                RegionSubregionCheckTask task = (RegionSubregionCheckTask) r.getMetadata().get(MetaKeys.REQUIREMENT_REGION);
+                RegionSubregionCheckTask task =
+                    (RegionSubregionCheckTask) r.getMetadata().get(MetaKeys.REQUIREMENT_REGION);
                 task.schedule(event.getRegion().getType(), event.getRegion().getTier());
             }
         }

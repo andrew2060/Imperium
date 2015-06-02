@@ -7,12 +7,7 @@ import net.kingdomsofarden.townships.instrumentation.InstrumentationManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.ClassFileTransformer;
@@ -31,15 +26,35 @@ public class VaultTransactionAgent implements ClassFileTransformer {
         instrumentation.addTransformer(transformer);
         try {
             instrumentation.redefineClasses(new ClassDefinition(Economy.class,
-                    InstrumentationManager.getBytesFromClass(Economy.class)));
+                InstrumentationManager.getBytesFromClass(Economy.class)));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Failed to redefine class!");
         }
     }
 
+    @SuppressWarnings("deprecation") public static OfflinePlayer convertPlayerName(String name) {
+        return Bukkit.getOfflinePlayer(name);
+    }
+
+    public static PlayerEconomyTransactionEvent injectPlayerEvent(OfflinePlayer player,
+        double amount, TransactionType type) {
+        PlayerEconomyTransactionEvent event =
+            new PlayerEconomyTransactionEvent(player, amount, type);
+        Bukkit.getPluginManager().callEvent(event);
+        return event;
+    }
+
+    public static BankEconomyTransactionEvent injectBankEvent(String bank, double amount,
+        TransactionType type) {
+        BankEconomyTransactionEvent event = new BankEconomyTransactionEvent(bank, amount, type);
+        Bukkit.getPluginManager().callEvent(event);
+        return event;
+    }
+
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+        ProtectionDomain protectionDomain, byte[] classBuffer) throws IllegalClassFormatException {
         if (loader != ClassLoader.getSystemClassLoader()) {
             return classBuffer;
         }
@@ -51,7 +66,8 @@ public class VaultTransactionAgent implements ClassFileTransformer {
         byte[] result = classBuffer;
         try {
             ClassReader reader = new ClassReader(classBuffer);
-            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            ClassWriter writer =
+                new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             ClassVisitor visitor = new EconomyClassAdapter(Opcodes.ASM4, writer);
             reader.accept(visitor, 0);
             result = writer.toByteArray();
@@ -61,33 +77,14 @@ public class VaultTransactionAgent implements ClassFileTransformer {
         return result;
     }
 
-    public class EconomyClassAdapter extends ClassVisitor {
-
-        public EconomyClassAdapter(int api, ClassVisitor visitor) {
-            super(api, visitor);
-        }
-
-        @Override
-        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-            if (name.equalsIgnoreCase("depositPlayer")) {
-                return new PlayerTransactionVisitor(Opcodes.ASM4, super.visitMethod(access, name, desc, signature, exceptions), name, desc, TransactionType.DEPOSIT);
-            } else if (name.equalsIgnoreCase("withdrawPlayer")) {
-                return new PlayerTransactionVisitor(Opcodes.ASM4, super.visitMethod(access, name, desc, signature, exceptions), name, desc, TransactionType.WITHDRAW);
-            } else if (name.equalsIgnoreCase("bankDeposit")) {
-                return new BankTransactionVisitor(Opcodes.ASM4, super.visitMethod(access, name, desc, signature, exceptions), name, desc, TransactionType.DEPOSIT);
-            } else if (name.equalsIgnoreCase("bankWithdraw")) {
-                return new BankTransactionVisitor(Opcodes.ASM4, super.visitMethod(access, name, desc, signature, exceptions), name, desc, TransactionType.WITHDRAW);
-            }
-            return null;
-        }
-    }
 
     public static class PlayerTransactionVisitor extends MethodVisitor implements Opcodes {
         private TransactionType type;
         private String signature;
         private String methodName;
 
-        public PlayerTransactionVisitor(int api, MethodVisitor visitor, String methodName, String descriptor, TransactionType type) {
+        public PlayerTransactionVisitor(int api, MethodVisitor visitor, String methodName,
+            String descriptor, TransactionType type) {
             super(api, visitor);
             this.methodName = methodName;
             this.signature = descriptor;
@@ -107,37 +104,36 @@ public class VaultTransactionAgent implements ClassFileTransformer {
             } else if (signature.startsWith("(Ljava/lang/String;D)")) {
                 this.visitVarInsn(ALOAD, 1);
                 this.visitMethodInsn(INVOKESTATIC,
-                        "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
-                        "convertPlayerName",
-                        "(Ljava/lang/String)Lorg/bukkit/OfflinePlayer");
+                    "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
+                    "convertPlayerName", "(Ljava/lang/String)Lorg/bukkit/OfflinePlayer");
                 this.visitVarInsn(DLOAD, 2);
                 idx = 3;
             } else {
                 this.visitVarInsn(ALOAD, 1);
                 this.visitMethodInsn(INVOKESTATIC,
-                        "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
-                        "convertPlayerName",
-                        "(Ljava/lang/String)Lorg/bukkit/OfflinePlayer");
+                    "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
+                    "convertPlayerName", "(Ljava/lang/String)Lorg/bukkit/OfflinePlayer");
                 this.visitVarInsn(DLOAD, 3);
                 idx = 4;
             }
             this.visitLdcInsn(type);
             this.visitMethodInsn(INVOKESTATIC,
-                    "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
-                    "injectPlayerEvent",
-                    "(Lorg/bukkit/OfflinePlayer;D;Lnet/kingdomsofarden/townships/api/events/EconomyTransactionEvent$TransactionType)" +
-                            "L/net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent");
+                "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
+                "injectPlayerEvent",
+                "(Lorg/bukkit/OfflinePlayer;D;Lnet/kingdomsofarden/townships/api/events/EconomyTransactionEvent$TransactionType)"
+                    + "L/net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent");
             this.visitVarInsn(ASTORE, idx);
             this.visitVarInsn(ALOAD, idx);
-            this.visitMethodInsn(INVOKEVIRTUAL, "net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent",
-                    "isCancelled",
-                    "()Z");
+            this.visitMethodInsn(INVOKEVIRTUAL,
+                "net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent",
+                "isCancelled", "()Z");
             Label other = new Label();
             this.visitJumpInsn(IFEQ, other);
-            this.visitMethodInsn(INVOKEVIRTUAL, "net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent",
-                    "getAmount",
-                    "()D");
-            this.visitVarInsn(DSTORE, idx - 1); // Overwrite default parameter value with the event's
+            this.visitMethodInsn(INVOKEVIRTUAL,
+                "net/kingdomsofarden/townships/api/events/PlayerEconomyTransactionEvent",
+                "getAmount", "()D");
+            this.visitVarInsn(DSTORE,
+                idx - 1); // Overwrite default parameter value with the event's
             super.visitCode();
             this.visitLabel(other);
             this.visitLdcInsn(0.00);
@@ -152,7 +148,8 @@ public class VaultTransactionAgent implements ClassFileTransformer {
         private String signature;
         private String methodName;
 
-        public BankTransactionVisitor(int api, MethodVisitor visitor, String methodName, String descriptor, TransactionType type) {
+        public BankTransactionVisitor(int api, MethodVisitor visitor, String methodName,
+            String descriptor, TransactionType type) {
             super(api, visitor);
             this.methodName = methodName;
             this.signature = descriptor;
@@ -165,21 +162,22 @@ public class VaultTransactionAgent implements ClassFileTransformer {
             this.visitVarInsn(DLOAD, 2);
             this.visitLdcInsn(type);
             this.visitMethodInsn(INVOKESTATIC,
-                    "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
-                    "injectBankEvent",
-                    "(Ljava/lang/String;D;Lnet/kingdomsofarden/townships/api/events/EconomyTransactionEvent$TransactionType)" +
-                            "L/net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent");
+                "net/kingdomsofarden/townships/instrumentation/agents/VaultTransactionAgent",
+                "injectBankEvent",
+                "(Ljava/lang/String;D;Lnet/kingdomsofarden/townships/api/events/EconomyTransactionEvent$TransactionType)"
+                    + "L/net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent");
             this.visitVarInsn(ASTORE, idx);
             this.visitVarInsn(ALOAD, idx);
-            this.visitMethodInsn(INVOKEVIRTUAL, "net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent",
-                    "isCancelled",
-                    "()Z");
+            this.visitMethodInsn(INVOKEVIRTUAL,
+                "net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent",
+                "isCancelled", "()Z");
             Label other = new Label();
             this.visitJumpInsn(IFEQ, other);
-            this.visitMethodInsn(INVOKEVIRTUAL, "net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent",
-                    "getAmount",
-                    "()D");
-            this.visitVarInsn(DSTORE, idx - 1); // Overwrite default parameter value with the event's
+            this.visitMethodInsn(INVOKEVIRTUAL,
+                "net/kingdomsofarden/townships/api/events/BankEconomyTransactionEvent", "getAmount",
+                "()D");
+            this.visitVarInsn(DSTORE,
+                idx - 1); // Overwrite default parameter value with the event's
             super.visitCode();
             this.visitLabel(other);
             this.visitLdcInsn(0.00);
@@ -188,21 +186,35 @@ public class VaultTransactionAgent implements ClassFileTransformer {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public static OfflinePlayer convertPlayerName(String name) {
-        return Bukkit.getOfflinePlayer(name);
-    }
 
-    public static PlayerEconomyTransactionEvent injectPlayerEvent(OfflinePlayer player, double amount, TransactionType type) {
-        PlayerEconomyTransactionEvent event = new PlayerEconomyTransactionEvent(player, amount, type);
-        Bukkit.getPluginManager().callEvent(event);
-        return event;
-    }
+    public class EconomyClassAdapter extends ClassVisitor {
 
-    public static BankEconomyTransactionEvent injectBankEvent(String bank, double amount, TransactionType type) {
-        BankEconomyTransactionEvent event = new BankEconomyTransactionEvent(bank, amount, type);
-        Bukkit.getPluginManager().callEvent(event);
-        return event;
+        public EconomyClassAdapter(int api, ClassVisitor visitor) {
+            super(api, visitor);
+        }
+
+        @Override
+        public MethodVisitor visitMethod(int access, String name, String desc, String signature,
+            String[] exceptions) {
+            if (name.equalsIgnoreCase("depositPlayer")) {
+                return new PlayerTransactionVisitor(Opcodes.ASM4,
+                    super.visitMethod(access, name, desc, signature, exceptions), name, desc,
+                    TransactionType.DEPOSIT);
+            } else if (name.equalsIgnoreCase("withdrawPlayer")) {
+                return new PlayerTransactionVisitor(Opcodes.ASM4,
+                    super.visitMethod(access, name, desc, signature, exceptions), name, desc,
+                    TransactionType.WITHDRAW);
+            } else if (name.equalsIgnoreCase("bankDeposit")) {
+                return new BankTransactionVisitor(Opcodes.ASM4,
+                    super.visitMethod(access, name, desc, signature, exceptions), name, desc,
+                    TransactionType.DEPOSIT);
+            } else if (name.equalsIgnoreCase("bankWithdraw")) {
+                return new BankTransactionVisitor(Opcodes.ASM4,
+                    super.visitMethod(access, name, desc, signature, exceptions), name, desc,
+                    TransactionType.WITHDRAW);
+            }
+            return null;
+        }
     }
 
 

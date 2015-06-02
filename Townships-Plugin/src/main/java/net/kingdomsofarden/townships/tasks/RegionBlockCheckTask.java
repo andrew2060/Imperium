@@ -29,9 +29,11 @@ public class RegionBlockCheckTask implements Runnable {
 
     public RegionBlockCheckTask(Region region, TownshipsPlugin plugin) {
         this.plugin = plugin;
-        StoredDataSection data = Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
+        StoredDataSection data =
+            Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
         if (data == null) {
-            throw new IllegalStateException("Supplied region does not have a corresponding type configuration!");
+            throw new IllegalStateException(
+                "Supplied region does not have a corresponding type configuration!");
         }
         reqs = new HashMap<Material, Integer>();
         StoredDataSection requirements = data.getSection("requirements");
@@ -51,8 +53,7 @@ public class RegionBlockCheckTask implements Runnable {
         this.processQueue = new LinkedHashSet<Material>();
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
         scheduled = false;
         if (region.isValid()) { // If invalid, assume pending removal anyways
             Map<Material, Integer> amounts = new HashMap<Material, Integer>();
@@ -63,8 +64,10 @@ public class RegionBlockCheckTask implements Runnable {
             Map<Material, Integer> remaining = region.getBounds().checkForBlocks(amounts);
             if (!remaining.isEmpty()) {
                 // Trigger a region disband
-                Townships.getRegions().remove(region); // We ignore cancellation state for requirement failures
-                RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
+                Townships.getRegions()
+                    .remove(region); // We ignore cancellation state for requirement failures
+                RegionDisbandEvent event =
+                    new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
                 Bukkit.getPluginManager().callEvent(event);
             }
         }

@@ -21,55 +21,45 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class CommandCreateRegion implements Command {
 
-    @Override
-    public String[] getIdentifiers() {
+    @Override public String[] getIdentifiers() {
         return new String[] {"region create", "town create"};
     }
 
-    @Override
-    public String getPermission() {
+    @Override public String getPermission() {
         return "townships.regions.create";
     }
 
-    @Override
-    public int getMaxArguments() {
+    @Override public int getMaxArguments() {
         return 2;
     }
 
-    @Override
-    public int getMinArguments() {
+    @Override public int getMinArguments() {
         return 1;
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    @Override public boolean execute(CommandSender sender, String[] args) {
         // Find the type of region being created
         if (!(sender instanceof Player)) {
             Messaging.sendFormattedMessage(sender, I18N.PLAYER_ONLY_COMMAND);
             return true;
         }
-        Optional<StoredDataSection> dataOptional = Townships.getConfiguration().getRegionConfiguration(args[0]);
+        Optional<StoredDataSection> dataOptional =
+            Townships.getConfiguration().getRegionConfiguration(args[0]);
         if (!dataOptional.isPresent()) {
-            Messaging.sendFormattedMessage(sender, I18N.REGION_TYPE_NOT_FOUND, args[0].toLowerCase());
+            Messaging
+                .sendFormattedMessage(sender, I18N.REGION_TYPE_NOT_FOUND, args[0].toLowerCase());
         }
         Serializer<Integer> intSerializer = new Serializer<Integer>() {
-            @Override
-            public String serialize(Integer obj) {
+            @Override public String serialize(Integer obj) {
                 return obj + "";
             }
 
-            @Override
-            public Integer deserialize(String input) {
+            @Override public Integer deserialize(String input) {
                 return (int) Double.valueOf(input).doubleValue();
             }
         };
@@ -94,16 +84,16 @@ public class CommandCreateRegion implements Command {
             Messaging.sendFormattedMessage(sender, I18N.SELECTION_REQUIRED);
             return true;
         }
-        if ((maxX != -1 && selection.getMaxX() - selection.getMinX() > maxX)
-                || (maxHeight != -1 && selection.getMaxY() - selection.getMinY() > maxHeight)
-                || (maxZ != -1 && selection.getMaxZ() - selection.getMinZ() > maxZ)) {
-            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_LARGE, maxX, maxHeight , maxZ);
+        if ((maxX != -1 && selection.getMaxX() - selection.getMinX() > maxX) || (maxHeight != -1
+            && selection.getMaxY() - selection.getMinY() > maxHeight) || (maxZ != -1
+            && selection.getMaxZ() - selection.getMinZ() > maxZ)) {
+            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_LARGE, maxX, maxHeight, maxZ);
             return true;
         }
-        if ((minX != -1 && selection.getMaxX() - selection.getMinX() < minX)
-                || (minHeight != -1 && selection.getMaxY() - selection.getMinY() < minHeight)
-                || (minZ != -1 && selection.getMaxZ() - selection.getMinZ() < minZ)) {
-            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_SMALL, maxX, maxHeight , maxZ);
+        if ((minX != -1 && selection.getMaxX() - selection.getMinX() < minX) || (minHeight != -1
+            && selection.getMaxY() - selection.getMinY() < minHeight) || (minZ != -1
+            && selection.getMaxZ() - selection.getMinZ() < minZ)) {
+            Messaging.sendFormattedMessage(sender, I18N.SELECTION_TOO_SMALL, maxX, maxHeight, maxZ);
             return true;
         }
         // Check region permissions
@@ -122,7 +112,8 @@ public class CommandCreateRegion implements Command {
             Material mat = Material.valueOf(matName.toUpperCase());
             if (mat == null) {
                 // Error in console TODO
-                Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
+                Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION,
+                    args[0].toLowerCase());
                 return true;
             }
             int amt = blockReqSection.get(matName, intSerializer, 0);
@@ -131,7 +122,8 @@ public class CommandCreateRegion implements Command {
             }
         }
         if (!blockReq.isEmpty()) { // Scan selection
-            World world = selection.getWorld();          // TODO find better way to do this, or async it
+            World world =
+                selection.getWorld();          // TODO find better way to do this, or async it
             locationLoop:
             for (int x = selection.getMinX(); x <= selection.getMaxX(); x++) {
                 for (int z = selection.getMinZ(); z <= selection.getMaxZ(); z++) {
@@ -209,7 +201,8 @@ public class CommandCreateRegion implements Command {
                 }
             }
         } catch (Exception e) {
-            Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION, args[0].toLowerCase());
+            Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION,
+                args[0].toLowerCase());
             e.printStackTrace(); // TODO print to debug instead
             return true;
         }
@@ -284,14 +277,13 @@ public class CommandCreateRegion implements Command {
         Bukkit.getPluginManager().callEvent(e);
         if (!e.isCancelled()) {
             Townships.getRegions().add(created);
-            Messaging.sendFormattedMessage(sender, I18N.REGION_SUCCESSFULLY_CREATED, created.getName().isPresent() ?
-                    created.getName().get() : createdId);
+            Messaging.sendFormattedMessage(sender, I18N.REGION_SUCCESSFULLY_CREATED,
+                created.getName().isPresent() ? created.getName().get() : createdId);
         }
         return true;
     }
 
-    @Override
-    public String getUsage() {
+    @Override public String getUsage() {
         return "/region create <type> [name]";
     }
 }

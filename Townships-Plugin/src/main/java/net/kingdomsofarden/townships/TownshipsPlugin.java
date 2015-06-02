@@ -37,8 +37,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
     private YAMLStorage storage;
 
 
-    @Override
-    public void onEnable() {
+    @Override public void onEnable() {
         // Initialize
         Townships.setInstance(this);
         config = new TownshipsConfiguration(this);
@@ -76,48 +75,41 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
 
     private boolean loadEconomy() {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
-                .getRegistration(net.milkbowl.vault.economy.Economy.class);
+            .getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         }
         return (economy != null);
     }
 
-    @Override
-    public void onDisable() {
+    @Override public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
         for (Region r : getRegions()) {
             getStorage().saveRegion(r, false);
         }
     }
 
-    @Override
-    public TownshipsRegionManager getRegions() {
+    @Override public TownshipsRegionManager getRegions() {
         return regionManager;
     }
 
-    @Override
-    public TownshipsCitizenManager getCitizens() {
+    @Override public TownshipsCitizenManager getCitizens() {
         return null; //TODO
     }
 
-    @Override
-    public TownshipsEffectManager getEffectManager() {
+    @Override public TownshipsEffectManager getEffectManager() {
         return effectManager;
     }
 
-    @Override
-    public Configuration getConfiguration() {
+    @Override public Configuration getConfiguration() {
         return config;
     }
 
-    @Override
-    public Storage getStorage() {
+    @Override public Storage getStorage() {
         return storage;
     }
 
-    @Override
-    public <T extends ITownshipsPlugin> T getBackingImplementation() {
+    @Override public <T extends ITownshipsPlugin> T getBackingImplementation() {
         return (T) this;
     }
 }

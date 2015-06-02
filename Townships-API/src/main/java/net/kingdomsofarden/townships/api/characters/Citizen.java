@@ -26,6 +26,7 @@ public interface Citizen {
 
     /**
      * Updates the Citizen to be in the given Area. Should always be terminal in the default implementation
+     *
      * @param area The Area to assign to the Citizen
      */
     void setCurrentArea(Area area);

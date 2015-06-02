@@ -9,13 +9,11 @@ import net.kingdomsofarden.townships.effects.common.EffectPeriodicCost;
 import org.bukkit.Bukkit;
 
 public class EffectUpkeep extends EffectPeriodicCost {
-    @Override
-    protected boolean onSuccessfulTick(Region region) {
+    @Override protected boolean onSuccessfulTick(Region region) {
         return true;
     }
 
-    @Override
-    protected boolean onInsufficientResources(Region region) {
+    @Override protected boolean onInsufficientResources(Region region) {
         RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.UPKEEP);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -26,13 +24,11 @@ public class EffectUpkeep extends EffectPeriodicCost {
         }
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "upkeep";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
 
     }
 }

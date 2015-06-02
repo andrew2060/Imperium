@@ -17,19 +17,16 @@ public class EffectDenySpawn implements Effect {
     private HashSet<EntityType> deny;
     private Region region;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "deny-spawn";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
         TownshipsPlugin impl = plugin.getBackingImplementation();
         Bukkit.getPluginManager().registerEvents(new SpawnListener(), impl);
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         deny = new HashSet<EntityType>();
         this.region = region;
         for (String key : data.getList("types")) {
@@ -38,16 +35,13 @@ public class EffectDenySpawn implements Effect {
         }
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         data.set("types", deny, new Serializer<EntityType>() {
-            @Override
-            public String serialize(EntityType obj) {
+            @Override public String serialize(EntityType obj) {
                 return obj.name();
             }
 
-            @Override
-            public EntityType deserialize(String input) {
+            @Override public EntityType deserialize(String input) {
                 return EntityType.valueOf(input.toUpperCase());
             }
         });
@@ -55,8 +49,7 @@ public class EffectDenySpawn implements Effect {
         this.region = null;
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 

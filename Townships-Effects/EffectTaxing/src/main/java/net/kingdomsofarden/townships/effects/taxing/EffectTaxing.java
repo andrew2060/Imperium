@@ -15,18 +15,15 @@ public class EffectTaxing extends EffectPeriodic {
 
     private Map<String, TaxItem> outstanding;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "taxing";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
 
     }
 
-    @Override
-    public long onTick(Region region, long time) {
+    @Override public long onTick(Region region, long time) {
         for (Region child : region.getChildren()) {
             if (taxes.containsKey(child.getType().toLowerCase())) {
                 TaxItem tax = taxes.get(child.getType().toLowerCase());
@@ -45,8 +42,7 @@ public class EffectTaxing extends EffectPeriodic {
         return super.onTick(region, time);
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onLoad(plugin, region, data);
         taxes = new HashMap<String, TaxItem>();
         outstanding = new HashMap<String, TaxItem>();
@@ -64,8 +60,7 @@ public class EffectTaxing extends EffectPeriodic {
         }
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         StoredDataSection section = data.getSection("taxes");
         for (Entry<String, TaxItem> entry : taxes.entrySet()) {

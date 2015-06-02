@@ -12,14 +12,13 @@ public class EffectTaskStack extends LinkedList<EffectTask> {
         this.position = position;
     }
 
-    @Override
-    public void push(EffectTask task) {
+    @Override public void push(EffectTask task) {
         super.push(task);
-        load += task.getLoad() + 1; // Increment always by one to denote presence of 0ms time effects
+        load +=
+            task.getLoad() + 1; // Increment always by one to denote presence of 0ms time effects
     }
 
-    @Override
-    public EffectTask pollLast() {
+    @Override public EffectTask pollLast() {
         EffectTask ret = super.pollLast();
         load -= ret.getLoad() + 1;
         return ret;
@@ -29,12 +28,12 @@ public class EffectTaskStack extends LinkedList<EffectTask> {
         return load;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
     public int getPosition() {
         return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
 }

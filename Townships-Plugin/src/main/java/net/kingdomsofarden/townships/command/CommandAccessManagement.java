@@ -14,29 +14,24 @@ import org.bukkit.command.CommandSender;
 import java.util.UUID;
 
 public class CommandAccessManagement implements Command {
-    @Override
-    public String[] getIdentifiers() {
+    @Override public String[] getIdentifiers() {
         return new String[] {"region manage access", "town manage access"};
     }
 
-    @Override
-    public String getPermission() {
+    @Override public String getPermission() {
         return "townships.region.manage";
     }
 
 
-    @Override
-    public int getMaxArguments() {
+    @Override public int getMaxArguments() {
         return 4;
     }
 
-    @Override
-    public int getMinArguments() {
+    @Override public int getMinArguments() {
         return 4;
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    @Override public boolean execute(CommandSender sender, String[] args) {
         Region r = Townships.getRegions().get(args[1]).orNull();
         if (r == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1].toLowerCase());
@@ -93,8 +88,7 @@ public class CommandAccessManagement implements Command {
         }
     }
 
-    @Override
-    public String getUsage() {
+    @Override public String getUsage() {
         return "/region manage access <region> <group|user> <name> <add|remove> <access>";
     }
 }

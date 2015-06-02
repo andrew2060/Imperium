@@ -24,6 +24,7 @@ public interface Area extends Collection<Region> {
 
     /**
      * <b>Warning: </b> for the default implementation, this will be relatively slow for non-terminal Areas
+     *
      * @return A Collection representation of all the regions stored (that have part of their bounding box within)
      * this Area
      */
@@ -40,6 +41,7 @@ public interface Area extends Collection<Region> {
 
     /**
      * Utility method to check whether a given location is within the bounds tracked by this collection
+     *
      * @param loc The location to check
      * @return True if within the bounds represented by this collection
      */
@@ -54,4 +56,13 @@ public interface Area extends Collection<Region> {
      * @return A collection of citizens currently within the bounds represented by the area
      */
     Collection<Citizen> getCitizensInArea();
+
+    /**
+     * @return Gets the total volume of all the bounds contained within this area.
+     */
+    int getContentVolume();
+
+    /**
+     * @return Gets the total covered surface area by all the bounds within this area should they all be flattened to 2d
+     */
 }

@@ -12,41 +12,34 @@ public class EffectPhysicalItemChest extends PhysicalChestItemProvider implement
 
     private Region region;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "resource-chest";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
 
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         region = r;
         chestLocation = data.get("location", new LocationSerializer(), null);
         priority = data.get("priority", new Serializer<Integer>() {
-            @Override
-            public String serialize(Integer obj) {
+            @Override public String serialize(Integer obj) {
                 return obj + "";
             }
 
-            @Override
-            public Integer deserialize(String input) {
+            @Override public Integer deserialize(String input) {
                 return Integer.valueOf(input);
             }
         }, -1);
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         data.set("location", chestLocation, new LocationSerializer());
         data.set("priority", priority);
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 

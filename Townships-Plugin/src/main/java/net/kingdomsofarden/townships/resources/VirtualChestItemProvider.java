@@ -13,8 +13,7 @@ public class VirtualChestItemProvider implements ItemProvider {
 
     protected Inventory inventory;
 
-    @Override
-    public int getAmount(Material mat) {
+    @Override public int getAmount(Material mat) {
         if (inventory == null) {
             return 0;
         }
@@ -25,8 +24,7 @@ public class VirtualChestItemProvider implements ItemProvider {
         return amt;
     }
 
-    @Override
-    public int remove(Material mat, int max) {
+    @Override public int remove(Material mat, int max) {
         if (inventory == null) {
             return 0;
         }
@@ -49,13 +47,13 @@ public class VirtualChestItemProvider implements ItemProvider {
         return max - amt;
     }
 
-    @Override
-    public int add(Material type, int max) {
+    @Override public int add(Material type, int max) {
         if (inventory == null) {
             return 0;
         }
         int rem = 0;
-        for (Entry<Integer, ItemStack> remaining : inventory.addItem(new ItemStack(type, max)).entrySet()) {
+        for (Entry<Integer, ItemStack> remaining : inventory.addItem(new ItemStack(type, max))
+            .entrySet()) {
             rem += remaining.getValue().getAmount();
         }
         return max - rem;

@@ -38,69 +38,57 @@ public class DynamicCuboidBoundingBox implements CuboidBoundingBox {
         this.vertices.add(new Integer[] {maxX, maxY, maxZ});
     }
 
-    @Override
-    public int getMinX() {
+    @Override public int getMinX() {
         return minX;
     }
 
-    @Override
-    public int getMaxX() {
+    @Override public int getMaxX() {
         return maxX;
     }
 
-    @Override
-    public int getMinY() {
+    @Override public int getMinY() {
         return minY;
     }
 
-    @Override
-    public int getMaxY() {
+    @Override public int getMaxY() {
         return maxY;
     }
 
-    @Override
-    public int getMinZ() {
+    @Override public int getMinZ() {
         return minZ;
     }
 
-    @Override
-    public int getMaxZ() {
+    @Override public int getMaxZ() {
         return maxZ;
     }
 
-    @Override
-    public boolean isInBounds(Location loc) {
+    @Override public boolean isInBounds(Location loc) {
         return isInBounds(loc.getX(), loc.getY(), loc.getZ());
     }
 
-    @Override
-    public boolean isInBounds(double x, double y, double z) {
-        return (getMinX() <= x) && (x <= getMaxX()) && (getMinY() <= y)
-                && (y <= getMaxY()) && (getMinZ() <= z) && (z <= getMaxZ());
+    @Override public boolean isInBounds(double x, double y, double z) {
+        return (getMinX() <= x) && (x <= getMaxX()) && (getMinY() <= y) && (y <= getMaxY()) && (
+            getMinZ() <= z) && (z <= getMaxZ());
     }
 
-    @Override
-    public boolean intersects(BoundingArea box) {
+    @Override public boolean intersects(BoundingArea box) {
         for (Integer[] vertex : box.getVertices()) {
-            if (box.isInBounds(vertex[0], vertex[1], vertex[2])) {
+            if (isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return true;
             }
         }
         return box.encapsulates(this);
     }
 
-    @Override
-    public Collection<Integer[]> getVertices() {
+    @Override public Collection<Integer[]> getVertices() {
         return vertices;
     }
 
-    @Override
-    public World getWorld() {
+    @Override public World getWorld() {
         throw new UnsupportedOperationException("Cannot get world in a dynamic bounding box");
     }
 
-    @Override
-    public boolean encapsulates(BoundingArea other) {
+    @Override public boolean encapsulates(BoundingArea other) {
         for (Integer[] vertex : other.getVertices()) {
             if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
                 return false;
@@ -109,18 +97,15 @@ public class DynamicCuboidBoundingBox implements CuboidBoundingBox {
         return true; // TODO not correct
     }
 
-    @Override
-    public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+    @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
         return null;
     }
 
-    @Override
-    public int size2d() {
+    @Override public int size2d() {
         return (maxX - minX) * (maxZ - minZ);
     }
 
-    @Override
-    public int volume() {
+    @Override public int volume() {
         return size2d() * (maxY - minY);
     }
 }

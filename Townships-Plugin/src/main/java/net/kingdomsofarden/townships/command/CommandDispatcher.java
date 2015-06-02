@@ -23,7 +23,8 @@ public class CommandDispatcher implements CommandExecutor {
 
 
     @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command label, String s, String[] cmd) {
+    public boolean onCommand(CommandSender sender, org.bukkit.command.Command label, String s,
+        String[] cmd) {
         for (int identifierLength = cmd.length; identifierLength >= 0; identifierLength--) {
             final StringBuilder identBuilder = new StringBuilder();
             identBuilder.append(s);
@@ -39,8 +40,10 @@ public class CommandDispatcher implements CommandExecutor {
             }
             // Check permissions
             if (sender instanceof Player) {
-                if (command.getPermission() != null && !sender.hasPermission(command.getPermission())) {
-                    Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_COMMAND, command.getPermission());
+                if (command.getPermission() != null && !sender
+                    .hasPermission(command.getPermission())) {
+                    Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_COMMAND,
+                        command.getPermission());
                     return true;
                 }
             }
@@ -48,10 +51,11 @@ public class CommandDispatcher implements CommandExecutor {
             String[] args = Arrays.copyOfRange(cmd, identifierLength, cmd.length);
             // Check argument length
             int len = args.length;
-            if (len < command.getMinArguments() || (command.getMaxArguments() != -1
-                    && len > command.getMaxArguments())) {
+            if (len < command.getMinArguments() || (command.getMaxArguments() != -1 && len > command
+                .getMaxArguments())) {
                 if (sender instanceof Player) {
-                    Messaging.sendFormattedMessage(sender, I18N.COMMAND_IMPROPER_ARGUMENTS, command.getUsage());
+                    Messaging.sendFormattedMessage(sender, I18N.COMMAND_IMPROPER_ARGUMENTS,
+                        command.getUsage());
                     return true;
                 }
             }

@@ -18,11 +18,11 @@ public class RegionCreateEvent extends Event implements Cancellable {
         this.cancelled = false;
     }
 
-    public HandlerList getHandlers() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 

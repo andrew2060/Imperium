@@ -12,29 +12,24 @@ public class EffectProtection implements Effect {
 
     private Region region;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "protection";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
         TownshipsPlugin p = (TownshipsPlugin) plugin;
         Bukkit.getPluginManager().registerEvents(new BlockProtectionListener(p), p);
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = null;
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 

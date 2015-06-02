@@ -25,17 +25,16 @@ public class YAMLStorage implements Storage {
         this.regionSaves.mkdir();
     }
 
-    @Override
-    public Region loadRegion(UUID id) {
-        File f = new File(regionSaves, id + ".yml"); // An exist check is not necessary as a blank configuration is retrieved
+    @Override public Region loadRegion(UUID id) {
+        File f = new File(regionSaves,
+            id + ".yml"); // An exist check is not necessary as a blank configuration is retrieved
         StoredDataSection section = new YAMLDataSection(YamlConfiguration.loadConfiguration(f));
         Region r = new TownshipsRegion(id, section);
         plugin.getRegions().add(r);
         return r;
     }
 
-    @Override
-    public void saveRegion(Region r, boolean async) {
+    @Override public void saveRegion(Region r, boolean async) {
         File f = new File(regionSaves, r.getUid() + ".yml");
         FileConfiguration save = new YamlConfiguration();
         r.saveConfigs(new YAMLDataSection(save));
@@ -46,20 +45,18 @@ public class YAMLStorage implements Storage {
         }
     }
 
-    @Override
-    public void removeRegion(UUID id) {
+    @Override public void removeRegion(UUID id) {
         File f = new File(regionSaves, id + ".yml");
         if (f.exists()) {
             f.delete();
         }
     }
 
-    @Override
-    public void loadAllRegions(Collection<Region> regions) {
+    @Override public void loadAllRegions(Collection<Region> regions) {
         for (String name : regionSaves.list()) {
             try {
                 if (name.toLowerCase().endsWith(".yml")) {
-                    UUID uid = UUID.fromString(name.substring(0, name.length()-4));
+                    UUID uid = UUID.fromString(name.substring(0, name.length() - 4));
                     loadRegion(uid);
                 }
             } catch (Exception e) {

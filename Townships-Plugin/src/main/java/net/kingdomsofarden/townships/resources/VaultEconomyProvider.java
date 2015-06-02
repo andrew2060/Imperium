@@ -20,30 +20,29 @@ public class VaultEconomyProvider implements EconomyProvider {
         this.accountUid = accountUid;
         this.identifier = identifier;
         if (!TownshipsPlugin.economy.getBanks().contains(accountUid.toString())) {
-            TownshipsPlugin.economy.createBank(accountUid.toString(), Bukkit.getOfflinePlayer(region.getRole(RoleGroup.ROOT).iterator().next())); // Guaranteed to always have one
+            TownshipsPlugin.economy.createBank(accountUid.toString(), Bukkit.getOfflinePlayer(
+                region.getRole(RoleGroup.ROOT).iterator().next())); // Guaranteed to always have one
         }
     }
 
-    @Override
-    public String getIdentifier() {
+    @Override public String getIdentifier() {
         return identifier;
     }
 
-    @Override
-    public boolean withdraw(double amount) {
-        if (TownshipsPlugin.economy.bankHas(accountUid.toString(), amount).type.equals(ResponseType.SUCCESS))
-            return TownshipsPlugin.economy.bankWithdraw(accountUid.toString(), amount).transactionSuccess();
+    @Override public boolean withdraw(double amount) {
+        if (TownshipsPlugin.economy.bankHas(accountUid.toString(), amount).type
+            .equals(ResponseType.SUCCESS))
+            return TownshipsPlugin.economy.bankWithdraw(accountUid.toString(), amount)
+                .transactionSuccess();
         else
             return false;
     }
 
-    @Override
-    public double getBalance() {
+    @Override public double getBalance() {
         return TownshipsPlugin.economy.bankBalance(accountUid.toString()).balance;
     }
 
-    @Override
-    public double deposit(double amount) {
+    @Override public double deposit(double amount) {
         return TownshipsPlugin.economy.bankDeposit(accountUid.toString(), amount).amount;
     }
 

@@ -20,8 +20,10 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
 
 
 
-    @Override
-    public String getName() {
+    Stats curr;
+    Stats last;
+
+    @Override public String getName() {
         return "governable";
     }
 
@@ -35,45 +37,31 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
 
     public double getProd() {
         long prop = System.currentTimeMillis() % Constants.YEAR_LENGTH;
-        double ratio = ((double)prop)/Constants.YEAR_LENGTH;
-        return curr.prod  + last.prod * (1-ratio);
+        double ratio = ((double) prop) / Constants.YEAR_LENGTH;
+        return curr.prod + last.prod * (1 - ratio);
     }
 
     public double getGnp() {
         long rem = System.currentTimeMillis() % Constants.YEAR_LENGTH;
-        double ratio = ((double)rem)/Constants.YEAR_LENGTH;
-        return curr.gnp + last.gnp * (1-ratio);
+        double ratio = ((double) rem) / Constants.YEAR_LENGTH;
+        return curr.gnp + last.gnp * (1 - ratio);
     }
 
     public double getExp() {
         long rem = System.currentTimeMillis() % Constants.YEAR_LENGTH;
-        double ratio = ((double)rem)/Constants.YEAR_LENGTH;
-        return curr.exp + last.exp * (1-ratio);    }
+        double ratio = ((double) rem) / Constants.YEAR_LENGTH;
+        return curr.exp + last.exp * (1 - ratio);
+    }
 
     public double getNNI() {
         return getGnp() - getExp();
     }
 
-    class Stats {
-        private int pop = 0;
-        private int land = 0;
-        private int prod = 0; // TODO events for this
-
-        private double gnp = 0;
-        private double exp = 0;
-    }
-
-    Stats curr;
-    Stats last;
-
-
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
 
     }
 
-    @Override
-    public long onTick(Region region, long time) {
+    @Override public long onTick(Region region, long time) {
         updateImmed();
         last = curr;
         curr = new Stats();
@@ -81,11 +69,11 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         curr.land = last.land;
         return super.onTick(region, time);
     }
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+
+    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         if (startTime == -1) {
-            startTime = System.currentTimeMillis()/Constants.YEAR_LENGTH + Constants.YEAR_LENGTH;
+            startTime = System.currentTimeMillis() / Constants.YEAR_LENGTH + Constants.YEAR_LENGTH;
         }
         period = Constants.YEAR_LENGTH;
         last = new Stats();
@@ -101,7 +89,8 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         curr.gnp = Double.valueOf(data.get("curr.gnp", "0"));
         curr.exp = Double.valueOf(data.get("curr.exp", "0"));
         if (!region.getEconomyProviders().containsKey(EconomyProvider.TREASURY)) {
-            region.getEconomyProviders().put(EconomyProvider.TREASURY, new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
+            region.getEconomyProviders().put(EconomyProvider.TREASURY,
+                new VaultEconomyProvider(region.getUid(), region, EconomyProvider.TREASURY));
         }
     }
 
@@ -144,5 +133,15 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
                 curr.exp += event.getAmount();
             }
         }
+    }
+
+
+    class Stats {
+        private int pop = 0;
+        private int land = 0;
+        private int prod = 0; // TODO events for this
+
+        private double gnp = 0;
+        private double exp = 0;
     }
 }

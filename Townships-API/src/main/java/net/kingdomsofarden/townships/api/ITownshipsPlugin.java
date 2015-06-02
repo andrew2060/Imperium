@@ -8,9 +8,14 @@ import net.kingdomsofarden.townships.api.storage.Storage;
 
 public interface ITownshipsPlugin {
     RegionManager getRegions();
+
     CitizenManager getCitizens();
+
     EffectManager getEffectManager();
+
     Configuration getConfiguration();
+
     Storage getStorage();
+
     <T extends ITownshipsPlugin> T getBackingImplementation();
 }

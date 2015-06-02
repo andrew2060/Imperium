@@ -6,15 +6,11 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
-import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
 import org.bukkit.World;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class QuadrantBoundCollection extends RegionBoundCollection {
 
@@ -22,7 +18,8 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     private int xDivisor;
     private int zDivisor;
 
-    public QuadrantBoundCollection(World world, int quadrant, RegionBoundCollection parent, int xLeft, int xRight, int zLower, int zUpper) {
+    public QuadrantBoundCollection(World world, int quadrant, RegionBoundCollection parent,
+        int xLeft, int xRight, int zLower, int zUpper) {
         this.parent = parent;
         this.quadrant = quadrant;
         this.subRegions = new RegionBoundCollection[4]; // [][] {{0 | 1} | {2 | 3}}
@@ -37,32 +34,37 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
 
-    @Override
-    public CuboidBoundingBox getBoundingBox() {
+    @Override public CuboidBoundingBox getBoundingBox() {
         return bounds;
     }
 
-    @Override
-    public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
+    @Override public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
         boolean upperHalf = z > zDivisor;
         boolean leftHalf = x <= xDivisor;
         if (leftHalf) {
             if (upperHalf) {
-                return subRegions[0] != null ? subRegions[0].getBoundingRegions(x, y, z) : new TreeSet<Region>();
+                return subRegions[0] != null ?
+                    subRegions[0].getBoundingRegions(x, y, z) :
+                    new TreeSet<Region>();
             } else {
-                return subRegions[2] != null ? subRegions[2].getBoundingRegions(x, y, z) : new TreeSet<Region>();
+                return subRegions[2] != null ?
+                    subRegions[2].getBoundingRegions(x, y, z) :
+                    new TreeSet<Region>();
             }
         } else {
             if (upperHalf) {
-                return subRegions[1] != null ? subRegions[1].getBoundingRegions(x, y, z) : new TreeSet<Region>();
+                return subRegions[1] != null ?
+                    subRegions[1].getBoundingRegions(x, y, z) :
+                    new TreeSet<Region>();
             } else {
-                return subRegions[3] != null ? subRegions[3].getBoundingRegions(x, y, z) : new TreeSet<Region>();
+                return subRegions[3] != null ?
+                    subRegions[3].getBoundingRegions(x, y, z) :
+                    new TreeSet<Region>();
             }
         }
     }
 
-    @Override
-    public Collection<Citizen> getCitizensInArea() {
+    @Override public Collection<Citizen> getCitizensInArea() {
         HashSet<Citizen> s = new HashSet<Citizen>();
         for (RegionBoundCollection col : subRegions) {
             for (Citizen c : col.getCitizensInArea()) {
@@ -72,8 +74,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return s;
     }
 
-    @Override
-    public boolean add(RegionBoundingBox b) {
+    @Override public boolean add(RegionBoundingArea b) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
@@ -104,34 +105,39 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
 
     // TODO: Alternative algorithms?
-    @Override
-    protected void constructContainedRegions(Set<Region> regions) {
+    @Override protected void constructContainedRegions(Set<Region> regions) {
         for (RegionBoundCollection c : subRegions) {
             c.constructContainedRegions(regions);
         }
     }
 
-    @Override
-    public Optional<Area> getBoundingArea(int x, int z) {
+    @Override public Optional<Area> getBoundingArea(int x, int z) {
         boolean upperHalf = z > zDivisor;
         boolean leftHalf = x <= xDivisor;
         if (leftHalf) {
             if (upperHalf) {
-                return subRegions[0] != null ? subRegions[0].getBoundingArea(x, z) : Optional.<Area>absent();
+                return subRegions[0] != null ?
+                    subRegions[0].getBoundingArea(x, z) :
+                    Optional.<Area>absent();
             } else {
-                return subRegions[2] != null ? subRegions[2].getBoundingArea(x, z) : Optional.<Area>absent();
+                return subRegions[2] != null ?
+                    subRegions[2].getBoundingArea(x, z) :
+                    Optional.<Area>absent();
             }
         } else {
             if (upperHalf) {
-                return subRegions[1] != null ? subRegions[1].getBoundingArea(x, z) : Optional.<Area>absent();
+                return subRegions[1] != null ?
+                    subRegions[1].getBoundingArea(x, z) :
+                    Optional.<Area>absent();
             } else {
-                return subRegions[3] != null ? subRegions[3].getBoundingArea(x, z) : Optional.<Area>absent();
+                return subRegions[3] != null ?
+                    subRegions[3].getBoundingArea(x, z) :
+                    Optional.<Area>absent();
             }
         }
     }
 
-    @Override
-    public void getIntersectingRegions(BoundingArea b, TreeSet<Region> col) {
+    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<Region> col) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
@@ -206,19 +212,18 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
             if (w <= 100 || h <= 100) { //TODO nicer partitioning
                 subRegions[i] = new TerminalBoundCollection(world, xLeft, xRight, zLower, zUpper);
             } else {
-                subRegions[i] = new QuadrantBoundCollection(world, i, this, xLeft, xRight, zLower, zUpper);
+                subRegions[i] =
+                    new QuadrantBoundCollection(world, i, this, xLeft, xRight, zLower, zUpper);
             }
         }
     }
 
 
-    @Override
-    public int size() {
+    @Override public int size() {
         return getContents().size();
     }
 
-    @Override
-    public boolean isEmpty() {
+    @Override public boolean isEmpty() {
         for (int i = 0; i < 4; i++) {
             if (subRegions[i] != null && !subRegions[i].isEmpty()) {
                 return false;
@@ -227,8 +232,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override
-    public boolean contains(Object o) {
+    @Override public boolean contains(Object o) {
         for (int i = 0; i < 4; i++) {
             if (subRegions[i] == null || !subRegions[i].contains(o)) {
                 return false;
@@ -237,23 +241,19 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override
-    public Iterator<Region> iterator() {
+    @Override public Iterator<Region> iterator() {
         return getContents().iterator();
     }
 
-    @Override
-    public Object[] toArray() {
+    @Override public Object[] toArray() {
         return getContents().toArray();
     }
 
-    @Override
-    public <T> T[] toArray(T[] a) {
+    @Override public <T> T[] toArray(T[] a) {
         return getContents().toArray(a);
     }
 
-    @Override
-    public boolean remove(Object o) {
+    @Override public boolean remove(Object o) {
         BoundingArea b;
         if (o instanceof Region) {
             b = ((Region) o).getBounds();
@@ -286,8 +286,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {  // TODO: faster algorithm for this
+    @Override public boolean containsAll(Collection<?> c) {  // TODO: faster algorithm for this
         for (Object o : c) {
             if (!contains(o)) {
                 return false;
@@ -296,8 +295,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override
-    public boolean removeAll(Collection<?> c) {
+    @Override public boolean removeAll(Collection<?> c) {
         boolean ret = false;
         for (Object o : c) {
             if (remove(o)) {
@@ -307,8 +305,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return ret;
     }
 
-    @Override
-    public boolean retainAll(Collection<?> c) {
+    @Override public boolean retainAll(Collection<?> c) {
         boolean ret = false;
         for (Region r : getContents()) {
             if (!c.contains(r) && remove(r)) {
@@ -318,8 +315,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return ret;
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         for (int i = 0; i < 4; i++) {
             if (subRegions[i] != null) {
                 subRegions[i].clear();

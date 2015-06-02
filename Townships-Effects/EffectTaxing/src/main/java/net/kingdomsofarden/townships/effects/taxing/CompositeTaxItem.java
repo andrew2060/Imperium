@@ -18,13 +18,11 @@ public class CompositeTaxItem implements TaxItem {
 
     public CompositeTaxItem(StoredDataSection section) {
         this.amount = section.get("money", new Serializer<Double>() {
-            @Override
-            public String serialize(Double obj) {
+            @Override public String serialize(Double obj) {
                 return obj + "";
             }
 
-            @Override
-            public Double deserialize(String input) {
+            @Override public Double deserialize(String input) {
                 return Double.valueOf(input);
             }
         }, 0.00);
@@ -45,8 +43,7 @@ public class CompositeTaxItem implements TaxItem {
     }
 
 
-    @Override
-    public boolean tax(Region taxer, Region taxed) {
+    @Override public boolean tax(Region taxer, Region taxed) {
         EconomyProvider selectedE = null;
         for (EconomyProvider provider : taxed.getEconomyProviders()) {
             if (provider.getIdentifier().equals("tax-account")) {
@@ -82,8 +79,7 @@ public class CompositeTaxItem implements TaxItem {
         return true;
     }
 
-    @Override
-    public void registerOutstanding(TaxItem tax, Region taxed) {
+    @Override public void registerOutstanding(TaxItem tax, Region taxed) {
         for (EconomyProvider provider : taxed.getEconomyProviders()) {
             if (provider.getIdentifier().equals("tax-account")) {
                 double bal = provider.getBalance();
@@ -108,18 +104,15 @@ public class CompositeTaxItem implements TaxItem {
         }
     }
 
-    @Override
-    public double getAmount() {
+    @Override public double getAmount() {
         return amount;
     }
 
-    @Override
-    public Map<Material, Integer> getItems() {
+    @Override public Map<Material, Integer> getItems() {
         return items;
     }
 
-    @Override
-    public void save(StoredDataSection section) {
+    @Override public void save(StoredDataSection section) {
         StoredDataSection data = section.getSection("items");
         for (Entry<Material, Integer> e : items.entrySet()) {
             data.set(e.getKey().name(), e.getValue());

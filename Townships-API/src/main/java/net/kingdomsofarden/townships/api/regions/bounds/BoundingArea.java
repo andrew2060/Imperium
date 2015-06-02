@@ -1,5 +1,7 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
+import net.kingdomsofarden.townships.api.math.Line3I;
+import net.kingdomsofarden.townships.api.math.Vector3I;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -33,9 +35,9 @@ public interface BoundingArea {
 
     /**
      * @return A sorted collection of vertices using Double[] {x, y, z} representation
-     * Specifically, the collection is sorted in ascending order, from -x/-y/-z to +x/+y/+z
+     * Specifically, the collection is sorted in clockwise vertex order by edgesx`
      */
-    Collection<Integer[]> getVertices();
+    Collection<Vector3I> getVertices();
 
     /**
      * @return The world containing this bounding box
@@ -50,10 +52,11 @@ public interface BoundingArea {
 
     /**
      * Checks the given region for the parameter blocks
+     *
      * @param blocks A mapping of block type/amount to check for
      * @return A mapping of remainder block type/amount not found
      */
-    Map<Material,Integer> checkForBlocks(Map<Material, Integer> blocks);
+    Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks);
 
     /**
      * @return The 2-dimensional area of this bounding box
@@ -64,4 +67,16 @@ public interface BoundingArea {
      * @return The block volume of this bounding box
      */
     int volume();
+
+    /**
+     * @param size The size to grow by
+     * @return A clone of this bounding area that is grown by the specified dimensions
+     */
+    <T extends BoundingArea> T grow(int size);
+
+
+    /**
+     * @return The edges of this bounding area as vector pairs
+     */
+    Collection<Line3I> getEdges();
 }

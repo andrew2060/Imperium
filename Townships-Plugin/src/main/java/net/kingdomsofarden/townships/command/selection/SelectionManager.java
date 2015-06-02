@@ -12,11 +12,11 @@ public class SelectionManager {
     public static LoadingCache<UUID, CuboidSelection> selections;
 
     static {
-        selections = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<UUID, CuboidSelection>() {
-            @Override
-            public CuboidSelection load(UUID key) throws Exception {
-                return new CuboidSelection();
-            }
-        });
+        selections = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES)
+            .build(new CacheLoader<UUID, CuboidSelection>() {
+                @Override public CuboidSelection load(UUID key) throws Exception {
+                    return new CuboidSelection();
+                }
+            });
     }
 }

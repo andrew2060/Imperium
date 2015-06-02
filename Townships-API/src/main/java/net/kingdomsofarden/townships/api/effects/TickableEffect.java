@@ -14,8 +14,9 @@ public interface TickableEffect extends Effect {
 
     /**
      * Called when a region performs a tick on its effects
+     *
      * @param region The region performing the ticking
-     * @param time The time in milliseconds the effect is being ticked
+     * @param time   The time in milliseconds the effect is being ticked
      * @return The time to schedule for the next tick, or LONG.MAX_VALUE to not schedule again
      */
     long onTick(Region region, long time);

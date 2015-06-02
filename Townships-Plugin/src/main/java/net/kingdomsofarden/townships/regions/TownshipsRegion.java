@@ -10,7 +10,7 @@ import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
-import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
@@ -26,17 +26,8 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeSet;
-import java.util.UUID;
 
 public class TownshipsRegion implements Region {
 
@@ -55,7 +46,7 @@ public class TownshipsRegion implements Region {
 
     private Map<String, Effect> effects;
 
-    private RegionBoundingBox bounds;
+    private RegionBoundingArea bounds;
 
     private Location pos1;
     private Location pos2;
@@ -86,8 +77,7 @@ public class TownshipsRegion implements Region {
         maxTierInRegion = new HashMap<Integer, Integer>();
         metadata = new HashMap<String, Object>();
         Comparator<Region> regionComparator = new Comparator<Region>() {
-            @Override
-            public int compare(Region o1, Region o2) {
+            @Override public int compare(Region o1, Region o2) {
                 int ret = o2.getTier() - o1.getTier();
                 if (ret == 0) {
                     return o1.getUid().compareTo(o2.getUid());
@@ -103,13 +93,11 @@ public class TownshipsRegion implements Region {
         name = config.get("name", null);
         type = config.get("type", "UNDEFINED");
         Serializer<Integer> intSerializer = new Serializer<Integer>() {
-            @Override
-            public String serialize(Integer obj) {
+            @Override public String serialize(Integer obj) {
                 return obj + "";
             }
 
-            @Override
-            public Integer deserialize(String input) {
+            @Override public Integer deserialize(String input) {
                 return (int) Double.valueOf(input).doubleValue();
             }
         };
@@ -117,7 +105,8 @@ public class TownshipsRegion implements Region {
         pos1 = config.get("position-1", new LocationSerializer(), null);
         pos2 = config.get("position-2", new LocationSerializer(), null);
         if (pos1 == null || pos2 == null) {
-            throw new IllegalStateException("Problem loading location of region " + regionUid + ": null");
+            throw new IllegalStateException(
+                "Problem loading location of region " + regionUid + ": null");
         }
         if (pos1.getWorld() != pos2.getWorld()) {
             throw new IllegalStateException("Mismatched worlds");
@@ -143,7 +132,8 @@ public class TownshipsRegion implements Region {
         }
         StoredDataSection effectSection = config.getSection("effects");
         for (String eName : effectSection.getKeys(false)) {
-            Effect e = Townships.getEffectManager().loadEffect(eName, this, effectSection.getSection(eName));
+            Effect e = Townships.getEffectManager()
+                .loadEffect(eName, this, effectSection.getSection(eName));
             effects.put(eName.toLowerCase(), e);
         }
         StoredDataSection requirements = config.getSection("requirements");
@@ -162,12 +152,16 @@ public class TownshipsRegion implements Region {
         }
         economyProviders = new EconomyProvider[0];
         itemProviders = new ItemProvider[0];
-        if (((ConfigurationSection)requirements.getBackingImplementation()).contains("block-requirements")) {
-            metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionBlockCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        if (((ConfigurationSection) requirements.getBackingImplementation())
+            .contains("block-requirements")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
+                new RegionBlockCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
-        if (((ConfigurationSection)requirements.getBackingImplementation()).contains("region-types-min")
-                || ((ConfigurationSection)requirements.getBackingImplementation()).contains("region-tiers-min")) {
-            metadata.put(MetaKeys.REQUIREMENT_BLOCK, new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        if (((ConfigurationSection) requirements.getBackingImplementation())
+            .contains("region-types-min") || ((ConfigurationSection) requirements
+            .getBackingImplementation()).contains("region-tiers-min")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
+                new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
         relations = new HashMap<Region, RelationState>();
         externRelations = new HashMap<Region, RelationState>();
@@ -194,38 +188,31 @@ public class TownshipsRegion implements Region {
         }
     }
 
-    @Override
-    public int getTier() {
+    @Override public int getTier() {
         return tier;
     }
 
-    @Override
-    public UUID getUid() {
+    @Override public UUID getUid() {
         return regionUid;
     }
 
-    @Override
-    public Optional<String> getName() {
+    @Override public Optional<String> getName() {
         return Optional.fromNullable(name);
     }
 
-    @Override
-    public Map<Region, RelationState> getRelations() {
+    @Override public Map<Region, RelationState> getRelations() {
         return relations;
     }
 
-    @Override
-    public Map<Region, RelationState> getExternRelations() {
+    @Override public Map<Region, RelationState> getExternRelations() {
         return externRelations;
     }
 
-    @Override
-    public Collection<UUID> getRole(RoleGroup group) {
+    @Override public Collection<UUID> getRole(RoleGroup group) {
         return citizenUidsByRole.get(group);
     }
 
-    @Override
-    public Collection<Citizen> getCitizensInBounds() {
+    @Override public Collection<Citizen> getCitizensInBounds() {
         HashSet<Citizen> contents = new HashSet<Citizen>();
         for (Area a : containingAreas) {
             for (Citizen c : a.getCitizensInArea()) {
@@ -238,37 +225,32 @@ public class TownshipsRegion implements Region {
         return contents;
     }
 
-    @Override
-    public RegionBoundingBox getBounds() {
+    @Override public RegionBoundingArea getBounds() {
         return bounds;
     }
 
-    @Override
-    public Collection<Effect> getEffects() {
+    @Override public Collection<Effect> getEffects() {
         return effects.values();
     }
 
-    @Override
-    public boolean hasEffect(String name) {
+    @Override public boolean hasEffect(String name) {
         return effects.containsKey(name.toLowerCase());
     }
 
-    @Override
-    public <T extends Effect> T getEffect(String name) throws IllegalStateException {
+    @Override public <T extends Effect> T getEffect(String name) throws IllegalStateException {
         T ret = (T) effects.get(name.toLowerCase());
         if (ret == null) {
-            throw new IllegalStateException("An attempt to retrieve the effect " + name + " was made when it did not exist on a region");
+            throw new IllegalStateException("An attempt to retrieve the effect " + name
+                + " was made when it did not exist on a region");
         }
         return ret;
     }
 
-    @Override
-    public Collection<RoleGroup> getRoles(Citizen citizen) {
+    @Override public Collection<RoleGroup> getRoles(Citizen citizen) {
         return rolesByCitizenUid.get(citizen.getUid());
     }
 
-    @Override
-    public void saveConfigs(StoredDataSection data) {
+    @Override public void saveConfigs(StoredDataSection data) {
         data.set("name", name);
         data.set("type", type);
         data.set("tier", tier);
@@ -288,7 +270,8 @@ public class TownshipsRegion implements Region {
         }
         StoredDataSection effectSection = data.getSection("effects");
         for (Effect effect : effects.values()) {
-            effect.onUnload(Townships.getInstance(), this, effectSection.getSection(effect.getName()));
+            effect.onUnload(Townships.getInstance(), this,
+                effectSection.getSection(effect.getName()));
         }
 
         // Requirements
@@ -310,13 +293,11 @@ public class TownshipsRegion implements Region {
             selfDiplomacy.set(e.getKey().getUid().toString(), e.getValue().toString());
         }
         for (Entry<Region, RelationState> e : externRelations.entrySet()) {
-            externDiplomacy .set(e.getKey().getUid().toString(), e.getValue().toString());
+            externDiplomacy.set(e.getKey().getUid().toString(), e.getValue().toString());
         }
-
     }
 
-    @Override
-    public String getType() {
+    @Override public String getType() {
         return type;
     }
 
@@ -324,21 +305,19 @@ public class TownshipsRegion implements Region {
         return containingAreas;
     }
 
-    @Override
-    public void addRole(Citizen citizen, RoleGroup group) {
+    @Override public void addRole(Citizen citizen, RoleGroup group) {
         rolesByCitizenUid.put(citizen.getUid(), group);
         citizenUidsByRole.put(group, citizen.getUid());
     }
 
-    @Override
-    public boolean removeRole(Citizen citizen, RoleGroup group) {
+    @Override public boolean removeRole(Citizen citizen, RoleGroup group) {
         boolean ret = rolesByCitizenUid.remove(citizen.getUid(), group);
         boolean ret2 = citizenUidsByRole.remove(group, citizen.getUid());
         return ret || ret2;
     }
 
-    @Override
-    public boolean hasAccess(Citizen citizen, AccessType type) { // TODO further investigate if not n^2 algorithm is possible
+    @Override public boolean hasAccess(Citizen citizen,
+        AccessType type) { // TODO further investigate if not n^2 algorithm is possible
         if (citizen.isRoot()) {
             return true;
         } else {
@@ -367,8 +346,7 @@ public class TownshipsRegion implements Region {
         return false;
     }
 
-    @Override
-    public boolean hasAccess(RoleGroup group, AccessType type) {
+    @Override public boolean hasAccess(RoleGroup group, AccessType type) {
         for (AccessType access : accessByRole.get(group)) {
             if (access.hasAccess(type)) {
                 return true;
@@ -377,8 +355,7 @@ public class TownshipsRegion implements Region {
         return false;
     }
 
-    @Override
-    public void addEconomyProvider(EconomyProvider provider) {
+    @Override public void addEconomyProvider(EconomyProvider provider) {
         economyProviders = Arrays.copyOf(economyProviders, economyProviders.length + 1);
         economyProviders[economyProviders.length - 1] = provider;
         int i = economyProviders.length - 2;
@@ -392,8 +369,8 @@ public class TownshipsRegion implements Region {
             }
         }
     }
-    @Override
-    public void addItemProvider(ItemProvider provider) {
+
+    @Override public void addItemProvider(ItemProvider provider) {
         itemProviders = Arrays.copyOf(itemProviders, itemProviders.length + 1);
         itemProviders[itemProviders.length - 1] = provider;
         int i = itemProviders.length - 2;
@@ -408,8 +385,7 @@ public class TownshipsRegion implements Region {
         }
     }
 
-    @Override
-    public void removeEconomyProvider(EconomyProvider provider) {
+    @Override public void removeEconomyProvider(EconomyProvider provider) {
         EconomyProvider[] temp = new EconomyProvider[economyProviders.length - 1];
         for (int i = 0, offset = 0; i < economyProviders.length; i++) {
             if (economyProviders[i].equals(provider)) {
@@ -422,8 +398,7 @@ public class TownshipsRegion implements Region {
         economyProviders = temp;
     }
 
-    @Override
-    public void removeItemProvider(ItemProvider provider) {
+    @Override public void removeItemProvider(ItemProvider provider) {
         ItemProvider[] temp = new ItemProvider[itemProviders.length - 1];
         for (int i = 0, offset = 0; i < itemProviders.length; i++) {
             if (itemProviders[i].equals(provider)) {
@@ -436,38 +411,31 @@ public class TownshipsRegion implements Region {
         itemProviders = temp;
     }
 
-    @Override
-    public EconomyProvider[] getEconomyProviders() {
+    @Override public EconomyProvider[] getEconomyProviders() {
         return economyProviders;
     }
 
-    @Override
-    public ItemProvider[] getItemProviders() {
+    @Override public ItemProvider[] getItemProviders() {
         return itemProviders;
     }
 
-    @Override
-    public boolean isValid() {
+    @Override public boolean isValid() {
         return valid;
     }
 
-    @Override
-    public void setValid(boolean valid) {
+    @Override public void setValid(boolean valid) {
         this.valid = valid;
     }
 
-    @Override
-    public Collection<Region> getParents() {
+    @Override public Collection<Region> getParents() {
         return parents;
     }
 
-    @Override
-    public Collection<Region> getChildren() {
+    @Override public Collection<Region> getChildren() {
         return children;
     }
 
-    @Override
-    public boolean isCompatible(Region child) {
+    @Override public boolean isCompatible(Region child) {
         String type = child.getType().toLowerCase();
         int tier = child.getTier();
         boolean careType = maxTypeInRegion.containsKey(type);
@@ -485,38 +453,31 @@ public class TownshipsRegion implements Region {
         return !(amtTier <= 0 || amtType <= 0);
     }
 
-    @Override
-    public Map<String, Object> getMetadata() {
+    @Override public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    @Override
-    public boolean addAccess(RoleGroup group, AccessType access) {
+    @Override public boolean addAccess(RoleGroup group, AccessType access) {
         return accessByRole.put(group, access);
     }
 
-    @Override
-    public boolean removeAccess(RoleGroup group, AccessType access) {
+    @Override public boolean removeAccess(RoleGroup group, AccessType access) {
         return accessByRole.remove(group, access);
     }
 
-    @Override
-    public boolean addAccess(UUID uid, AccessType access) {
+    @Override public boolean addAccess(UUID uid, AccessType access) {
         return accessByCitizenUid.put(uid, access);
     }
 
-    @Override
-    public boolean removeAccess(UUID uid, AccessType access) {
+    @Override public boolean removeAccess(UUID uid, AccessType access) {
         return accessByCitizenUid.remove(uid, access);
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return regionUid.hashCode();
     }
 
-    @Override
-    public boolean equals(Object o) {
+    @Override public boolean equals(Object o) {
         if (o instanceof UUID) {
             return regionUid.equals(o);
         } else {

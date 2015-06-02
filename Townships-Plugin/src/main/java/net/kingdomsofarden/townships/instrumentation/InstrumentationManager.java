@@ -6,12 +6,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import net.milkbowl.vault.economy.Economy;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
@@ -22,7 +17,7 @@ import java.util.jar.Manifest;
 
 /**
  * Adapted from Xyene's excellent guide to ASM manipulation
- *
+ * <p/>
  * Original code below written by Xyene (http://www.github.com/Xyene)
  */
 public class InstrumentationManager {
@@ -38,7 +33,8 @@ public class InstrumentationManager {
      * @throws AgentInitializationException
      */
     public static void attachAgentToJVM(Class agent, Class... resources)
-            throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+        throws IOException, AttachNotSupportedException, AgentLoadException,
+        AgentInitializationException {
 
         VirtualMachine vm = VirtualMachine.attach(getPidFromRuntimeMBean());
         vm.loadAgent(generateAgentJar(agent, resources).getAbsolutePath());
@@ -107,6 +103,7 @@ public class InstrumentationManager {
     }
 
     public static byte[] getBytesFromClass(Class<Economy> clazz) throws IOException {
-        return getBytesFromStream(clazz.getClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
+        return getBytesFromStream(clazz.getClassLoader()
+            .getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
     }
 }

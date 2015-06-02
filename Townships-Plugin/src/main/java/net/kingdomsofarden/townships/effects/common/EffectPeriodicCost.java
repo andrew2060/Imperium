@@ -20,8 +20,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
     private Double cost;
     private Map<Material, Integer> resources;
 
-    @Override
-    public long onTick(Region region, long time) {
+    @Override public long onTick(Region region, long time) {
         EconomyProvider[] econProviders = region.getEconomyProviders();
         if (cost > 0) {
             double amt = cost;
@@ -99,6 +98,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
 
     /**
      * Runs when tick is run successfully
+     *
      * @param region The region to be ticked
      * @return Whether a repeat should be scheduled
      */
@@ -106,13 +106,13 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
 
     /**
      * Runs when tick is run unsuccessfully (i.e. upkeep requirements not met)
+     *
      * @param region The region being ticked
      * @return Whether the region should be ticked again
      */
     protected abstract boolean onInsufficientResources(Region region);
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         StoredDataSection subSection = data.getSection("cost");
         resources = new HashMap<Material, Integer>();
@@ -127,20 +127,17 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
             }
         }
         cost = subSection.get("money", new Serializer<Double>() {
-            @Override
-            public String serialize(Double obj) {
+            @Override public String serialize(Double obj) {
                 return obj + "";
             }
 
-            @Override
-            public Double deserialize(String input) {
+            @Override public Double deserialize(String input) {
                 return Double.valueOf(input);
             }
         }, 0.00);
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         StoredDataSection subSection = data.getSection("cost");
         if (cost != 0.00) {
@@ -155,8 +152,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
         }
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 }

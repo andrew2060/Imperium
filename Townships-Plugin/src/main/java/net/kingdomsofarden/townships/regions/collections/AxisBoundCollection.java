@@ -6,32 +6,19 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
-import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
 import org.bukkit.World;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class AxisBoundCollection extends RegionBoundCollection {
 
     private static final int GRID_DIVISION = 10000;
     private static final int DEFAULT_CAPACITY = 5;
-
-    enum AxisType {
-        X,
-        Z
-    }
-
     private AxisType axis;
     private RegionBoundCollection[] positiveAxis;
     private RegionBoundCollection[] negativeAxis;
-
 
     public AxisBoundCollection(World w, boolean init) {
         positiveAxis = new RegionBoundCollection[DEFAULT_CAPACITY];
@@ -46,6 +33,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
     }
 
+
     public AxisBoundCollection(World world, int xIdx) {
         this(world, false);
         if (xIdx >>> 31 == 1) {
@@ -57,8 +45,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override
-    protected boolean add(RegionBoundingBox b) {
+    @Override public boolean add(RegionBoundingArea b) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -113,7 +100,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     }
 
-    private boolean add(RegionBoundingBox bound, int i, boolean negative) {
+    private boolean add(RegionBoundingArea bound, int i, boolean negative) {
         RegionBoundCollection[] coll = ensureCapacity(i, negative);
         if (coll[i] == null) {
             if (axis == AxisType.X) {
@@ -149,8 +136,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     }
 
-    @Override
-    protected void constructContainedRegions(Set<Region> regions) {
+    @Override protected void constructContainedRegions(Set<Region> regions) {
         for (RegionBoundCollection col : positiveAxis) {
             col.constructContainedRegions(regions);
         }
@@ -159,13 +145,22 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
+    @Override protected void constructContainedRegions(HashSet<RegionBoundingArea> bounds) {
+        for (RegionBoundCollection col : positiveAxis) {
+            col.constructContainedRegions(bounds);
+        }
+        for (RegionBoundCollection col : negativeAxis) {
+            col.constructContainedRegions(bounds);
+        }
+    }
+
     private RegionBoundCollection get(int x, int z) {
         boolean neg = false;
         int idx;
         if (axis == AxisType.X) {
-            idx = x/GRID_DIVISION;
+            idx = x / GRID_DIVISION;
         } else {
-            idx = z/GRID_DIVISION;
+            idx = z / GRID_DIVISION;
         }
         if (idx >>> 31 == 1) {
             neg = true;
@@ -180,8 +175,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return ret;
     }
 
-    @Override
-    public Optional<Area> getBoundingArea(int x, int z) {
+    @Override public Optional<Area> getBoundingArea(int x, int z) {
         RegionBoundCollection ret = get(x, z);
         if (ret == null) {
             return Optional.absent();
@@ -190,8 +184,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override
-    public void getIntersectingRegions(BoundingArea b, TreeSet<Region> coll) {
+    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<Region> coll) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -232,6 +225,10 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
+    @Override public Collection<RegionBoundingArea> getContainedBounds() {
+        return null; // TODO
+    }
+
     private void getIntersections(BoundingArea b, int i, boolean negative, TreeSet<Region> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         if (coll[i] != null) {
@@ -239,9 +236,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-
-    @Override
-    public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
+    @Override public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
         RegionBoundCollection ret = get(x, z);
         if (ret == null) {
             return new TreeSet<Region>();
@@ -250,8 +245,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override
-    public Collection<Citizen> getCitizensInArea() {
+    @Override public Collection<Citizen> getCitizensInArea() {
         HashSet s = new HashSet<Citizen>();
         for (RegionBoundCollection col : positiveAxis) {
             Collections.addAll(s, col.getCitizensInArea());
@@ -262,8 +256,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return s;
     }
 
-    @Override
-    public int size() {
+    @Override public int size() {
         int sum = 0;
         for (RegionBoundCollection col : positiveAxis) {
             sum += col.size();
@@ -274,8 +267,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return sum;
     }
 
-    @Override
-    public boolean isEmpty() {
+    @Override public boolean isEmpty() {
         for (RegionBoundCollection col : positiveAxis) {
             if (!(col.isEmpty())) {
                 return false;
@@ -289,8 +281,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override
-    public boolean contains(Object o) {
+    @Override public boolean contains(Object o) {
         for (RegionBoundCollection col : positiveAxis) {
             if (col.contains(o)) {
                 return true;
@@ -304,23 +295,19 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return false;
     }
 
-    @Override
-    public Iterator<Region> iterator() {
+    @Override public Iterator<Region> iterator() {
         return getContents().iterator();
     }
 
-    @Override
-    public Object[] toArray() {
+    @Override public Object[] toArray() {
         return getContents().toArray();
     }
 
-    @Override
-    public <T> T[] toArray(T[] a) {
+    @Override public <T> T[] toArray(T[] a) {
         return getContents().toArray(a);
     }
 
-    @Override
-    public boolean remove(Object o) {
+    @Override public boolean remove(Object o) {
         BoundingArea b;
         if (o instanceof Region) {
             b = ((Region) o).getBounds();
@@ -387,8 +374,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return !(i >= coll.length || coll[i] == null) && coll[i].remove(bound);
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
+    @Override public boolean containsAll(Collection<?> c) {
         for (Object o : c) {
             if (!contains(o)) {
                 return false;
@@ -397,8 +383,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override
-    public boolean removeAll(Collection<?> c) {
+    @Override public boolean removeAll(Collection<?> c) {
         boolean ret = false;
         for (Object o : c) {
             if (remove(o)) {
@@ -408,8 +393,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return ret;
     }
 
-    @Override
-    public boolean retainAll(Collection<?> c) {
+    @Override public boolean retainAll(Collection<?> c) {
         boolean ret = false;
         for (Region r : getContents()) {
             if (!c.contains(r) && remove(r)) {
@@ -419,8 +403,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return ret;
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         for (int i = 0; i < positiveAxis.length; i++) {
             if (positiveAxis[i] != null) {
                 positiveAxis[i].clear();
@@ -433,5 +416,10 @@ public class AxisBoundCollection extends RegionBoundCollection {
                 negativeAxis[i] = null;
             }
         }
+    }
+
+    enum AxisType {
+        X,
+        Z
     }
 }

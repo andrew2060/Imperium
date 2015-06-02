@@ -5,8 +5,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
-import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
-import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingBox;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
@@ -60,9 +59,9 @@ public interface Region {
     Collection<Citizen> getCitizensInBounds();
 
     /**
-     * @return The {@link RegionBoundingBox} representing this region's area
+     * @return The {@link RegionBoundingArea} representing this region's area
      */
-    RegionBoundingBox getBounds();
+    RegionBoundingArea getBounds();
 
     /**
      * @return A collection of effects currently active for this region
@@ -76,12 +75,12 @@ public interface Region {
     boolean hasEffect(String name);
 
     /**
-     * @param <T> The explicit class type of the effect to retrieve
+     * @param <T>  The explicit class type of the effect to retrieve
      * @param name The name of the effect non-case sensitive
      * @return The effect retrieved
      * @throws IllegalStateException if no such effect exists
      */
-    <T extends Effect> T getEffect(String name) throws IllegalStateException ;
+    <T extends Effect> T getEffect(String name) throws IllegalStateException;
 
     /**
      * @param citizen The citizen to check
@@ -91,6 +90,7 @@ public interface Region {
 
     /**
      * Populates the parameter data section with this region's configuration
+     *
      * @param data The data section to save to
      */
     void saveConfigs(StoredDataSection data);
@@ -106,14 +106,14 @@ public interface Region {
 
     /**
      * @param citizen The citizen to check
-     * @param type The type of access to check for
+     * @param type    The type of access to check for
      * @return true if the citizen has the given or compatible access type
      */
     boolean hasAccess(Citizen citizen, AccessType type);
 
     /**
      * @param group The group to check
-     * @param type The type of access to check for
+     * @param type  The type of access to check for
      * @return true if the group has the given or compatible access type
      */
     boolean hasAccess(RoleGroup group, AccessType type);
@@ -128,7 +128,7 @@ public interface Region {
 
     Map<String, EconomyProvider> getEconomyProviders();
 
-    Map<String, ItemProvider>  getItemProviders();
+    Map<String, ItemProvider> getItemProviders();
 
     /**
      * @return The region's validity, i.e. whether it is currently considered a valid region (may not be true if, for
@@ -139,6 +139,7 @@ public interface Region {
 
     /**
      * Sets the region's validity
+     *
      * @param valid The validity state of the region
      * @see #isValid()
      */
@@ -167,9 +168,11 @@ public interface Region {
     Map<String, Object> getMetadata();
 
     boolean addAccess(RoleGroup group, AccessType access);
+
     boolean removeAccess(RoleGroup group, AccessType access);
 
     boolean addAccess(UUID uid, AccessType access);
+
     boolean removeAccess(UUID uid, AccessType access);
 
     /**
@@ -180,8 +183,4 @@ public interface Region {
 
     Collection<Citizen> getCitizens();
 
-    /**
-     * @return The ZOC that this region exerts, used in buffered composite bounding box calculations
-     */
-    BoundingArea getZOC();
 }

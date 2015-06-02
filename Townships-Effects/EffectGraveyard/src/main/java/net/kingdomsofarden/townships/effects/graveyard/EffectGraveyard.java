@@ -21,25 +21,21 @@ import java.util.Random;
 
 public class EffectGraveyard implements Effect, Listener {
 
+    private static Random rand = new Random();
+    private static ArrayList<EffectGraveyard> activeEffects = new ArrayList<EffectGraveyard>();
     private Region region;
     private boolean global;
     private Location location;
 
-    private static Random rand = new Random();
-    private static ArrayList<EffectGraveyard> activeEffects = new ArrayList<EffectGraveyard>();
-
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "graveyard";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
+    @Override public void onInit(ITownshipsPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, (TownshipsPlugin) plugin);
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
         this.global = Boolean.parseBoolean(data.get("global", "false"));
         this.location = data.get("respawn-location", new LocationSerializer(), null);
@@ -48,8 +44,7 @@ public class EffectGraveyard implements Effect, Listener {
         }
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = null;
         data.set("respawn-location", location, new LocationSerializer());
         if (this.global) {
@@ -57,8 +52,7 @@ public class EffectGraveyard implements Effect, Listener {
         }
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 

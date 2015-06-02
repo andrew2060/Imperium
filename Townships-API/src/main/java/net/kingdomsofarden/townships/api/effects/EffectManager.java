@@ -9,7 +9,8 @@ import net.kingdomsofarden.townships.api.util.StoredDataSection;
 public interface EffectManager {
     /**
      * Loads the given effect
-     * @param name The effect to load
+     *
+     * @param name   The effect to load
      * @param region The region loading the effect
      * @param config A representation of the stored effect configuration, likely part of the region configuration
      *               itself, or a newly created one containing default values for dynamically loaded effects

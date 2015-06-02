@@ -18,10 +18,15 @@ public class EffectHeap {
 
     private int direction = -1; // 0 if left child, 1 if right child
 
+    private static void swap(EffectHeap e1, EffectHeap e2) {
+        EffectTask temp = e1.value;
+        e1.value = e2.value;
+        e2.value = temp;
+    }
+
     public EffectTask get() {
         return root.value;
     }
-
 
     public void add(EffectTask task) {
         if (root == null) {
@@ -138,7 +143,6 @@ public class EffectHeap {
 
     }
 
-
     public EffectHeap getLeft() {
         return left;
     }
@@ -161,12 +165,5 @@ public class EffectHeap {
 
     public void setParent(EffectHeap parent) {
         this.parent = parent;
-    }
-
-
-    private static void swap(EffectHeap e1, EffectHeap e2) {
-        EffectTask temp = e1.value;
-        e1.value = e2.value;
-        e2.value = temp;
     }
 }

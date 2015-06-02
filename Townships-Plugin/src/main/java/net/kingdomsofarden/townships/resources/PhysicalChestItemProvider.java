@@ -16,8 +16,7 @@ public class PhysicalChestItemProvider implements ItemProvider {
 
     protected Location chestLocation;
 
-    @Override
-    public int getAmount(Material mat) {
+    @Override public int getAmount(Material mat) {
         if (chestLocation == null) {
             return 0;
         }
@@ -29,14 +28,14 @@ public class PhysicalChestItemProvider implements ItemProvider {
             return 0;
         }
         int amt = 0;
-        for (Entry<Integer, ? extends ItemStack> entry : chest.getBlockInventory().all(mat).entrySet()) {
-             amt += entry.getValue().getAmount();
+        for (Entry<Integer, ? extends ItemStack> entry : chest.getBlockInventory().all(mat)
+            .entrySet()) {
+            amt += entry.getValue().getAmount();
         }
         return amt;
     }
 
-    @Override
-    public int remove(Material mat, int max) {
+    @Override public int remove(Material mat, int max) {
         if (chestLocation == null) {
             return 0;
         }
@@ -49,7 +48,8 @@ public class PhysicalChestItemProvider implements ItemProvider {
         }
         int amt = max;
         Map<Integer, Integer> slotRemoveAmts = new HashMap<Integer, Integer>();
-        for (Entry<Integer, ? extends ItemStack> entry : chest.getBlockInventory().all(mat).entrySet()) {
+        for (Entry<Integer, ? extends ItemStack> entry : chest.getBlockInventory().all(mat)
+            .entrySet()) {
             int removable = entry.getValue().getAmount();
             removable = removable > amt ? amt : removable;
             slotRemoveAmts.put(entry.getKey(), removable);
@@ -68,8 +68,7 @@ public class PhysicalChestItemProvider implements ItemProvider {
     }
 
 
-    @Override
-    public int add(Material type, int max) {
+    @Override public int add(Material type, int max) {
         if (chestLocation == null) {
             return 0;
         }
@@ -82,7 +81,8 @@ public class PhysicalChestItemProvider implements ItemProvider {
         }
         Inventory inv = chest.getBlockInventory();
         int rem = 0;
-        for (Entry<Integer, ItemStack> remaining : inv.addItem(new ItemStack(type, max)).entrySet()) {
+        for (Entry<Integer, ItemStack> remaining : inv.addItem(new ItemStack(type, max))
+            .entrySet()) {
             rem += remaining.getValue().getAmount();
         }
         return max - rem;

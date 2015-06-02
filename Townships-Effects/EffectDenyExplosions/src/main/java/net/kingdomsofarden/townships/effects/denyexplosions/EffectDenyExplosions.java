@@ -13,28 +13,24 @@ public class EffectDenyExplosions implements Effect, Listener {
 
     private Region region;
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "deny-explosions";
     }
 
-    @Override
-    public void onInit(ITownshipsPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new ExplosiveProtectionListener(), (Plugin)plugin);
+    @Override public void onInit(ITownshipsPlugin plugin) {
+        Bukkit.getPluginManager()
+            .registerEvents(new ExplosiveProtectionListener(), (Plugin) plugin);
     }
 
-    @Override
-    public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = region;
     }
 
-    @Override
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
         this.region = null;
     }
 
-    @Override
-    public Region getRegion() {
+    @Override public Region getRegion() {
         return region;
     }
 

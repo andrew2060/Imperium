@@ -17,11 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -50,7 +46,8 @@ public class TownshipsEffectManager implements EffectManager {
 
     // Enables dynamic registration by adding entries here
     private void loadCoreEffects() {
-        effects.put(new PendingRelationChangeEffect().getName().toLowerCase(), PendingRelationChangeEffect.class);
+        effects.put(new PendingRelationChangeEffect().getName().toLowerCase(),
+            PendingRelationChangeEffect.class);
     }
 
     public EffectTaskManager getEffectTaskManager() {
@@ -58,12 +55,11 @@ public class TownshipsEffectManager implements EffectManager {
     }
 
 
-    @Override
-    public Effect loadEffect(String name, Region loader, StoredDataSection config) {
+    @Override public Effect loadEffect(String name, Region loader, StoredDataSection config) {
         if (effects.containsKey(name.toLowerCase())) {
             try {
                 Class<? extends Effect> clazz = effects.get(name.toLowerCase());
-                Constructor<? extends Effect> c = clazz.getConstructor(new Class[]{});
+                Constructor<? extends Effect> c = clazz.getConstructor(new Class[] {});
                 Effect e = c.newInstance(new Object[] {});
                 e.onLoad(plugin, loader, config);
                 return e;
@@ -101,7 +97,8 @@ public class TownshipsEffectManager implements EffectManager {
                 while (entries.hasMoreElements()) {
                     JarEntry element = entries.nextElement();
                     if (element.getName().equalsIgnoreCase("effect.info")) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
+                        BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(jarFile.getInputStream(element)));
                         String next = reader.readLine();
                         while (next != null) {
                             if (next.toLowerCase().startsWith("main-class: ")) {
@@ -114,13 +111,16 @@ public class TownshipsEffectManager implements EffectManager {
                 }
                 if (mainClass != null) {
                     addFile(f);
-                    Class<? extends Effect> clazz = (Class<? extends Effect>) Class.forName(mainClass);
+                    Class<? extends Effect> clazz =
+                        (Class<? extends Effect>) Class.forName(mainClass);
                     // Make empty copy to get name
                     try {
-                        Effect e = (Effect) clazz.getConstructor(new Class[]{}).newInstance(new Object[]{});
+                        Effect e = (Effect) clazz.getConstructor(new Class[] {})
+                            .newInstance(new Object[] {});
                         effects.put(e.getName().toLowerCase(), clazz);
                     } catch (NoSuchMethodException e) {
-                        plugin.getLogger().log(Level.SEVERE, "Could not load " + mainClass + " all effects must " +
+                        plugin.getLogger().log(Level.SEVERE,
+                            "Could not load " + mainClass + " all effects must " +
                                 "have an empty constructor");
                         continue;
                     }
@@ -144,9 +144,10 @@ public class TownshipsEffectManager implements EffectManager {
     // ClassLoader related methods
     private void addURL(URL url) throws IOException {
         try {
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
+            Method method =
+                URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
             method.setAccessible(true);
-            method.invoke(this.loader, new Object[]{url});
+            method.invoke(this.loader, new Object[] {url});
         } catch (Exception e) {
             throw new IOException("Error adding URL to ClassLoader", e);
         }
@@ -155,7 +156,6 @@ public class TownshipsEffectManager implements EffectManager {
     private void addFile(File file) throws IOException {
         addURL(file.toURI().toURL());
     }
-
 
 
 

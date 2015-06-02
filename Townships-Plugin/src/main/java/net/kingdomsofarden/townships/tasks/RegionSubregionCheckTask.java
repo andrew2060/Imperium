@@ -24,9 +24,11 @@ public class RegionSubregionCheckTask implements Runnable {
 
     public RegionSubregionCheckTask(Region region, TownshipsPlugin plugin) {
         this.plugin = plugin;
-        StoredDataSection data = Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
+        StoredDataSection data =
+            Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
         if (data == null) {
-            throw new IllegalStateException("Supplied region does not have a corresponding type configuration!");
+            throw new IllegalStateException(
+                "Supplied region does not have a corresponding type configuration!");
         }
         StoredDataSection requirements = data.getSection("requirements");
         regionTypeMinReq = new HashMap<String, Integer>();
@@ -50,8 +52,7 @@ public class RegionSubregionCheckTask implements Runnable {
         this.checkedTypes = new LinkedHashSet<String>();
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
         scheduled = false;
         if (region.isValid()) {
             HashMap<String, Integer> typeReq = new HashMap<String, Integer>();
@@ -86,7 +87,8 @@ public class RegionSubregionCheckTask implements Runnable {
             }
             if (!(typeReq.isEmpty() && tierReq.isEmpty())) {
                 Townships.getRegions().remove(region); // Ignore cancellation
-                RegionDisbandEvent event = new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
+                RegionDisbandEvent event =
+                    new RegionDisbandEvent(region, DisbandCause.BLOCK_REQUIREMENTS_NOT_MET);
                 Bukkit.getPluginManager().callEvent(event);
             }
         }
