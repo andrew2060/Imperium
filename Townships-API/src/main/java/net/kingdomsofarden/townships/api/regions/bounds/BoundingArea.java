@@ -79,4 +79,10 @@ public interface BoundingArea {
      * @return The edges of this bounding area as vector pairs
      */
     Collection<Line3I> getEdges();
+
+    /**
+     * @return A flattened (2D) representation of this bounding area, at y=0
+     */
+    BoundingArea flatten();
+
 }

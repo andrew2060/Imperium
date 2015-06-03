@@ -1,7 +1,9 @@
 package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.HashMultiset;
 import net.kingdomsofarden.townships.api.characters.Citizen;
+import net.kingdomsofarden.townships.api.math.Vector3I;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
@@ -18,12 +20,18 @@ import java.util.*;
  */
 public class TerminalBoundCollection extends RegionBoundCollection {
 
-    private Set<Region> contents;
+    private Map<Region, RegionBoundingArea> contents;
     // TODO: use heap/binary tree instead for most efficient searching for a specific region?
     private Collection<Citizen> currCitizens;
+    private Collection<Vector3I> vertices;
+    private Map<Region, BoundingArea> flattenedBounds;
+    private Collection<Vector3I> verticesFlattened;
+
+    private boolean vertexCacheValid;
 
     public TerminalBoundCollection(World world, int xLeft, int xRight, int zLower, int zUpper) {
-        this.contents = new LinkedHashSet<Region>();
+        this.contents = new HashMap<Region, RegionBoundingArea>();
+        this.flattenedBounds = new HashMap<Region, BoundingArea>();
         this.minX = xLeft;
         this.maxX = xRight;
         this.minZ = zLower;
@@ -31,6 +39,9 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         this.currCitizens = new HashSet<Citizen>();
         this.world = world;
         this.bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
+        this.vertices = new HashSet<Vector3I>();
+        this.verticesFlattened = new HashSet<Vector3I>();
+        this.vertexCacheValid = false;
     }
 
     @Override public CuboidBoundingBox getBoundingBox() {
@@ -48,9 +59,9 @@ public class TerminalBoundCollection extends RegionBoundCollection {
                 }
             }
         });
-        for (Region r : contents) {
-            if (r.getBounds().isInBounds(x, y, z)) {
-                ret.add(r);
+        for (RegionBoundingArea r : contents.values()) {
+            if (r.isInBounds(x, y, z)) {
+                ret.add(r.getRegion());
             }
         }
         return ret;
@@ -61,7 +72,15 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     @Override public boolean add(RegionBoundingArea bound) {
         TownshipsRegion r = (TownshipsRegion) bound.getRegion();
         r.getBoundingAreas().add(this);
-        return contents.add(bound.getRegion());
+        flattenedBounds.put(r, bound.flatten());
+        // Add vertices to what we are tracking
+//        for (Vector3I vertex : bound.getVertices()) {
+//            if (bounds.isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
+//                vertices.add(vertex);
+//                verticesFlattened.add(new Vector3I(vertex.getX(), 0, vertex.getZ()));
+//            }
+//        }
+        return contents.put(r, bound) != bound;
     }
 
     @Override public int size() {
@@ -73,46 +92,56 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override public boolean contains(Object o) {
-        return contents.contains(o);
-    }
-
-    @Override public Iterator<Region> iterator() {
-        return contents.iterator();
-    }
-
-    @Override public Object[] toArray() {
-        return contents.toArray();
-    }
-
-    @Override public <T> T[] toArray(T[] a) {
-        return contents.toArray(a);
-    }
-
-    @Override public boolean remove(Object o) {
-        if (contents.remove(o)) {
-            if (o instanceof Region) {
-                TownshipsRegion r = (TownshipsRegion) o;
-                r.getBoundingAreas().remove(this);
-            } else if (o instanceof RegionBoundingArea) {
-                TownshipsRegion r = (TownshipsRegion) ((RegionBoundingArea) o).getRegion();
-                r.getBoundingAreas().remove(this);
-            }
-            return true;
+        if (o instanceof Region) {
+            return contents.containsKey(o);
+        } else if (o instanceof RegionBoundingArea) {
+            return contents.containsValue(o);
         } else {
             return false;
         }
     }
 
+    @Override public Iterator<Region> iterator() {
+        return contents.keySet().iterator();
+    }
+
+    @Override public Object[] toArray() {
+        return contents.keySet().toArray();
+    }
+
+    @Override public <T> T[] toArray(T[] a) {
+        return contents.keySet().toArray(a);
+    }
+
+    @Override public boolean remove(Object o) {
+        if (o instanceof Region) {
+            if (contents.remove(o) != null) {
+                TownshipsRegion r = (TownshipsRegion) o;
+                r.getBoundingAreas().remove(this);
+                flattenedBounds.remove(r);
+                return true;
+            }
+        } else if (o instanceof RegionBoundingArea) {
+            if (contents.remove(((RegionBoundingArea) o).getRegion()) != null) {
+                TownshipsRegion r = (TownshipsRegion) ((RegionBoundingArea) o).getRegion();
+                r.getBoundingAreas().remove(this);
+                flattenedBounds.remove(r);
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override public boolean containsAll(Collection<?> c) {
-        return contents.containsAll(c);
+        return contents.keySet().containsAll(c);
     }
 
     @Override public boolean addAll(Collection<? extends Region> c) {
-        return contents.addAll(c);
+        return contents.keySet().addAll(c);
     }
 
     @Override protected void constructContainedRegions(Set<Region> regions) {
-        regions.addAll(contents);
+        regions.addAll(contents.keySet());
     }
 
     @Override public Optional<Area> getBoundingArea(int x, int z) {
@@ -120,19 +149,42 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override public void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col) {
-        for (Region r : contents) {
-            if (bounds.intersects(r.getBounds()) && !bounds.equals(r.getBounds())) {
-                col.add(r);
+        for (RegionBoundingArea r : contents.values()) {
+            if (bounds.intersects(r) && !bounds.equals(r)) {
+                col.add(r.getRegion());
             }
         }
     }
 
+    @Override public Collection<RegionBoundingArea> getContainedBounds() {
+        return contents.values();
+    }
+
+    @Override
+    public Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea bounds) {
+        return null;
+    }
+
     @Override public boolean removeAll(Collection<?> c) {
-        return contents.removeAll(c);
+        boolean mod = false;
+        for (Object obj : c) {
+            if (remove(obj)) {
+                mod = true;
+            }
+        }
+        return mod;
     }
 
     @Override public boolean retainAll(Collection<?> c) {
-        return contents.retainAll(c);
+        boolean mod = false;
+        for (Object o : c) {
+            if (!contains(o)) {
+                if (remove(o)) {
+                    mod = true;
+                }
+            }
+        }
+        return mod;
     }
 
     @Override public void clear() {
@@ -143,4 +195,16 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         return currCitizens;
     }
 
+    @Override public int getContentVolume() {
+        for (RegionBoundingArea bounds : contents.values()) {
+
+        }
+        return 0;
+    }
+
+    @Override public int getContentSurfaceArea() {
+        return 0;
+    }
+
 }
+H

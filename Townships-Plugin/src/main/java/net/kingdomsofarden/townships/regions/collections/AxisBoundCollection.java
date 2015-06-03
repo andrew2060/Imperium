@@ -12,6 +12,9 @@ import org.bukkit.World;
 
 import java.util.*;
 
+/**
+ * Represents a region bound collection along one axis
+ */
 public class AxisBoundCollection extends RegionBoundCollection {
 
     private static final int GRID_DIVISION = 10000;
@@ -145,15 +148,6 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override protected void constructContainedRegions(HashSet<RegionBoundingArea> bounds) {
-        for (RegionBoundCollection col : positiveAxis) {
-            col.constructContainedRegions(bounds);
-        }
-        for (RegionBoundCollection col : negativeAxis) {
-            col.constructContainedRegions(bounds);
-        }
-    }
-
     private RegionBoundCollection get(int x, int z) {
         boolean neg = false;
         int idx;
@@ -229,10 +223,60 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return null; // TODO
     }
 
+    @Override public Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea b) {
+        HashSet<RegionBoundingArea> coll = new HashSet<RegionBoundingArea>();
+        if (b instanceof CuboidBoundingBox) {
+            CuboidBoundingBox bound = (CuboidBoundingBox) b;
+            int leftBound;
+            int rightBound;
+            if (axis == AxisType.X) {
+                leftBound = bound.getMinX() / GRID_DIVISION;
+                rightBound = bound.getMaxX() / GRID_DIVISION;
+            } else {
+                leftBound = bound.getMinZ() / GRID_DIVISION;
+                rightBound = bound.getMaxZ() / GRID_DIVISION;
+            }
+            boolean crossSigns = leftBound >> 31 != rightBound >> 31;
+            for (int i = leftBound; i != rightBound; i++) {
+                switch (Integer.signum(i)) {
+                    case -1:
+                        getIntersections(b, i * -1, true, coll);
+                        break;
+                    case 0:
+                        if (crossSigns) {
+                            getIntersections(b, 0, true, coll);
+                            getIntersections(b, 0, false, coll);
+                        } else {
+                            if (rightBound >>> 31 == 0) {
+                                getIntersections(b, 0, false, coll);
+                            } else {
+                                getIntersections(b, 0, true, coll);
+
+                            }
+                        }
+                        break;
+                    case 1:
+                        getIntersections(b, i, false, coll);
+                        break;
+                }
+            }
+        }
+        return coll;
+    }
+
     private void getIntersections(BoundingArea b, int i, boolean negative, TreeSet<Region> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         if (coll[i] != null) {
             coll[i].getIntersectingRegions(b, add);
+        }
+    }
+
+    private void getIntersections(RegionBoundingArea b, int i, boolean negative,
+        Set<RegionBoundingArea>
+        add) {
+        RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
+        if (coll[i] != null) {
+            add.addAll(coll[i].getIntersectingBounds(b));
         }
     }
 
@@ -254,6 +298,28 @@ public class AxisBoundCollection extends RegionBoundCollection {
             Collections.addAll(s, col.getCitizensInArea());
         }
         return s;
+    }
+
+    @Override public int getContentVolume() {
+        int sum = 0;
+        for (RegionBoundCollection col : positiveAxis) {
+            sum += col.getContentVolume();
+        }
+        for (RegionBoundCollection col : negativeAxis) {
+            sum += col.getContentVolume();
+        }
+        return sum;
+    }
+
+    @Override public int getContentSurfaceArea() {
+        int sum = 0;
+        for (RegionBoundCollection col : positiveAxis) {
+            sum += col.getContentSurfaceArea();
+        }
+        for (RegionBoundCollection col : negativeAxis) {
+            sum += col.getContentSurfaceArea();
+        }
+        return sum;
     }
 
     @Override public int size() {
@@ -410,7 +476,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
                 positiveAxis[i] = null;
             }
         }
-        for (int i = 0; i < negativeAxis.length; i++) {
+            for (int i = 0; i < negativeAxis.length; i++) {
             if (negativeAxis[i] != null) {
                 negativeAxis[i].clear();
                 negativeAxis[i] = null;

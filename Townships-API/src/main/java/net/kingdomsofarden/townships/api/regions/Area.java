@@ -48,7 +48,8 @@ public interface Area extends Collection<Region> {
     boolean isInBounds(Location loc);
 
     /**
-     * @return The bounds of this area, 0 indicating minimum X, 1 indicating maximum X, 2 indicating minimum Z, 3 indicating maximum Z
+     * @return The bounds of this area, 0 indicating minimum X, 1 indicating maximum X,
+     * 2 indicating minimum Z, 3 indicating maximum Z
      */
     int[] getBounds();
 
@@ -63,6 +64,8 @@ public interface Area extends Collection<Region> {
     int getContentVolume();
 
     /**
-     * @return Gets the total covered surface area by all the bounds within this area should they all be flattened to 2d
+     * @return Gets the total covered surface area by all the bounds within this area should they
+     * all be flattened to 2d
      */
+    int getContentSurfaceArea();
 }

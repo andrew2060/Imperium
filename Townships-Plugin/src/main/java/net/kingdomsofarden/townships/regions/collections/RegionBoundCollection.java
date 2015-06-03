@@ -85,13 +85,11 @@ public abstract class RegionBoundCollection implements Area {
 
     protected abstract void constructContainedRegions(Set<Region> regions);
 
-    protected abstract void constructContainedRegions(HashSet<RegionBoundingArea> bounds);
-
     public abstract Optional<Area> getBoundingArea(int x, int z);
 
     public abstract void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col);
 
     public abstract Collection<RegionBoundingArea> getContainedBounds();
 
-    public abstract Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea grow);
+    public abstract Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea bounds);
 }

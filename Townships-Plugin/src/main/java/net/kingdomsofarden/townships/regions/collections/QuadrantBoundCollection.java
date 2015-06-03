@@ -12,6 +12,9 @@ import org.bukkit.World;
 
 import java.util.*;
 
+/**
+ * Represents a quadrant based tree-like bounding box subdivision
+ */
 public class QuadrantBoundCollection extends RegionBoundCollection {
 
     private RegionBoundCollection[] subRegions;
@@ -74,6 +77,22 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return s;
     }
 
+    @Override public int getContentVolume() {
+        int sum = 0;
+        for (RegionBoundCollection sub : subRegions) {
+            sum += sub.getContentVolume();
+        }
+        return sum;
+    }
+
+    @Override public int getContentSurfaceArea() {
+        int sum = 0;
+        for (RegionBoundCollection sub : subRegions) {
+            sum += sub.getContentSurfaceArea();
+        }
+        return sum;
+    }
+
     @Override public boolean add(RegionBoundingArea b) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
@@ -103,13 +122,13 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         }
     }
 
-
     // TODO: Alternative algorithms?
     @Override protected void constructContainedRegions(Set<Region> regions) {
         for (RegionBoundCollection c : subRegions) {
             c.constructContainedRegions(regions);
         }
     }
+
 
     @Override public Optional<Area> getBoundingArea(int x, int z) {
         boolean upperHalf = z > zDivisor;
@@ -163,6 +182,15 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         } else {
             return; // TODO, non cuboid
         }
+    }
+
+    @Override public Collection<RegionBoundingArea> getContainedBounds() {
+        return null;
+    }
+
+    @Override
+    public Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea bounds) {
+        return null;
     }
 
     private void checkIndexAndCreate(int i) {
