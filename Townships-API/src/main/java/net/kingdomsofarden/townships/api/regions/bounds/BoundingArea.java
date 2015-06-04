@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
+import net.kingdomsofarden.townships.api.math.Geometry;
 import net.kingdomsofarden.townships.api.math.Line3I;
 import net.kingdomsofarden.townships.api.math.Vector3I;
 import org.bukkit.Location;
@@ -34,10 +35,9 @@ public interface BoundingArea {
     boolean intersects(BoundingArea box);
 
     /**
-     * @return A sorted collection of vertices using Double[] {x, y, z} representation
-     * Specifically, the collection is sorted in clockwise vertex order by edgesx`
+     * @return The geometry associated with this bounding area
      */
-    Collection<Vector3I> getVertices();
+    Geometry getBoundGeometry();
 
     /**
      * @return The world containing this bounding box
@@ -74,11 +74,6 @@ public interface BoundingArea {
      */
     <T extends BoundingArea> T grow(int size);
 
-
-    /**
-     * @return The edges of this bounding area as vector pairs
-     */
-    Collection<Line3I> getEdges();
 
     /**
      * @return A flattened (2D) representation of this bounding area, at y=0
