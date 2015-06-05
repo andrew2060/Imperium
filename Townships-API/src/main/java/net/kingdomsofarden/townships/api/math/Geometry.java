@@ -15,4 +15,9 @@ public interface Geometry {
      * @return The edges associated with a given vertex, represented as {@link Line3I}
      */
     Collection<Line3I> getEdges(Vector3I vertex);
+
+    /**
+     * @return The faces associated 
+     */
+    Collection<Face3I> getFaces();
 }

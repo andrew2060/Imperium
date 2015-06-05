@@ -1,5 +1,7 @@
 package net.kingdomsofarden.townships.api.math;
 
+import org.bukkit.util.Vector;
+
 /**
  * Represents a line segment between two {@link Vector3I}, commonly used for bounding region edges.
  * Note that lines are limited to traveling on only one axis for performance reasons and as their
@@ -71,4 +73,17 @@ public class Line3I {
         }
         return valid ? new Vector3I(x, y, z) : null;
     }
+
+    public Vector asVectorNormal(Vector3I origin) {
+        if (origin.equals(point1)) {
+            return new Vector(point2.getX() - point1.getX(), point2.getY() - point1.getY(),
+                point2.getZ() - point1.getZ()).normalize();
+        } else if (origin.equals(point2)) {
+            return new Vector(point1.getX() - point2.getX(), point1.getY() - point2.getY(),
+                point1.getZ() - point2.getZ()).normalize();
+        } else {
+            return null;
+        }
+    }
+
 }
