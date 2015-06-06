@@ -1,13 +1,10 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import net.kingdomsofarden.townships.api.math.Geometry;
-import net.kingdomsofarden.townships.api.math.Line3I;
-import net.kingdomsofarden.townships.api.math.Vector3I;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.util.Collection;
 import java.util.Map;
 
 public interface BoundingArea {

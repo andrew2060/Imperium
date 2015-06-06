@@ -1,9 +1,10 @@
 package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.HashMultiset;
 import net.kingdomsofarden.townships.api.characters.Citizen;
-import net.kingdomsofarden.townships.api.math.Vector3I;
+import net.kingdomsofarden.townships.api.math.Geometry;
+import net.kingdomsofarden.townships.api.math.Line3I;
+import net.kingdomsofarden.townships.api.math.Point3I;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
@@ -23,9 +24,9 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     private Map<Region, RegionBoundingArea> contents;
     // TODO: use heap/binary tree instead for most efficient searching for a specific region?
     private Collection<Citizen> currCitizens;
-    private Collection<Vector3I> vertices;
+    private Collection<Point3I> vertices;
     private Map<Region, BoundingArea> flattenedBounds;
-    private Collection<Vector3I> verticesFlattened;
+    private Collection<Point3I> verticesFlattened;
 
     private boolean vertexCacheValid;
 
@@ -39,8 +40,8 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         this.currCitizens = new HashSet<Citizen>();
         this.world = world;
         this.bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
-        this.vertices = new HashSet<Vector3I>();
-        this.verticesFlattened = new HashSet<Vector3I>();
+        this.vertices = new HashSet<Point3I>();
+        this.verticesFlattened = new HashSet<Point3I>();
         this.vertexCacheValid = false;
     }
 
@@ -74,10 +75,10 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         r.getBoundingAreas().add(this);
         flattenedBounds.put(r, bound.flatten());
         // Add vertices to what we are tracking
-//        for (Vector3I vertex : bound.getVertices()) {
+//        for (Point3I vertex : bound.getVertices()) {
 //            if (bounds.isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
 //                vertices.add(vertex);
-//                verticesFlattened.add(new Vector3I(vertex.getX(), 0, vertex.getZ()));
+//                verticesFlattened.add(new Point3I(vertex.getX(), 0, vertex.getZ()));
 //            }
 //        }
         return contents.put(r, bound) != bound;
@@ -197,7 +198,10 @@ public class TerminalBoundCollection extends RegionBoundCollection {
 
     @Override public int getContentVolume() {
         for (RegionBoundingArea bounds : contents.values()) {
-
+            Geometry geometry = bounds.getBoundGeometry();
+            for (Point3I vertex : geometry.getVertices()) {
+                Collection<Line3I> edges = geometry.getEdges(vertex);
+            }
         }
         return 0;
     }

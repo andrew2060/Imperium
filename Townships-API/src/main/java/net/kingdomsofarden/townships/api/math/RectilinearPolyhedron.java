@@ -42,7 +42,7 @@ public class RectilinearPolyhedron {
 
         @Override public void add(BoundingArea bounds) {
             int[][][] touched = new int[2][2][2];
-            for (Vector3I vec : bounds.getVertices()) {
+            for (Point3I vec : bounds.getVertices()) {
                 int x = 0;
                 int y = 0;
                 int z = 0;

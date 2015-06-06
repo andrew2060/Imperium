@@ -3,38 +3,38 @@ package net.kingdomsofarden.townships.api.math;
 import org.bukkit.util.Vector;
 
 /**
- * Represents a line segment between two {@link Vector3I}, commonly used for bounding region edges.
+ * Represents a line segment between two {@link Point3I}, commonly used for bounding region edges.
  * Note that lines are limited to traveling on only one axis for performance reasons and as their
  * most common use case are for edges of cuboidal regions
  */
 public class Line3I {
-    private final Vector3I point1;
-    private final Vector3I point2;
+    private final Point3I point1;
+    private final Point3I point2;
 
-    public Line3I(Vector3I point1, Vector3I point2) {
+    public Line3I(Point3I point1, Point3I point2) {
         this.point1 = point1;
         this.point2 = point2;
     }
 
 
-    public Vector3I getPoint1() {
+    public Point3I getPoint1() {
         return point1;
     }
 
-    public Vector3I getPoint2() {
+    public Point3I getPoint2() {
         return point2;
     }
 
 
     /**
      * @param other The line to compute an intersection with
-     * @return A {@link Vector3I} representing the intersection point between this line and other, or null if no such
+     * @return A {@link Point3I} representing the intersection point between this line and other, or null if no such
      * intersection exists
      */
-    public Vector3I getIntersection(Line3I other) {
+    public Point3I getIntersection(Line3I other) {
         // Determine which coordinates are static since this specific case of lines only operates on 1 dimension
-        Vector3I other1 = other.getPoint1();
-        Vector3I other2 = other.getPoint2();
+        Point3I other1 = other.getPoint1();
+        Point3I other2 = other.getPoint2();
         boolean x1 = point1.getX() != point2.getX();
         boolean y1 = point1.getY() != point2.getY();
         boolean x2 = other1.getX() != other2.getX();
@@ -71,10 +71,10 @@ public class Line3I {
         } else {
             valid = point1.getZ() <= z && z <= point2.getZ();
         }
-        return valid ? new Vector3I(x, y, z) : null;
+        return valid ? new Point3I(x, y, z) : null;
     }
 
-    public Vector asVectorNormal(Vector3I origin) {
+    public Vector asVectorNormal(Point3I origin) {
         if (origin.equals(point1)) {
             return new Vector(point2.getX() - point1.getX(), point2.getY() - point1.getY(),
                 point2.getZ() - point1.getZ()).normalize();

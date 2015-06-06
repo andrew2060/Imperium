@@ -1,11 +1,11 @@
 package net.kingdomsofarden.townships.api.math;
 
-public class Vector3I {
+public class Point3I {
     private int x;
     private int y;
     private int z;
 
-    public Vector3I(int x, int y, int z) {
+    public Point3I(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -31,10 +31,10 @@ public class Vector3I {
     }
 
     @Override public boolean equals(Object o) {
-        if (!(o instanceof Vector3I)) {
+        if (!(o instanceof Point3I)) {
             return false;
         } else {
-            Vector3I v = (Vector3I) o;
+            Point3I v = (Point3I) o;
             return v.x == x && v.y == y && v.z == z;
         }
     }
