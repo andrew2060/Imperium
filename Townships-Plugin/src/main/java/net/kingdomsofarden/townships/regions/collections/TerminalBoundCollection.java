@@ -2,9 +2,7 @@ package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
-import net.kingdomsofarden.townships.api.math.Geometry;
-import net.kingdomsofarden.townships.api.math.Line3I;
-import net.kingdomsofarden.townships.api.math.Point3I;
+import net.kingdomsofarden.townships.api.math.*;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
@@ -200,7 +198,22 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         for (RegionBoundingArea bounds : contents.values()) {
             Geometry geometry = bounds.getBoundGeometry();
             for (Point3I vertex : geometry.getVertices()) {
-                Collection<Line3I> edges = geometry.getEdges(vertex);
+                LinkedList<Face> faces = new LinkedList<Face>();
+                ArrayList<Line3I> localEdges = new ArrayList<Line3I>(geometry.getEdges(vertex));
+                // Get all pairs of two and find faces
+                for (int i = 0; i < localEdges.size(); i++) {
+                    for (int j = 1; j < localEdges.size(); j++) {
+                        Axis l1Axis = localEdges.get(i).getAxisOfTravel();
+                        Axis l2Axis = localEdges.get(j).getAxisOfTravel();
+                        if (l1Axis.asIntValue() != l2Axis.asIntValue()) {
+                            int intVal = 6 - (l1Axis.asIntValue() + l2Axis.asIntValue());
+                            Axis perpendicularAxis = Axis.fromIntValue(intVal);
+                            Plane p = new Plane(perpendicularAxis, intVal == 1 ? vertex.getX() :
+                                intVal == 2 ? vertex.getY() : vertex.getZ());
+                            Face face = new Face(plane)
+                        }
+                    }
+                }
             }
         }
         return 0;

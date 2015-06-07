@@ -17,7 +17,7 @@ public interface Geometry {
     Collection<Line3I> getEdges(Point3I vertex);
 
     /**
-     * @return The faces associated
+     * @return The faces associated with this geometry
      */
-    Collection<Face3I> getFaces();
+    Collection<Face> getFaces();
 }

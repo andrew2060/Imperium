@@ -4,8 +4,7 @@ import org.bukkit.util.Vector;
 
 /**
  * Represents a line segment between two {@link Point3I}, commonly used for bounding region edges.
- * Note that lines are limited to traveling on only one axis for performance reasons and as their
- * most common use case are for edges of cuboidal regions
+ * Note that lines are limited to traveling on only one axis (axis-aligned)
  */
 public class Line3I {
     private final Point3I point1;
@@ -15,7 +14,6 @@ public class Line3I {
         this.point1 = point1;
         this.point2 = point2;
     }
-
 
     public Point3I getPoint1() {
         return point1;
@@ -74,13 +72,23 @@ public class Line3I {
         return valid ? new Point3I(x, y, z) : null;
     }
 
-    public Vector asVectorNormal(Point3I origin) {
+    public Axis getAxisOfTravel() {
+        if (point1.getX() != point2.getX()) {
+            return Axis.X;
+        } else if (point1.getY() != point2.getY()) {
+            return Axis.Y;
+        } else {
+            return Axis.Z; // Axis aligned, has to be one of three
+        }
+    }
+
+    public Vector asVector(Point3I origin) {
         if (origin.equals(point1)) {
             return new Vector(point2.getX() - point1.getX(), point2.getY() - point1.getY(),
-                point2.getZ() - point1.getZ()).normalize();
+                point2.getZ() - point1.getZ());
         } else if (origin.equals(point2)) {
             return new Vector(point1.getX() - point2.getX(), point1.getY() - point2.getY(),
-                point1.getZ() - point2.getZ()).normalize();
+                point1.getZ() - point2.getZ());
         } else {
             return null;
         }
