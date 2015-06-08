@@ -10,6 +10,8 @@ import java.util.LinkedHashSet;
  */
 public class Face {
     private Plane plane;
+    private Vector v1;
+    private Vector v2;
     private Collection<Line3I> edges;
     private Collection<Point3I> vertices;
 
