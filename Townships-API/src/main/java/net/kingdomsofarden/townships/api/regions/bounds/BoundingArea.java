@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import net.kingdomsofarden.townships.api.math.Geometry;
+import net.kingdomsofarden.townships.api.math.RectangularGeometry;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,9 +33,15 @@ public interface BoundingArea {
     boolean intersects(BoundingArea box);
 
     /**
-     * @return The geometry associated with this bounding area
+     * @return The geometry associated with this bounding area (post intersections being processed
+     * out)
      */
     Geometry getBoundGeometry();
+
+    /**
+     * @return The raw rectangular geometry associated with this bounding area
+     */
+    RectangularGeometry getRawRectangularGeometry();
 
     /**
      * @return The world containing this bounding box
