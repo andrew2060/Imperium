@@ -2,7 +2,8 @@ package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
-import net.kingdomsofarden.townships.api.math.*;
+import net.kingdomsofarden.townships.api.math.Point3I;
+import net.kingdomsofarden.townships.api.math.Rectangle;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
@@ -219,101 +220,105 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         //                }
         //            }
         //        }
-        //        return 0;
-        throw new UnsupportedOperationException("Complex Volume Geometries are not implemented "
-            + "yet!");
+        //        return 0; // TODO
+        throw new UnsupportedOperationException(
+            "Complex Volume Geometries are not implemented " + "yet!");
     }
 
     @Override public int getContentSurfaceArea() {
         if (!geometryCacheValid) {
+            int sum = 0;
             Collection<Rectangle> raw = new HashSet<Rectangle>();
             // Sweep algorithm: left->right bottom->top
             for (BoundingArea bounds : flattenedBounds.values()) {
                 raw.addAll(bounds.getRawRectangularGeometry().getBaseRectangles());
             }
-            Pair[] startXColl = new Pair[raw.size()];
-            Pair[] endXColl = new Pair[raw.size()];
-            int temp = 0;
+            RectangleXPair[] sortedPairs = new RectangleXPair[raw.size() * 2];
+            int temp = -1;
             for (Rectangle rectangle : raw) {
-                startXColl[temp] = new Pair(rectangle, rectangle.getStartX());
-                endXColl[temp] = new Pair(rectangle, rectangle.getEndX());
+                sortedPairs[temp++] =
+                    new RectangleXPair(rectangle, Direction.BEGIN, rectangle.getStartX());
+                sortedPairs[temp++] = new RectangleXPair(rectangle, Direction.END, rectangle.getEndX());
             }
-            Arrays.sort(startXColl);
-            Arrays.sort(endXColl);
-            int xStartIdx = 0;
-            int xEndIdx = 0;
-            // Construct preexisting on left side too, ending edges need to trail by 1
+            Arrays.sort(sortedPairs);
+            int xStart = bounds.getMinX();
             Set<Rectangle> rectangles = new HashSet<Rectangle>();
-            while (startXColl[xStartIdx].value < bounds.getMinX() && xStartIdx < startXColl.length) {
-                xStartIdx++;
-                rectangles.add(startXColl[xStartIdx].rectangle);
-            }
-            while (endXColl[xEndIdx].value < bounds.getMaxX() && xEndIdx < endXColl.length) {
-                xEndIdx++;
-                rectangles.add(endXColl[xEndIdx].rectangle);
-            }
-            int sum = 0;
-            Deque<Rectangle> remove = new LinkedList<Rectangle>();
-            for (int i = bounds.getMinX(); i <= bounds.getMaxX(); i++) {
-                rectangles.removeAll(remove);
-                remove.clear();
-                Pair curr;
-                while ((curr = startXColl[xStartIdx]).value == i) {
-                    rectangles.add(curr.rectangle);
-                    xStartIdx++;
+            Deque<Rectangle> removeQueue = new LinkedList<Rectangle>();
+            for (int i = 0; i < sortedPairs.length; ) {
+                // Remove all preceding from queue - this is faster than removeAll because
+                // removeQueue will always be smaller
+                for (Rectangle rect : removeQueue) {
+                    rectangles.remove(rect);
                 }
-                while ((curr = endXColl[xEndIdx]).value == i) {
-                    remove.push(curr.rectangle);
-                    xEndIdx++;
+                removeQueue.clear();
+                RectangleXPair rect = sortedPairs[i];
+                int currX = rect.value;
+                if (xStart >= currX) { // We are still before/at the beginning of our bounds
+                    continue;
                 }
-                int[] startZ = new int[rectangles.size()];
-                int[] endZ = new int[rectangles.size()];
-                int zStartIdx = 0;
-                int zEndIdx = 0;
-                int j = 0;
+                // Get all that share this boundary
+                while (rect.value == currX && i < sortedPairs.length) {
+                    if (rect.direction == Direction.BEGIN) {
+                        rectangles.add(rect.rectangle);
+                    } else {
+                        removeQueue.add(rect.rectangle);
+                    }
+                    i++;
+                    rect = sortedPairs[i];
+                }
+                // Length of segment
+                int xLength = currX - xStart;
+                // Rerun cross sections
+                int j = -1;
+                RectangleZPair[] crossSectionValues = new RectangleZPair[rectangles.size() * 2];
                 for (Rectangle rectangle : rectangles) {
-                    startZ[j] = rectangle.getStartZ();
-                    endZ[j] = rectangle.getEndZ();
-                    j++;
+                    crossSectionValues[++j] = new RectangleZPair(Direction.BEGIN, rectangle.getStartZ
+                        ());
+                    crossSectionValues[++j] = new RectangleZPair(Direction.END, rectangle.getEndZ
+                        ());
                 }
-                Arrays.sort(startZ);
-                Arrays.sort(endZ);
-                int overlap = 0;
-                int len = 0;
-                int removals = 0;
-                for (int z = startZ[0]; z <= endZ[endZ.length - 1]; z++) {
-                    overlap -= removals;
-                    removals = 0;
-                    while (startZ[zStartIdx] == z) {
-                        overlap++;
-                        zStartIdx++;
-                    }
-                    while (endZ[zEndIdx] == z) {
-                        removals++;
-                        zEndIdx++;
-                    }
-                    if (overlap > 0) {
-                        len++;
+
+                Arrays.sort(crossSectionValues);
+                int zLength = 0; // The total accumulated length of the rectangular cross section
+                int layers = 0; // The total rectangle layers covering this area so far
+                int zStart = bounds.getMinZ();
+
+                for (RectangleZPair entry : crossSectionValues) {
+                    if (entry.direction == Direction.BEGIN) {
+                        if (layers == 0 && entry.value > zStart) { // Only allow positive
+                            // increments of z
+                            zStart = entry.value;
+                        }
+                        layers++;
+                    } else {
+                        layers--; // We sort such that begins comes before
+                        if (layers == 0) {
+                            if (entry.value > bounds.getMaxZ()) {
+                                zLength += bounds.getMaxZ() - zStart;
+                                break; // We are done/have hit the end
+                            } else {
+                                zLength += entry.value - zStart; // Add to cross section
+                                zStart = entry.value + 1;
+                            }
+                        }
                     }
                 }
-                sum += len;
+                sum += zLength * xLength;
             }
             area = sum;
+            geometryCacheValid = true;
         }
         return area;
     }
 
-    private class Pair implements Comparable<Pair> {
-        Rectangle rectangle;
-        int value;
+    private static class RectangleZPair implements Comparable<RectangleZPair> {
+        private Direction direction;
+        private int value;
 
-        public Pair(Rectangle rectangle, int value) {
-            this.rectangle = rectangle;
+
+        private RectangleZPair(Direction direction, int value) {
+            this.direction = direction;
             this.value = value;
-        }
-
-        @Override public int compareTo(Pair o) {
-            return value - o.value;
         }
 
         @Override public boolean equals(Object o) {
@@ -322,7 +327,61 @@ public class TerminalBoundCollection extends RegionBoundCollection {
             if (o == null || getClass() != o.getClass())
                 return false;
 
-            Pair pair = (Pair) o;
+            RectangleZPair that = (RectangleZPair) o;
+
+            if (value != that.value)
+                return false;
+            return direction == that.direction;
+
+        }
+
+        @Override public int hashCode() {
+            int result = direction != null ? direction.hashCode() : 0;
+            result = 31 * result + value;
+            return result;
+        }
+
+        @Override public int compareTo(RectangleZPair o) {
+            int ret = value - o.value;
+            if (ret == 0) {
+                return direction.compareTo(o.direction);
+            } else {
+                return ret;
+            }
+        }
+
+    }
+
+    private enum Direction implements Comparable<Direction> {
+        BEGIN, END
+    }
+
+    private static class RectangleXPair implements Comparable<RectangleXPair> {
+        Direction direction;
+        Rectangle rectangle;
+        int value;
+
+        public RectangleXPair(Rectangle rectangle, Direction direction, int value) {
+            this.rectangle = rectangle;
+            this.value = value;
+            this.direction = direction;
+        }
+
+        @Override public int compareTo(RectangleXPair o) {
+            int ret = value - o.value;
+            if (ret == 0) {
+                return direction.compareTo(o.direction);
+            }
+            return ret;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+
+            RectangleXPair pair = (RectangleXPair) o;
 
             if (value != pair.value)
                 return false;
