@@ -9,12 +9,12 @@ public class Rectangle {
     private int endZ;
 
     public Rectangle(Point3I point1, Point3I point2) {
-        this.point1 = point1;
-        this.point2 = point2;
         this.startX = Math.min(point1.getX(), point2.getX());
         this.endX = Math.max(point1.getX(), point2.getX());
         this.startZ = Math.min(point1.getZ(), point2.getZ());
         this.endZ = Math.max(point1.getZ(), point2.getZ());
+        this.point1 = new Point3I(startX, 0, startZ);
+        this.point2 = new Point3I(endX, 0, endZ);
     }
 
     public Point3I getPoint1() {

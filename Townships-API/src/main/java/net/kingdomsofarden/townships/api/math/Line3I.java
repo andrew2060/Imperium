@@ -10,9 +10,30 @@ public class Line3I {
     private final Point3I point1;
     private final Point3I point2;
 
-    public Line3I(Point3I point1, Point3I point2) {
-        this.point1 = point1;
-        this.point2 = point2;
+    public Line3I(Point3I point1, Point3I point2) { // Normalize by x > z > y
+        if (point1.equals(point2)) {
+            throw new IllegalArgumentException("Cannot create line between two same points!");
+        }
+        boolean order = true; // Current order is correct
+        if (point1.getX() == point2.getX()) {
+            if (point1.getZ() == point2.getZ()) {
+                if (point1.getY() > point2.getY()) {
+                    order = false;
+                }
+            } else if (point1.getZ() > point2.getZ()) {
+                order = false;
+            }
+        } else if (point1.getX() > point2.getX()) {
+            order = false;
+        }
+        if (order) {
+            this.point1 = point1;
+            this.point2 = point2;
+        } else {
+            this.point1 = point2;
+            this.point2 = point1;
+        }
+
     }
 
     public Point3I getPoint1() {
@@ -94,4 +115,21 @@ public class Line3I {
         }
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Line3I line3I = (Line3I) o;
+
+        return point1.equals(line3I.point1) && point2.equals(line3I.point2);
+
+    }
+
+    @Override public int hashCode() {
+        int result = point1.hashCode();
+        result = 31 * result + (point2.hashCode());
+        return result;
+    }
 }

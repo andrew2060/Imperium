@@ -20,4 +20,10 @@ public interface Geometry {
      * @return The faces associated with this geometry
      */
     Collection<Face> getFaces();
+
+    /**
+     * @return A collection (unsorted) of all the rectangles (can be singular or plural) that
+     * make up this geometry (a 2d representation of the elements of this bounding region)
+     */
+    Collection<Rectangle> getBaseRectangles();
 }

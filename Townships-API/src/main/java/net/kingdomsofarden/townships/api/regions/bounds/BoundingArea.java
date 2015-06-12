@@ -1,7 +1,6 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import net.kingdomsofarden.townships.api.math.Geometry;
-import net.kingdomsofarden.townships.api.math.RectangularGeometry;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,11 +38,6 @@ public interface BoundingArea {
     Geometry getBoundGeometry();
 
     /**
-     * @return The raw rectangular geometry associated with this bounding area
-     */
-    RectangularGeometry getRawRectangularGeometry();
-
-    /**
      * @return The world containing this bounding box
      */
     World getWorld();
@@ -73,10 +67,13 @@ public interface BoundingArea {
     int volume();
 
     /**
+     * @param clazz The class of the resulting bounding area to obtain
      * @param size The size to grow by
      * @return A clone of this bounding area that is grown by the specified dimensions
+     * @throws IllegalArgumentException if clazz is not a bounding area type that can be derived
+     * from this bounding area
      */
-    <T extends BoundingArea> T grow(int size);
+    <T extends BoundingArea> T grow(Class<T> clazz, int size);
 
 
     /**
