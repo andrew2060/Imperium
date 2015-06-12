@@ -1,12 +1,17 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
+import net.kingdomsofarden.townships.api.math.Geometry;
+import net.kingdomsofarden.townships.api.math.Point3I;
+import net.kingdomsofarden.townships.api.math.RectangularGeometry;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class CuboidSelection implements CuboidBoundingBox {
 
@@ -38,31 +43,20 @@ public class CuboidSelection implements CuboidBoundingBox {
         if (!box.getWorld().equals(getWorld())) {
             return false;
         }
-        for (Integer[] vertex : box.getVertices()) {
-            if (box.isInBounds(vertex[0], vertex[1], vertex[2])) {
+        for (Point3I vertex : box.getBoundGeometry().getVertices()) {
+            if (box.isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
                 return true;
             }
         }
         return box.encapsulates(this);
     }
 
-    @Override public Collection<Integer[]> getVertices() {
-        ArrayList<Integer[]> vertices = new ArrayList<Integer[]>(8);
-        int minX = getMinX();
-        int maxX = getMaxX();
-        int minY = getMinY();
-        int maxY = getMaxY();
-        int minZ = getMinZ();
-        int maxZ = getMaxZ();
-        vertices.add(new Integer[] {minX, minY, minZ});
-        vertices.add(new Integer[] {minX, maxY, minZ});
-        vertices.add(new Integer[] {minX, minY, maxZ});
-        vertices.add(new Integer[] {minX, maxY, maxZ});
-        vertices.add(new Integer[] {maxX, minY, minZ});
-        vertices.add(new Integer[] {maxX, maxY, minZ});
-        vertices.add(new Integer[] {maxX, minY, maxZ});
-        vertices.add(new Integer[] {maxX, maxY, maxZ});
-        return vertices;
+    @Override public Geometry getBoundGeometry() {
+        return null;
+    }
+
+    @Override public RectangularGeometry getRawRectangularGeometry() {
+        return null;
     }
 
     @Override public int getMinX() {
@@ -144,11 +138,31 @@ public class CuboidSelection implements CuboidBoundingBox {
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        for (Integer[] vertex : other.getVertices()) {
-            if (!isInBounds(vertex[0], vertex[1], vertex[2])) {
+        for (Point3I vertex : other.getBoundGeometry().getVertices()) {
+            if (!isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
                 return false;
             }
         }
-        return true; // TODO not correct
+        return true;
+    }
+
+    @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+        return null;
+    }
+
+    @Override public int size2d() {
+        return 0;
+    }
+
+    @Override public int volume() {
+        return 0;
+    }
+
+    @Override public <T extends BoundingArea> T grow(int size) {
+        return null;
+    }
+
+    @Override public BoundingArea flatten() {
+        return null;
     }
 }
