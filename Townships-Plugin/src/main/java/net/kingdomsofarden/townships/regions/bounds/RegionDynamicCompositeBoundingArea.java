@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
 import net.kingdomsofarden.townships.api.Townships;
+import net.kingdomsofarden.townships.api.math.Geometry;
 import net.kingdomsofarden.townships.api.math.Line3I;
 import net.kingdomsofarden.townships.api.math.Point3I;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -45,14 +46,14 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         sizeCacheValid = false;
         vectorCacheValid = false;
         volumeCacheValid = false;
-        contents = new HashMap<String, Collection<Region>>();
+        contents = new HashMap<>();
         region = r;
         center = c;
         new GrowthRunnable(center).run();
     }
 
     public void add(Region region) {
-        RegionBoundingArea grow = region.getBounds().grow(buffer);
+        RegionBoundingArea grow = region.getBounds().grow(RegionBoundingArea.class, buffer);
         boundsMap.add(grow);
         // Remove existing vertices that intersect with what we are adding
         Iterator<Point3I> it = vertices.iterator();
@@ -64,15 +65,15 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         }
         // Get vertices from our new addition that do not intersect with
         // what we have already and add to our current vertices
-        for (Point3I vec : grow.getVertices()) {
+        for (Point3I vec : grow.getBoundGeometry().getVertices()) {
             if (boundsMap.getBoundingRegions(vec.getX(), vec.getY(), vec.getZ()).isEmpty()) {
                 vertices.add(vec);
             }
         }
         // Readd intersections
         for (RegionBoundingArea intersect : boundsMap.getIntersectingBounds(grow)) {
-            for (Line3I edge : intersect.getEdges()) {
-                for (Line3I edge2 : grow.getEdges()) {
+            for (Line3I edge : intersect.getBoundGeometry().getAllEdges()) {
+                for (Line3I edge2 : grow.getBoundGeometry().getAllEdges()) {
                     Point3I add;
                     if ((add = edge.getIntersection(edge2)) != null) {
                         vertices.add(add);
@@ -84,7 +85,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     }
 
     public void remove(Region region) {
-        boundsMap.remove(region.getBounds().grow(buffer));
+        boundsMap.remove(region.getBounds().grow
+            (RegionBoundingArea.class, buffer));
     }
 
     @Override public boolean isInBounds(Location loc) {
@@ -96,68 +98,71 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     }
 
     @Override public boolean intersects(BoundingArea box) {
-        TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
-            @Override public int compare(Region o1, Region o2) {
-                int ret = o2.getTier() - o1.getTier();
-                if (ret == 0) {
-                    return o1.getUid().compareTo(o2.getUid());
-                } else {
-                    return ret;
-                }
+        TreeSet<Region> ret = new TreeSet<Region>((o1, o2) -> {
+            int ret1 = o2.getTier() - o1.getTier();
+            if (ret1 == 0) {
+                return o1.getUid().compareTo(o2.getUid());
+            } else {
+                return ret1;
             }
         });
         boundsMap.getIntersectingRegions(box, ret);
         return !ret.isEmpty() && !box.encapsulates(this);
     }
 
-    @Override public Collection<Point3I> getVertices() {
-        if (!vectorCacheValid) {
-            HashMap<Region, Collection<Point3I>> vertexConstruction =
-                new HashMap<Region, Collection<Point3I>>();
-            for (RegionBoundingArea b : boundsMap.getContainedBounds()) {
-                vertexConstruction.put(b.getRegion(), b.getVertices());
-            }
-            // Remove intersections
-            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
-                Iterator<Point3I> i = e.getValue().iterator();
-                while (i.hasNext()) {
-                    Point3I vertex = i.next();
-                    TreeSet<Region> bounds =
-                        boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
-                    bounds.remove(e.getKey());
-                    if (!bounds.isEmpty()) { // Intersects with something else, can't be a vertex
-                        i.remove();
-                    }
-                }
-            }
-            Collection<Point3I> intersections = buildIntersections();
-            Iterator<Point3I> i = intersections.iterator();
-            while (i.hasNext()) {
-                Point3I vertex = i.next();
-                TreeSet<Region> bounds =
-                    boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
-                if (bounds.size() != 1) { // Intersects with something else, can't be a vertex
-                    i.remove();
-                }
-            }
-            // Create composite vertex collection
-            Collection<Point3I> ret = new LinkedList<Point3I>();
-            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
-                ret.addAll(e.getValue());
-            }
-            ret.addAll(intersections);
-            vectorCacheValid = true;
-            vertices = ret;
-        }
-        return vertices;
+    @Override public Geometry getBoundGeometry() {
+        // TODO
+        return null;
     }
+    //
+//    @Override public Collection<Point3I> getVertices() {
+//        if (!vectorCacheValid) {
+//            HashMap<Region, Collection<Point3I>> vertexConstruction =
+//                new HashMap<Region, Collection<Point3I>>();
+//            for (RegionBoundingArea b : boundsMap.getContainedBounds()) {
+//                vertexConstruction.put(b.getRegion(), b.getVertices());
+//            }
+//            // Remove intersections
+//            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
+//                Iterator<Point3I> i = e.getValue().iterator();
+//                while (i.hasNext()) {
+//                    Point3I vertex = i.next();
+//                    TreeSet<Region> bounds =
+//                        boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
+//                    bounds.remove(e.getKey());
+//                    if (!bounds.isEmpty()) { // Intersects with something else, can't be a vertex
+//                        i.remove();
+//                    }
+//                }
+//            }
+//            Collection<Point3I> intersections = buildIntersections();
+//            Iterator<Point3I> i = intersections.iterator();
+//            while (i.hasNext()) {
+//                Point3I vertex = i.next();
+//                TreeSet<Region> bounds =
+//                    boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
+//                if (bounds.size() != 1) { // Intersects with something else, can't be a vertex
+//                    i.remove();
+//                }
+//            }
+//            // Create composite vertex collection
+//            Collection<Point3I> ret = new LinkedList<Point3I>();
+//            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
+//                ret.addAll(e.getValue());
+//            }
+//            ret.addAll(intersections);
+//            vectorCacheValid = true;
+//            vertices = ret;
+//        }
+//        return vertices;
+//    }
 
     @Override public World getWorld() {
         return world;
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        for (Point3I vertex : other.getVertices()) {
+        for (Point3I vertex : other.getBoundGeometry().getVertices()) {
             if (!boundsMap.isInBounds(
                 new Location(other.getWorld(), vertex.getX(), vertex.getY(), vertex.getZ()))) {
                 return false;
@@ -172,75 +177,50 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
                 + " performance reasons");
     }
 
-    public Collection<Point3I> buildIntersections() {
-        Set<Point3I> intersections = new HashSet<Point3I>();
-        for (Entry<Region, Map<Collection<Line3I>, Collection<Region>>> entry : vectors
-            .entrySet()) {
-            for (Entry<Collection<Line3I>, Collection<Region>> e : entry.getValue().entrySet()) {
-                for (Line3I line : e.getKey()) {
-                    for (Region region : e.getValue()) {
-                        for (Line3I line2 : region.getBounds().grow(buffer).getEdges()) {
-                            Point3I intersect = line.getIntersection(line2);
-                            if (intersect != null) {
-                                intersections.add(intersect);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return intersections;
-    }
+//    public Collection<Point3I> buildIntersections() {
+//        Set<Point3I> intersections = new HashSet<Point3I>();
+//        for (Entry<Region, Map<Collection<Line3I>, Collection<Region>>> entry : vectors
+//            .entrySet()) {
+//            for (Entry<Collection<Line3I>, Collection<Region>> e : entry.getValue().entrySet()) {
+//                for (Line3I line : e.getKey()) {
+//                    for (Region region : e.getValue()) {
+//                        for (Line3I line2 : region.getBounds().grow(BoundingArea.class,
+//                            buffer).getBoundGeometry().getEdges()) {
+//                            Point3I intersect = line.getIntersection(line2);
+//                            if (intersect != null) {
+//                                intersections.add(intersect);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return intersections;
+//    }
 
     @Override public int size2d() {
-        if (sizeCacheValid) {
-            return size;
-        } else {
-            // Get vectors
-            ArrayList<Point3I> vertices = flatten(getVertices());
-            // Calculate area by abs((x1y2-y1x2)+(x2y3-y2x3)...+(xny1-ynx1))/2 for consecutive vertice pairs
-            int one = 0;
-            int two = 1;
-            int max = vertices.size();
-            int sum = 0;
-            while (one != max) {
-                Point3I v1 = vertices.get(one);
-                Point3I v2 = vertices.get(two);
-                sum += v1.getX() * v2.getZ() - v1.getZ() * v2.getX();
-                one++;
-                two++;
-                if (two == max) {
-                    two = 0;
-                }
-            }
-            sum = Math.abs(sum);
-            sum /= 2;
-            size = sum;
+        if (!sizeCacheValid) {
+            size = boundsMap.getContentSurfaceArea();
             sizeCacheValid = true;
-            return size;
         }
-    }
-
-    // Flattens into a 2d structure
-    private ArrayList<Point3I> flatten(Collection<Point3I> vertices) {
-        HashSet<Point3I> coll = new LinkedHashSet<Point3I>();
-        for (Point3I vec : vertices) {
-            coll.add(new Point3I(vec.getX(), 0, vec.getZ()));
-        }
-        // TODO: remove inner vertices
-        return new ArrayList<Point3I>(coll);
+        return size;
     }
 
     @Override public int volume() {
         if (!volumeCacheValid) {
-            volume = size2d() * 256; // Composite bounding regions are all 256 blocks
+            volume = boundsMap.getContentVolume();
             volumeCacheValid = true;
         }
         return volume;
     }
 
-    @Override public <T extends BoundingArea> T grow(int size) {
+    @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
         return (T) new RegionDynamicCompositeBoundingArea(buffer + size, world, region, center);
+    }
+
+    @Override public BoundingArea flatten() {
+        // TODO
+        return null;
     }
 
     @Override public Region getRegion() {
@@ -269,12 +249,11 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
             Set<Region> temp = new HashSet<Region>();
             while ((next = lastIteration.poll()) != null) {
                 processed.add(next);
-                RegionBoundingArea grown = region.getBounds().grow(buffer);
-                for (RegionBoundingArea r : Townships.getRegions().getIntersectingBounds(grown)) {
-                    if (!this.processed.contains(r.getRegion()) && !temp.contains(r.getRegion())) {
-                        temp.add(r.getRegion());
-                    }
-                }
+                RegionBoundingArea grown = region.getBounds().grow(RegionBoundingArea.class,
+                    buffer);
+                Townships.getRegions().getIntersectingBounds(grown).stream().filter(
+                    r -> !this.processed.contains(r.getRegion()) && !temp.contains(r.getRegion()))
+                    .forEach(r -> temp.add(r.getRegion()));
             }
             if (!lastIteration.isEmpty()) {
                 temp.addAll(lastIteration);

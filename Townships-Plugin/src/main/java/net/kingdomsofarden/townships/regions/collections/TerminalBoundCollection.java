@@ -231,7 +231,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
             Collection<Rectangle> raw = new HashSet<Rectangle>();
             // Sweep algorithm: left->right bottom->top
             for (BoundingArea bounds : flattenedBounds.values()) {
-                raw.addAll(bounds.getRawRectangularGeometry().getBaseRectangles());
+                raw.addAll(bounds.getBoundGeometry().getBaseRectangles());
             }
             RectangleXPair[] sortedPairs = new RectangleXPair[raw.size() * 2];
             int temp = -1;
