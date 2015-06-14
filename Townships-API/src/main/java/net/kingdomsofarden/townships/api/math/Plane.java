@@ -6,11 +6,13 @@ package net.kingdomsofarden.townships.api.math;
 public class Plane {
 
     private final Axis axis;
-    private final int value;
 
-    public Plane(Axis axis, int value) {
+    public Plane(Axis axis) {
         this.axis = axis;
-        this.value = value;
+    }
+
+    public Axis getNormalAxis() {
+        return axis;
     }
 
     @Override public boolean equals(Object o) {
@@ -21,20 +23,11 @@ public class Plane {
 
         Plane plane = (Plane) o;
 
-        if (value != plane.value)
-            return false;
         return axis == plane.axis;
 
     }
 
     @Override public int hashCode() {
-        int result = axis != null ? axis.hashCode() : 0;
-        result = 31 * result + value;
-        return result;
+        return axis != null ? axis.hashCode() : 0;
     }
-
-    public Axis getAxis() {
-        return axis;
-    }
-
 }

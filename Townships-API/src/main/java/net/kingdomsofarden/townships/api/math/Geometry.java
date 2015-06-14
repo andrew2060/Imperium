@@ -17,6 +17,11 @@ public interface Geometry {
     Collection<Line3I> getEdges(Point3I vertex);
 
     /**
+     * @return All the edges within this geometry, represented as {@link Line3I}
+     */
+    Collection<Line3I> getAllEdges();
+
+    /**
      * @return The faces associated with this geometry
      */
     Collection<Face> getFaces();

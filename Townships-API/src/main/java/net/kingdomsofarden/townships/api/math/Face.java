@@ -10,31 +10,29 @@ import java.util.LinkedHashSet;
  */
 public class Face {
     private Plane plane;
-    private Vector v1;
-    private Vector v2;
     private Collection<Line3I> edges;
     private Collection<Point3I> vertices;
 
-    public Face(Plane plane, Line3I edge1, Line3I edge2) {
-        this.plane = plane;
+    public Face(Line3I edge1, Line3I edge2) {
         Axis a1 = edge1.getAxisOfTravel();
         Axis a2 = edge2.getAxisOfTravel();
-        edges = new LinkedHashSet<Line3I>();
-        vertices = new LinkedHashSet<Point3I>();
+        plane = new Plane(Axis.fromIntValue(6 - (a1.asIntValue() + a2.asIntValue())));
+        edges = new LinkedHashSet<>();
+        vertices = new LinkedHashSet<>();
         edges.add(edge1);
         edges.add(edge2);
         if (a1 == a2) {
-            if (isAxisAligned(edge1.getPoint1(), edge2.getPoint1())
-                && isAxisAligned(edge1.getPoint2(), edge2.getPoint2())) {
+            if (isAxisAligned(edge1.getPoint1(), edge2.getPoint1()) && isAxisAligned(
+                edge1.getPoint2(), edge2.getPoint2())) {
                 edges.add(new Line3I(edge1.getPoint1(), edge2.getPoint1()));
                 edges.add(new Line3I(edge1.getPoint2(), edge2.getPoint2()));
-            } else if (isAxisAligned(edge1.getPoint1(), edge2.getPoint2())
-                && isAxisAligned(edge1.getPoint2(), edge2.getPoint1())) {
+            } else if (isAxisAligned(edge1.getPoint1(), edge2.getPoint2()) && isAxisAligned(
+                edge1.getPoint2(), edge2.getPoint1())) {
                 edges.add(new Line3I(edge1.getPoint1(), edge2.getPoint2()));
                 edges.add(new Line3I(edge1.getPoint2(), edge2.getPoint1()));
             } else {
-                throw new IllegalArgumentException("Supplied edges are parallel and not "
-                    + "axis-aligned to each other!");
+                throw new IllegalArgumentException(
+                    "Supplied edges are parallel and not " + "axis-aligned to each other!");
             }
             vertices.add(edge1.getPoint1());
             vertices.add(edge2.getPoint1());
@@ -55,12 +53,13 @@ public class Face {
                 throw new IllegalArgumentException("Supplied edges do not share a common vertex!");
             }
             Vector v = edge1.asVector(common);
-            Point3I lastVertex = new Point3I(other.getX() + v.getBlockX(), other.getY() + v
-                .getBlockY(), other.getZ() + v.getBlockZ());
+            Point3I lastVertex =
+                new Point3I(other.getX() + v.getBlockX(), other.getY() + v.getBlockY(),
+                    other.getZ() + v.getBlockZ());
             vertices.add(other);
             vertices.add(lastVertex);
-            Point3I line1Other = edge1.getPoint1().equals(common) ? edge1.getPoint2() : edge1
-                .getPoint1();
+            Point3I line1Other =
+                edge1.getPoint1().equals(common) ? edge1.getPoint2() : edge1.getPoint1();
             edges.add(new Line3I(line1Other, lastVertex));
             edges.add(new Line3I(other, lastVertex));
         }
@@ -99,9 +98,7 @@ public class Face {
             return false;
 
         Face face = (Face) o;
-
         return plane.equals(face.plane) && edges.equals(face.edges);
-
     }
 
     @Override public int hashCode() {
