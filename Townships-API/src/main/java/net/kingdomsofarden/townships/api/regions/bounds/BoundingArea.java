@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
+import com.google.gson.JsonObject;
 import net.kingdomsofarden.townships.api.math.Geometry;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -80,5 +81,10 @@ public interface BoundingArea {
      * @return A flattened (2D) representation of this bounding area, at y=0
      */
     BoundingArea flatten();
+
+    /**
+     * Initializes the bounds with the given settings as provided as a JSON object
+     */
+    void initialize(JsonObject json);
 
 }

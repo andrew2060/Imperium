@@ -2,6 +2,8 @@ package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
@@ -16,13 +18,11 @@ import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
-import net.kingdomsofarden.townships.regions.bounds.RegionAxisAlignedBoundingBox;
 import net.kingdomsofarden.townships.tasks.RegionBlockCheckTask;
 import net.kingdomsofarden.townships.tasks.RegionSubregionCheckTask;
 import net.kingdomsofarden.townships.util.LocationSerializer;
 import net.kingdomsofarden.townships.util.MetaKeys;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -49,9 +49,6 @@ public class TownshipsRegion implements Region {
 
     private RegionBoundingArea bounds;
 
-    private Location pos1;
-    private Location pos2;
-
     private Collection<Area> containingAreas;
     private String type;
 
@@ -63,6 +60,7 @@ public class TownshipsRegion implements Region {
 
     private boolean valid;
     private Map<String, Object> metadata;
+    private Map<UUID, Map<String, Object>> regionMetadata;
     private Map<Region, RelationState> relations;
     private Map<Region, RelationState> externRelations;
     private Set<Citizen> citizens;
@@ -70,26 +68,24 @@ public class TownshipsRegion implements Region {
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
         valid = true;
-        containingAreas = new LinkedList<Area>();
+        containingAreas = new LinkedList<>();
         rolesByCitizenUid = HashMultimap.create();
         citizenUidsByRole = HashMultimap.create();
         accessByCitizenUid = HashMultimap.create();
         accessByRole = HashMultimap.create();
-        maxTypeInRegion = new HashMap<String, Integer>();
-        maxTierInRegion = new HashMap<Integer, Integer>();
-        metadata = new HashMap<String, Object>();
-        Comparator<Region> regionComparator = new Comparator<Region>() {
-            @Override public int compare(Region o1, Region o2) {
-                int ret = o2.getTier() - o1.getTier();
-                if (ret == 0) {
-                    return o1.getUid().compareTo(o2.getUid());
-                } else {
-                    return ret;
-                }
+        maxTypeInRegion = new HashMap<>();
+        maxTierInRegion = new HashMap<>();
+        metadata = new HashMap<>();
+        Comparator<Region> regionComparator = (o1, o2) -> {
+            int ret = o2.getTier() - o1.getTier();
+            if (ret == 0) {
+                return o1.getUid().compareTo(o2.getUid());
+            } else {
+                return ret;
             }
         };
-        parents = new TreeSet<Region>(regionComparator);
-        children = new TreeSet<Region>(regionComparator);
+        parents = new TreeSet<>(regionComparator);
+        children = new TreeSet<>(regionComparator);
         // Populate region identifier data
         regionUid = rId;
         name = config.get("name", null);
@@ -104,16 +100,25 @@ public class TownshipsRegion implements Region {
             }
         };
         tier = config.get("tier", intSerializer, -1);
-        pos1 = config.get("position-1", new LocationSerializer(), null);
-        pos2 = config.get("position-2", new LocationSerializer(), null);
-        if (pos1 == null || pos2 == null) {
-            throw new IllegalStateException(
-                "Problem loading location of region " + regionUid + ": null");
+        Class<? extends RegionBoundingArea> boundsClazz;
+        try {
+            boundsClazz =
+                (Class<? extends RegionBoundingArea>) Class.forName(config.get
+                    ("region-bounds-class", "net.kingdomsofarden.townships.regions.bounds"
+                        + ".RegionAxisAlignedBoundingBox"));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return;
         }
-        if (pos1.getWorld() != pos2.getWorld()) {
-            throw new IllegalStateException("Mismatched worlds");
+        JsonObject boundsSettings = new JsonParser().parse(config.get("region-bounds-settings",
+            "{}")).getAsJsonObject();
+        try {
+            bounds = boundsClazz.newInstance();
+            bounds.initialize(boundsSettings);
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return;
         }
-        bounds = new RegionAxisAlignedBoundingBox(this, pos1, pos2);
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
             RoleGroup group = RoleGroup.valueOf(roleName);
@@ -127,7 +132,7 @@ public class TownshipsRegion implements Region {
                 }
             }
         }
-        effects = new HashMap<String, Effect>();
+        effects = new HashMap<>();
         StoredDataSection meta = config.getSection("metadata");
         for (String key : meta.getKeys(false)) {
             metadata.put(key, meta.<ConfigurationSection>getBackingImplementation().get(key));
@@ -188,7 +193,7 @@ public class TownshipsRegion implements Region {
             }
             externRelations.put(r, state);
         }
-        // TODO citizens
+        // TODO citizens, regional metadata
     }
 
     @Override public int getTier() {
@@ -416,6 +421,10 @@ itemProviders.remove(provider.getIdentifier());
 
     @Override public Map<String, Object> getMetadata() {
         return metadata;
+    }
+
+    @Override public Map<String, Object> getRegionalMetadata(Region region) {
+        return regionMetadata.getOrDefault(region.getUid(), new HashMap<>());
     }
 
     @Override public boolean addAccess(RoleGroup group, AccessType access) {

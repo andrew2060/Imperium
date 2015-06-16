@@ -1,27 +1,44 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
-import net.kingdomsofarden.townships.api.math.Point3I;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
-import org.bukkit.Location;
 
 public class AxisAlignedBoundingBox extends AbstractCuboidBoundingBox {
 
-    public AxisAlignedBoundingBox(Location loc1, Location loc2) {
-        super(loc1.getWorld(), new Point3I(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ()),
-            new Point3I(loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ()));
-        if (!loc1.getWorld().equals(loc2.getWorld())) {
-            throw new IllegalStateException("Mismatched world locations!");
-        }
-    }
-
     @Override protected <T extends BoundingArea> T produceGrown(int size) {
-        Location loc1 = new Location(world, minX, minY, minZ).subtract(size, size, size);
-        Location loc2 = new Location(world, maxX, maxY, maxZ).add(size, size, size);
-        return (T) new AxisAlignedBoundingBox(loc1, loc2);
+        T ret = (T) new AxisAlignedBoundingBox();
+        JsonObject init = new JsonObject();
+        init.add("world", new JsonPrimitive(world.getUID().toString()));
+        JsonObject point1 = new JsonObject();
+        point1.add("x", new JsonPrimitive(minX - size));
+        point1.add("y", new JsonPrimitive(minY - size));
+        point1.add("z", new JsonPrimitive(minZ - size));
+        JsonObject point2 = new JsonObject();
+        point2.add("x", new JsonPrimitive(maxX + size));
+        point2.add("y", new JsonPrimitive(maxY + size));
+        point2.add("z", new JsonPrimitive(maxZ + size));
+        init.add("point1", point1);
+        init.add("point2", point2);
+        ret.initialize(init);
+        return ret;
     }
 
     @Override protected BoundingArea generateFlattened() {
-        return new AxisAlignedBoundingBox(new Location(world, minX, 0, minZ), new Location(world,
-         maxX, 0, maxZ));
+        AxisAlignedBoundingBox ret =  new AxisAlignedBoundingBox();
+        JsonObject init = new JsonObject();
+        init.add("world", new JsonPrimitive(world.getUID().toString()));
+        JsonObject point1 = new JsonObject();
+        point1.add("x", new JsonPrimitive(minX));
+        point1.add("y", new JsonPrimitive(0));
+        point1.add("z", new JsonPrimitive(minZ));
+        JsonObject point2 = new JsonObject();
+        point2.add("x", new JsonPrimitive(maxX));
+        point2.add("y", new JsonPrimitive(0));
+        point2.add("z", new JsonPrimitive(maxZ));
+        init.add("point1", point1);
+        init.add("point2", point2);
+        ret.initialize(init);
+        return ret;
     }
 }

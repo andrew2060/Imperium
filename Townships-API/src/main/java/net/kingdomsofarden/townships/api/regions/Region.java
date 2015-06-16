@@ -102,15 +102,17 @@ public interface Region {
 
     /**
      * Adds the given {@link RoleGroup} to the given {@link Citizen} for this Region
+     *
      * @param citizen The citizen
-     * @param group The rolegroup to add
+     * @param group   The rolegroup to add
      */
     void addRole(Citizen citizen, RoleGroup group);
 
     /**
      * Removes the given {@link RoleGroup} from the given {@link Citizen} for this Region
+     *
      * @param citizen The citizen
-     * @param group The role group to remove
+     * @param group   The role group to remove
      * @return Whether anything was actually removed (false if the citizen never had that role)
      */
     boolean removeRole(Citizen citizen, RoleGroup group);
@@ -174,9 +176,21 @@ public interface Region {
     boolean isCompatible(Region region);
 
     /**
+     * Retrieves a metadata mapping for keys that are not associated with any regions (global)
+     *
      * @return A mapping of metadata values currently associated with the region
+     * @see {@link #getRegionalMetadata(Region)}
      */
     Map<String, Object> getMetadata();
+
+    /**
+     * Retrieves a metadata mapping for this region that is associated with the supplied region
+     * @param region The region to check for
+     * @return A mapping of metadata values currently associated with the region by the supplied
+     * region
+     * @see {@link #getMetadata()}
+     */
+    Map<String, Object> getRegionalMetadata(Region region);
 
     boolean addAccess(RoleGroup group, AccessType access);
 

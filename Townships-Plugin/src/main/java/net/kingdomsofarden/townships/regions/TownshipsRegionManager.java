@@ -8,12 +8,16 @@ import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
+import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class TownshipsRegionManager implements RegionManager {
 
@@ -24,9 +28,9 @@ public class TownshipsRegionManager implements RegionManager {
 
     public TownshipsRegionManager(TownshipsPlugin plugin) {
         this.plugin = plugin;
-        this.maps = new HashMap<UUID, RegionBoundCollection>();
-        this.uidToRegion = new HashMap<UUID, Region>();
-        this.nameToUid = new HashMap<String, UUID>();
+        this.maps = new HashMap<>();
+        this.uidToRegion = new HashMap<>();
+        this.nameToUid = new HashMap<>();
     }
 
     @Override public int size() {
@@ -52,6 +56,10 @@ public class TownshipsRegionManager implements RegionManager {
         return uidToRegion.values().iterator();
     }
 
+    @Override public void forEach(Consumer<? super Region> action) {
+
+    }
+
     @Override public Object[] toArray() {
         return uidToRegion.values().toArray();
     }
@@ -61,12 +69,9 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override public boolean add(Region region) {
-        for (Effect effect : region.getEffects()) {
-            if (effect instanceof TickableEffect) {
-                plugin.getEffectManager().getEffectTaskManager()
-                    .schedule((TickableEffect) effect, region);
-            }
-        }
+        region.getEffects().stream().filter(effect -> effect instanceof TickableEffect).forEach(
+            effect -> plugin.getEffectManager().getEffectTaskManager()
+                .schedule((TickableEffect) effect, region));
         UUID id = region.getUid();
         uidToRegion.put(id, region);
         if (region.getName().isPresent()) {
@@ -156,6 +161,15 @@ public class TownshipsRegionManager implements RegionManager {
         return modify;
     }
 
+    @Override public boolean removeIf(Predicate<? super Region> filter) {
+        final boolean[] modified = {false};
+        new ArrayList<>(uidToRegion.values()).stream().filter(filter::test).forEach(region -> {
+            uidToRegion.remove(region.getUid());
+            modified[0] = true;
+        });
+        return modified[0];
+    }
+
     @Override public boolean retainAll(Collection<?> c) {
         boolean modify = false;
         for (Object o : c) {
@@ -173,13 +187,25 @@ public class TownshipsRegionManager implements RegionManager {
             "Flushing the Region Manager is not a permitted operation");
     }
 
+    @Override public Spliterator<Region> spliterator() {
+        return uidToRegion.values().spliterator();
+    }
+
+    @Override public Stream<Region> stream() {
+        return uidToRegion.values().stream();
+    }
+
+    @Override public Stream<Region> parallelStream() {
+        return uidToRegion.values().parallelStream();
+    }
+
     @Override public TreeSet<Region> getBoundingRegions(Location loc) {
         UUID world = loc.getWorld().getUID();
         if (maps.containsKey(world)) {
             return maps.get(world)
                 .getBoundingRegions(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
         } else {
-            return new TreeSet<Region>();
+            return new TreeSet<>();
         }
     }
 
@@ -193,20 +219,22 @@ public class TownshipsRegionManager implements RegionManager {
     @Override public TreeSet<Region> getIntersectingRegions(BoundingArea bounds) {
         UUID world = bounds.getWorld().getUID();
         if (maps.containsKey(world)) {
-            TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
-                @Override public int compare(Region o1, Region o2) {
-                    int ret = o2.getTier() - o1.getTier();
-                    if (ret == 0) {
-                        return o1.getUid().compareTo(o2.getUid());
-                    } else {
-                        return ret;
-                    }
+            TreeSet<Region> ret = new TreeSet<>((o1, o2) -> {
+                int ret1 = o2.getTier() - o1.getTier();
+                if (ret1 == 0) {
+                    return o1.getUid().compareTo(o2.getUid());
+                } else {
+                    return ret1;
                 }
             });
             maps.get(world).getIntersectingRegions(bounds, ret);
             return ret;
         }
-        return new TreeSet<Region>();
+        return new TreeSet<>();
+    }
+
+    @Override public Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds) {
+        return null;
     }
 
     @Override public Optional<Region> get(String name) {

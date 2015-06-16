@@ -15,6 +15,12 @@ import java.util.Map.Entry;
 public class PhysicalChestItemProvider implements ItemProvider {
 
     protected Location chestLocation;
+    private String name;
+
+    public PhysicalChestItemProvider(Location location, String name) {
+        this.chestLocation = location;
+        this.name = name;
+    }
 
     @Override public int getAmount(Material mat) {
         if (chestLocation == null) {
@@ -88,4 +94,7 @@ public class PhysicalChestItemProvider implements ItemProvider {
         return max - rem;
     }
 
+    @Override public String getIdentifier() {
+        return name;
+    }
 }

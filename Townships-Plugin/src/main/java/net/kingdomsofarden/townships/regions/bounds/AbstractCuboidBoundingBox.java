@@ -1,8 +1,10 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
+import com.google.gson.JsonObject;
 import net.kingdomsofarden.townships.api.math.*;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -23,27 +25,6 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
     private BoundingArea flatten = null;
     private HashMap<Integer, BoundingArea> growths;
     private Geometry geometry;
-    
-    public AbstractCuboidBoundingBox(World boundsWorld, Point3I point1, Point3I point2) {
-        minX = Math.min(point1.getX(), point2.getX());
-        maxX = Math.max(point1.getX(), point2.getX());
-        minY = Math.min(point1.getY(), point2.getY());
-        maxY = Math.max(point1.getY(), point2.getY());
-        minZ = Math.min(point1.getZ(), point2.getZ());
-        maxZ = Math.max(point1.getZ(), point2.getZ());
-        world = boundsWorld;
-        ArrayList<Point3I> vertices = new ArrayList<>(8);
-        vertices.add(new Point3I(minX, minY, minZ));
-        vertices.add(new Point3I(minX, maxY, minZ));
-        vertices.add(new Point3I(minX, minY, maxZ));
-        vertices.add(new Point3I(minX, maxY, maxZ));
-        vertices.add(new Point3I(maxX, minY, minZ));
-        vertices.add(new Point3I(maxX, maxY, minZ));
-        vertices.add(new Point3I(maxX, minY, maxZ));
-        vertices.add(new Point3I(maxX, maxY, maxZ));
-        growths = new HashMap<>();
-        geometry = new CuboidGeometry(vertices);
-    }
 
 
     @Override public int getMinX() {
@@ -150,6 +131,33 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
     }
 
     protected abstract BoundingArea generateFlattened();
+
+    public void initialize(JsonObject json) {
+        world = Bukkit.getWorld(UUID.fromString(json.get("world").getAsString()));
+        JsonObject point1Info = json.get("point1").getAsJsonObject();
+        JsonObject point2Info = json.get("point2").getAsJsonObject();
+        Point3I point1 = new Point3I(point1Info.get("x").getAsInt(), point1Info.get("y").getAsInt
+            (), point1Info.get("z").getAsInt());
+        Point3I point2 = new Point3I(point2Info.get("x").getAsInt(), point2Info.get("y").getAsInt
+            (), point2Info.get("z").getAsInt());
+        minX = Math.min(point1.getX(), point2.getX());
+        maxX = Math.max(point1.getX(), point2.getX());
+        minY = Math.min(point1.getY(), point2.getY());
+        maxY = Math.max(point1.getY(), point2.getY());
+        minZ = Math.min(point1.getZ(), point2.getZ());
+        maxZ = Math.max(point1.getZ(), point2.getZ());
+        ArrayList<Point3I> vertices = new ArrayList<>(8);
+        vertices.add(new Point3I(minX, minY, minZ));
+        vertices.add(new Point3I(minX, maxY, minZ));
+        vertices.add(new Point3I(minX, minY, maxZ));
+        vertices.add(new Point3I(minX, maxY, maxZ));
+        vertices.add(new Point3I(maxX, minY, minZ));
+        vertices.add(new Point3I(maxX, maxY, minZ));
+        vertices.add(new Point3I(maxX, minY, maxZ));
+        vertices.add(new Point3I(maxX, maxY, maxZ));
+        growths = new HashMap<>();
+        geometry = new CuboidGeometry(vertices);
+    }
 
     private class CuboidGeometry implements Geometry {
 

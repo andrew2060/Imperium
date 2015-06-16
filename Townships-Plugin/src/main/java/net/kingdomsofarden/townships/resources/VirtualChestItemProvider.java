@@ -8,10 +8,17 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 public class VirtualChestItemProvider implements ItemProvider {
 
     protected Inventory inventory;
+    private String name;
+
+    public VirtualChestItemProvider(UUID enderChestUid) {
+        name = enderChestUid.toString();
+        // TODO
+    }
 
     @Override public int getAmount(Material mat) {
         if (inventory == null) {
@@ -59,4 +66,7 @@ public class VirtualChestItemProvider implements ItemProvider {
         return max - rem;
     }
 
+    @Override public String getIdentifier() {
+        return null;
+    }
 }
