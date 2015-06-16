@@ -100,8 +100,19 @@ public interface Region {
      */
     String getType();
 
+    /**
+     * Adds the given {@link RoleGroup} to the given {@link Citizen} for this Region
+     * @param citizen The citizen
+     * @param group The rolegroup to add
+     */
     void addRole(Citizen citizen, RoleGroup group);
 
+    /**
+     * Removes the given {@link RoleGroup} from the given {@link Citizen} for this Region
+     * @param citizen The citizen
+     * @param group The role group to remove
+     * @return Whether anything was actually removed (false if the citizen never had that role)
+     */
     boolean removeRole(Citizen citizen, RoleGroup group);
 
     /**
@@ -176,10 +187,10 @@ public interface Region {
     boolean removeAccess(UUID uid, AccessType access);
 
     /**
-     * @param player The player to check
+     * @param citizen The player to check
      * @return Whether the given Citizen is a Citizen of this (super) region
      */
-    boolean isCitizen(Citizen player);
+    boolean isCitizen(Citizen citizen);
 
     Collection<Citizen> getCitizens();
 

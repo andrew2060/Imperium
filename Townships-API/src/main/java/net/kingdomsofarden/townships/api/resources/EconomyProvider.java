@@ -4,8 +4,6 @@ public interface EconomyProvider extends ResourceProvider {
 
     public static final String TREASURY = "TREASURY";
 
-    String getIdentifier();
-
     boolean withdraw(double amount);
 
     double getBalance();

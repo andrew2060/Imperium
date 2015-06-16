@@ -35,7 +35,7 @@ public class RegionBlockCheckTask implements Runnable {
             throw new IllegalStateException(
                 "Supplied region does not have a corresponding type configuration!");
         }
-        reqs = new HashMap<Material, Integer>();
+        reqs = new HashMap<>();
         StoredDataSection requirements = data.getSection("requirements");
         StoredDataSection blockReqSection = requirements.getSection("block-requirements");
         for (String matName : blockReqSection.getKeys(false)) {
@@ -50,13 +50,13 @@ public class RegionBlockCheckTask implements Runnable {
             }
         }
         this.region = region;
-        this.processQueue = new LinkedHashSet<Material>();
+        this.processQueue = new LinkedHashSet<>();
     }
 
     @Override public void run() {
         scheduled = false;
         if (region.isValid()) { // If invalid, assume pending removal anyways
-            Map<Material, Integer> amounts = new HashMap<Material, Integer>();
+            Map<Material, Integer> amounts = new HashMap<>();
             for (Material mat : processQueue) {
                 amounts.put(mat, reqs.get(mat));
             }

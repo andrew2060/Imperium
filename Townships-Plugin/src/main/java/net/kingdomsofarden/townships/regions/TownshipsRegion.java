@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class TownshipsRegion implements Region {
 
@@ -57,13 +58,14 @@ public class TownshipsRegion implements Region {
     private TreeSet<Region> parents;
     private TreeSet<Region> children;
 
-    private EconomyProvider[] economyProviders;
-    private ItemProvider[] itemProviders;
+    private Map<String, EconomyProvider> economyProviders;
+    private Map<String, ItemProvider> itemProviders;
 
     private boolean valid;
     private Map<String, Object> metadata;
     private Map<Region, RelationState> relations;
     private Map<Region, RelationState> externRelations;
+    private Set<Citizen> citizens;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -150,8 +152,8 @@ public class TownshipsRegion implements Region {
             int arg = maxTierReqSection.get(tierNum, intSerializer, 0);
             maxTierInRegion.put(tier, arg);
         }
-        economyProviders = new EconomyProvider[0];
-        itemProviders = new ItemProvider[0];
+        economyProviders = new HashMap<>();
+        itemProviders = new HashMap<>();
         if (((ConfigurationSection) requirements.getBackingImplementation())
             .contains("block-requirements")) {
             metadata.put(MetaKeys.REQUIREMENT_BLOCK,
@@ -163,8 +165,8 @@ public class TownshipsRegion implements Region {
             metadata.put(MetaKeys.REQUIREMENT_BLOCK,
                 new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
-        relations = new HashMap<Region, RelationState>();
-        externRelations = new HashMap<Region, RelationState>();
+        relations = new HashMap<>();
+        externRelations = new HashMap<>();
         StoredDataSection diplomacy = config.getSection("diplomacy");
         StoredDataSection selfDiplomacy = diplomacy.getSection("self");
         StoredDataSection externDiplomacy = diplomacy.getSection("others");
@@ -186,6 +188,7 @@ public class TownshipsRegion implements Region {
             }
             externRelations.put(r, state);
         }
+        // TODO citizens
     }
 
     @Override public int getTier() {
@@ -258,10 +261,8 @@ public class TownshipsRegion implements Region {
         data.set("position-2", pos2, new LocationSerializer());
         StoredDataSection roleSection = data.getSection("roles");
         for (RoleGroup group : citizenUidsByRole.keySet()) {
-            List<String> toAdd = new LinkedList<String>();
-            for (UUID uid : citizenUidsByRole.get(group)) {
-                toAdd.add(uid + "");
-            }
+            List<String> toAdd = citizenUidsByRole.get(group).stream().map(UUID::toString)
+                .collect(Collectors.toCollection(LinkedList::new));
             roleSection.set(group.toString(), toAdd);
         }
         StoredDataSection meta = data.getSection("metadata");
@@ -356,66 +357,26 @@ public class TownshipsRegion implements Region {
     }
 
     @Override public void addEconomyProvider(EconomyProvider provider) {
-        economyProviders = Arrays.copyOf(economyProviders, economyProviders.length + 1);
-        economyProviders[economyProviders.length - 1] = provider;
-        int i = economyProviders.length - 2;
-        while (i > 0) {
-            if (provider.getPriority() > economyProviders[i].getPriority()) {
-                economyProviders[i + 1] = economyProviders[i];
-                economyProviders[i] = provider;
-                i--;
-            } else {
-                break;
-            }
-        }
+        economyProviders.put(provider.getIdentifier(), provider);
     }
 
     @Override public void addItemProvider(ItemProvider provider) {
-        itemProviders = Arrays.copyOf(itemProviders, itemProviders.length + 1);
-        itemProviders[itemProviders.length - 1] = provider;
-        int i = itemProviders.length - 2;
-        while (i > 0) {
-            if (provider.getPriority() > itemProviders[i].getPriority()) {
-                itemProviders[i + 1] = itemProviders[i];
-                itemProviders[i] = provider;
-                i--;
-            } else {
-                break;
-            }
-        }
+        itemProviders.put(provider.getIdentifier(), provider);
     }
 
     @Override public void removeEconomyProvider(EconomyProvider provider) {
-        EconomyProvider[] temp = new EconomyProvider[economyProviders.length - 1];
-        for (int i = 0, offset = 0; i < economyProviders.length; i++) {
-            if (economyProviders[i].equals(provider)) {
-                offset++;
-            } else {
-                temp[i - offset] = economyProviders[i];
-            }
-            economyProviders[i] = null;
-        }
-        economyProviders = temp;
+        economyProviders.remove(provider.getIdentifier());
     }
 
     @Override public void removeItemProvider(ItemProvider provider) {
-        ItemProvider[] temp = new ItemProvider[itemProviders.length - 1];
-        for (int i = 0, offset = 0; i < itemProviders.length; i++) {
-            if (itemProviders[i].equals(provider)) {
-                offset++;
-            } else {
-                temp[i - offset] = itemProviders[i];
-            }
-            itemProviders[i] = null;
-        }
-        itemProviders = temp;
+itemProviders.remove(provider.getIdentifier());
     }
 
-    @Override public EconomyProvider[] getEconomyProviders() {
+    @Override public Map<String, EconomyProvider> getEconomyProviders() {
         return economyProviders;
     }
 
-    @Override public ItemProvider[] getItemProviders() {
+    @Override public Map<String, ItemProvider> getItemProviders() {
         return itemProviders;
     }
 
@@ -471,6 +432,14 @@ public class TownshipsRegion implements Region {
 
     @Override public boolean removeAccess(UUID uid, AccessType access) {
         return accessByCitizenUid.remove(uid, access);
+    }
+
+    @Override public boolean isCitizen(Citizen citizen) {
+        return citizens.contains(citizen);
+    }
+
+    @Override public Collection<Citizen> getCitizens() {
+        return null; // TODO
     }
 
     @Override public int hashCode() {

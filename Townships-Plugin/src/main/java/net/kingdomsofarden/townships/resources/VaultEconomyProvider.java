@@ -13,7 +13,6 @@ import java.util.UUID;
 public class VaultEconomyProvider implements EconomyProvider {
 
     private UUID accountUid;
-    private int priority;
     private String identifier;
 
     public VaultEconomyProvider(UUID accountUid, Region region, String identifier) {
