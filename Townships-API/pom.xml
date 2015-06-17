@@ -9,8 +9,7 @@
         <artifactId>Townships-Parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
-    <groupId>net.kingdomsofarden</groupId>
+    
     <artifactId>Townships-API</artifactId>
     <version>1.0-SNAPSHOT</version>
 
