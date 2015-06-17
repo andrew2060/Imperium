@@ -8,7 +8,7 @@ import java.util.Set;
  */
 public interface StoredDataSection {
 
-    static final String PATH_SEPARATOR = ".";
+    String PATH_SEPARATOR = ".";
 
     /**
      * @return The memory section that backs
@@ -85,5 +85,5 @@ public interface StoredDataSection {
      * @param object     The object to store
      * @param serializer The serializer to serialiaze the object with
      */
-    void set(String path, Object object, Serializer serializer);
+    <T> void set(String path, T object, Serializer<T> serializer);
 }

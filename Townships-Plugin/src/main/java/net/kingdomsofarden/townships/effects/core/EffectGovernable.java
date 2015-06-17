@@ -6,19 +6,26 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.events.BankEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
+import net.kingdomsofarden.townships.api.events.ProductionEvent;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
 import net.kingdomsofarden.townships.resources.VaultEconomyProvider;
 import net.kingdomsofarden.townships.util.Constants;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.Map;
+
+/**
+ * The governable effect grants the ability to conduct diplomacy and engage in/be captured
+ * through warfare, as well as capturing other governable regions. IN addition, governable grants
+ * access to demographics statistics
+ */
 public class EffectGovernable extends EffectPeriodic implements Listener {
-
-
 
     Stats curr;
     Stats last;
@@ -58,7 +65,7 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
     }
 
     @Override public void onInit(ITownshipsPlugin plugin) {
-
+        Bukkit.getPluginManager().registerEvents(this, plugin.getBackingImplementation());
     }
 
     @Override public long onTick(Region region, long time) {
@@ -135,11 +142,19 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onProduction(ProductionEvent event) {
+        Map<String, Integer> prod = event.getItemProduction();
+        final int[] i = {0};
+        prod.values().stream().forEach(v -> i[0] += v);
+        curr.prod += i[0];
+        curr.gnp += event.getEconProduction();
+    }
 
     class Stats {
         private int pop = 0;
         private int land = 0;
-        private int prod = 0; // TODO events for this
+        private int prod = 0;
 
         private double gnp = 0;
         private double exp = 0;

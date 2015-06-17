@@ -91,5 +91,5 @@ public abstract class RegionBoundCollection implements Area {
 
     public abstract Collection<RegionBoundingArea> getContainedBounds();
 
-    public abstract Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea bounds);
+    public abstract Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds);
 }

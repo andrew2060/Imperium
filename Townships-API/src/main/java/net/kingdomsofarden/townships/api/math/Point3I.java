@@ -1,5 +1,7 @@
 package net.kingdomsofarden.townships.api.math;
 
+import com.google.gson.JsonObject;
+
 public class Point3I {
     private int x;
     private int y;
@@ -9,6 +11,11 @@ public class Point3I {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public static Point3I fromJsonObject(JsonObject obj) {
+        return new Point3I(obj.get("x").getAsInt(), obj.get("y").getAsInt(),
+            obj.get("z").getAsInt());
     }
 
     public int getX() {
@@ -21,6 +28,14 @@ public class Point3I {
 
     public int getZ() {
         return z;
+    }
+
+    public JsonObject asJsonObject() {
+        JsonObject ret = new JsonObject();
+        ret.addProperty("x", x);
+        ret.addProperty("y", y);
+        ret.addProperty("z", z);
+        return ret;
     }
 
     @Override public int hashCode() {

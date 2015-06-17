@@ -136,11 +136,7 @@ public class EffectHeap {
         if (node.parent.value.getNextTick() > val) {
             swap(node, node.parent);
             percolateUp(node.parent);
-            return;
-        } else {
-            return;
         }
-
     }
 
     public EffectHeap getLeft() {

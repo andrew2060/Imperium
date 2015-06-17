@@ -31,21 +31,23 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     private double power;
     private double decay;
     private RegionBoundCollection boundsMap;
+    private RegionBoundCollection flattened;
     private int buffer;
     private World world;
     private Region region;
     private Region center;
     private Collection<Region> extensors;
-
     private Collection<Point3I> vertices;
-    // A map of region to its edges/colliding regions
-    private Map<Region, Map<Collection<Line3I>, Collection<Region>>> vectors;
 
     private Map<String, Collection<Region>> contents;
+    private RegionBoundingArea flattenedBounds;
 
-    public void add(Region region) { // TODO
+
+
+    public void add(Region region) {
         RegionBoundingArea grow = region.getBounds().grow(RegionBoundingArea.class, buffer);
         boundsMap.add(grow);
+        flattened.add((RegionBoundingArea) grow.flatten());
         // Remove existing vertices that intersect with what we are adding
         Iterator<Point3I> it = vertices.iterator();
         while (it.hasNext()) {
@@ -221,14 +223,14 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     }
 
     @Override public BoundingArea flatten() {
-        // TODO
-        return null;
+        return flattenedBounds;
     }
 
     @Override public void initialize(JsonObject json) {
         buffer = json.get("buffer").getAsInt();
         world = Bukkit.getWorld(UUID.fromString(json.get("world").getAsString()));
         boundsMap = new AxisBoundCollection(world, true);
+        flattened = new AxisBoundCollection(world, true);
         vertices = null;
         contents = new HashMap<>();
         region =
@@ -246,6 +248,25 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         decay = json.get("decay").getAsDouble();
         power = json.get("power").getAsDouble();
         new CompositionAggregationThread().run();
+        flattenedBounds = new WrappedDynamicBoundingArea();
+    }
+
+    @Override public JsonObject save() {
+        JsonObject ret = new JsonObject();
+        ret.addProperty("buffer", buffer);
+        ret.addProperty("world", world.getUID().toString());
+        ret.addProperty("region", region.getUid().toString());
+        ret.addProperty("center", center.getUid().toString());
+        JsonArray arr = new JsonArray();
+        int i = 0;
+        for (Region r : extensors) {
+            arr.set(i, new JsonPrimitive(r.getUid().toString()));
+            i++;
+        }
+        ret.add("extensors", arr);
+        ret.addProperty("decay", decay);
+        ret.addProperty("power", power);
+        return ret;
     }
 
     @Override public Region getRegion() {
@@ -266,19 +287,25 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
      */
     private class CompositionAggregationThread extends Thread {
         private Map<Region, Double> visited;
-        private Map<Region, CompositionWorkerThread> threadMap = new HashMap<>();
+        private Map<Region, CompositionWorkerThread> threadMap;
         private Set<Region> visitedNodes;
+
+        public CompositionAggregationThread() {
+            visited = new HashMap<>();
+            threadMap = new HashMap<>();
+            visitedNodes = new HashSet<>();
+        }
 
 
         @Override public void run() {
             boundsMap.clear();
             CompositionWorkerThread t = new CompositionWorkerThread(center);
             threadMap.put(center, t);      // Centerpoint worker
-            ThreadManager.getInstance().getRegionThreadPool().submit(t);
+            ThreadManager.getInstance().getThreadPool().submit(t);
             for (Region r : extensors) {
                 t = new CompositionWorkerThread(r);
                 threadMap.put(r, t);       // Extensor workers
-                ThreadManager.getInstance().getRegionThreadPool().submit(t);
+                ThreadManager.getInstance().getThreadPool().submit(t);
             }
             // Results aggregation via traversal of nodes recursively
             appendResults(center);
@@ -286,8 +313,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
             visited.keySet().forEach(RegionDynamicCompositeBoundingArea.this::add);
             extensors = visitedNodes;
             for (Map.Entry<Region, Double> entry : visited.entrySet()) {
-                entry.getKey().getRegionalMetadata(getRegion()).put(MetaKeys.MAX_POWER, entry
-                    .getValue());
+                entry.getKey().getRegionalMetadata(getRegion())
+                    .put(MetaKeys.MAX_POWER, entry.getValue());
             }
             // TODO check ownerships of source/extensors and individual added regions
         }
@@ -361,4 +388,85 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         }
     }
 
+
+    private class WrappedDynamicBoundingArea implements RegionBoundingArea {
+
+        @Override public Region getRegion() {
+            return region;
+        }
+
+        @Override public boolean isInBounds(Location loc) {
+            return flattened.isInBounds(loc);
+        }
+
+        @Override public boolean isInBounds(double x, double y, double z) {
+            return flattened.getBoundingBox().isInBounds(x, y, z);
+        }
+
+        @Override public boolean intersects(BoundingArea box) {
+            TreeSet<Region> ret = new TreeSet<Region>((o1, o2) -> {
+                int ret1 = o2.getTier() - o1.getTier();
+                if (ret1 == 0) {
+                    return o1.getUid().compareTo(o2.getUid());
+                } else {
+                    return ret1;
+                }
+            });
+            flattened.getIntersectingRegions(box, ret);
+            return !ret.isEmpty() && !box.encapsulates(this);
+        }
+
+        @Override public Geometry getBoundGeometry() {
+            // TODO
+            return null;
+        }
+
+        @Override public World getWorld() {
+            return world;
+        }
+
+        @Override public boolean encapsulates(BoundingArea other) {
+            for (Point3I vertex : other.getBoundGeometry().getVertices()) {
+                if (!flattened.isInBounds(
+                    new Location(other.getWorld(), vertex.getX(), vertex.getY(), vertex.getZ()))) {
+                    return false;
+                }
+            }
+            for (Point3I vertex : getBoundGeometry().getVertices()) {
+                if (!other.isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public int size2d() {
+            return flattened.getContentSurfaceArea();
+        }
+
+        @Override public int volume() {
+            return flattened.getContentVolume();
+        }
+
+        @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
+            return (T) RegionDynamicCompositeBoundingArea.this.grow(clazz, size).flatten();
+        }
+
+        @Override public BoundingArea flatten() {
+            return this;
+        }
+
+        @Override public void initialize(JsonObject json) {
+            // Do nothing
+        }
+
+        @Override public JsonObject save() {
+            // Do nothing
+            return null;
+        }
+    }
 }

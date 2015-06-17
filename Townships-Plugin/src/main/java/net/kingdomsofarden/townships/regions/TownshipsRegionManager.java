@@ -2,7 +2,6 @@ package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.TownshipsPlugin;
-import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -110,12 +109,11 @@ public class TownshipsRegionManager implements RegionManager {
         if (r == null) {
             return false;
         }
-        for (Effect effect : r.getEffects()) {
-            if (effect instanceof TickableEffect) {
+        r.getEffects().stream().filter(effect -> effect instanceof TickableEffect)
+            .forEach(effect -> {
                 plugin.getEffectManager().getEffectTaskManager()
                     .unschedule((TickableEffect) effect);
-            }
-        }
+            });
         UUID id = r.getUid();
         uidToRegion.remove(id);
         if (r.getName().isPresent()) {
@@ -234,7 +232,10 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override public Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds) {
-        return null;
+        RegionBoundCollection boundsTree = maps.get(bounds.getWorld().getUID());
+        return boundsTree == null ?
+            Collections.emptyList() :
+            boundsTree.getIntersectingBounds(bounds);
     }
 
     @Override public Optional<Region> get(String name) {

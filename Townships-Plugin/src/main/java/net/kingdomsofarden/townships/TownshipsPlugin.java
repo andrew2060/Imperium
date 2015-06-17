@@ -54,13 +54,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         // Do ASM Stuff with Vault
         try {
             InstrumentationManager.attachAgentToJVM(VaultTransactionAgent.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AttachNotSupportedException e) {
-            e.printStackTrace();
-        } catch (AgentLoadException e) {
-            e.printStackTrace();
-        } catch (AgentInitializationException e) {
+        } catch (IOException | AttachNotSupportedException | AgentInitializationException | AgentLoadException e) {
             e.printStackTrace();
         }
 

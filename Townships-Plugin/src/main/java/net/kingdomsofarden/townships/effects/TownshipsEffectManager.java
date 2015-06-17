@@ -38,7 +38,7 @@ public class TownshipsEffectManager implements EffectManager {
         loader = (URLClassLoader) plugin.getClass().getClassLoader();
         effectsDir = new File(plugin.getDataFolder(), EFFECTS_DIR);
         effectsDir.mkdir();
-        effects = new HashMap<String, Class<? extends Effect>>();
+        effects = new HashMap<>();
         taskManager = new EffectTaskManager(Constants.EFFECT_SPREAD_DELAY);
         loadEffects(effectsDir);
         loadCoreEffects();
@@ -59,26 +59,20 @@ public class TownshipsEffectManager implements EffectManager {
         if (effects.containsKey(name.toLowerCase())) {
             try {
                 Class<? extends Effect> clazz = effects.get(name.toLowerCase());
-                Constructor<? extends Effect> c = clazz.getConstructor(new Class[] {});
-                Effect e = c.newInstance(new Object[] {});
+                Constructor<? extends Effect> c = clazz.getConstructor();
+                Effect e = c.newInstance();
                 e.onLoad(plugin, loader, config);
                 return e;
-            } catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
+                return null;
             }
-            return null;
         } else {
             return null;
         }
     }
 
-    private void loadEffects(File effectsDir) {
+    @SuppressWarnings("unchecked") private void loadEffects(File effectsDir) {
         List<File> toLoad = new LinkedList<File>();
         for (final String fileName : effectsDir.list()) {
             toLoad.add(new File(effectsDir, fileName));
@@ -115,27 +109,18 @@ public class TownshipsEffectManager implements EffectManager {
                         (Class<? extends Effect>) Class.forName(mainClass);
                     // Make empty copy to get name
                     try {
-                        Effect e = (Effect) clazz.getConstructor(new Class[] {})
-                            .newInstance(new Object[] {});
+                        Effect e = clazz.getConstructor(new Class[] {})
+                            .newInstance();
                         effects.put(e.getName().toLowerCase(), clazz);
                     } catch (NoSuchMethodException e) {
                         plugin.getLogger().log(Level.SEVERE,
                             "Could not load " + mainClass + " all effects must " +
                                 "have an empty constructor");
-                        continue;
                     }
 
 
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (IOException | ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -145,9 +130,9 @@ public class TownshipsEffectManager implements EffectManager {
     private void addURL(URL url) throws IOException {
         try {
             Method method =
-                URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
+                URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
-            method.invoke(this.loader, new Object[] {url});
+            method.invoke(this.loader, url);
         } catch (Exception e) {
             throw new IOException("Error adding URL to ClassLoader", e);
         }

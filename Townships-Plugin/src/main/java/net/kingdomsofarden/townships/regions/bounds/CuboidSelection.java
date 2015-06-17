@@ -1,5 +1,6 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
+import com.google.gson.JsonObject;
 import net.kingdomsofarden.townships.api.math.*;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
@@ -198,6 +199,14 @@ public class CuboidSelection implements CuboidBoundingBox {
 
     @Override public BoundingArea flatten() {
         throw new UnsupportedOperationException("Selections can't be flattened!");
+    }
+
+    @Override public void initialize(JsonObject json) {
+        // Not used
+    }
+
+    @Override public JsonObject save() {
+        return null; // Not used
     }
 
     private class CuboidGeometry implements Geometry {

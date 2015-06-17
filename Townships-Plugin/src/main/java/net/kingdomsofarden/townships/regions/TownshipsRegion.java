@@ -20,7 +20,6 @@ import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.tasks.RegionBlockCheckTask;
 import net.kingdomsofarden.townships.tasks.RegionSubregionCheckTask;
-import net.kingdomsofarden.townships.util.LocationSerializer;
 import net.kingdomsofarden.townships.util.MetaKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class TownshipsRegion implements Region {
+
 
     private UUID regionUid;
     private String name;
@@ -46,6 +46,8 @@ public class TownshipsRegion implements Region {
     private Map<Integer, Integer> maxTierInRegion;
 
     private Map<String, Effect> effects;
+
+    private Map<UUID, Double> standings;
 
     private RegionBoundingArea bounds;
 
@@ -63,7 +65,7 @@ public class TownshipsRegion implements Region {
     private Map<UUID, Map<String, Object>> regionMetadata;
     private Map<Region, RelationState> relations;
     private Map<Region, RelationState> externRelations;
-    private Set<Citizen> citizens;
+    private Set<UUID> citizens;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -76,6 +78,9 @@ public class TownshipsRegion implements Region {
         maxTypeInRegion = new HashMap<>();
         maxTierInRegion = new HashMap<>();
         metadata = new HashMap<>();
+        regionMetadata = new HashMap<>();
+        economyProviders = new HashMap<>();
+        itemProviders = new HashMap<>();
         Comparator<Region> regionComparator = (o1, o2) -> {
             int ret = o2.getTier() - o1.getTier();
             if (ret == 0) {
@@ -102,16 +107,15 @@ public class TownshipsRegion implements Region {
         tier = config.get("tier", intSerializer, -1);
         Class<? extends RegionBoundingArea> boundsClazz;
         try {
-            boundsClazz =
-                (Class<? extends RegionBoundingArea>) Class.forName(config.get
-                    ("region-bounds-class", "net.kingdomsofarden.townships.regions.bounds"
-                        + ".RegionAxisAlignedBoundingBox"));
+            boundsClazz = (Class<? extends RegionBoundingArea>) Class.forName(config
+                .get("region-bounds-class", "net.kingdomsofarden.townships.regions.bounds"
+                    + ".RegionAxisAlignedBoundingBox"));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return;
         }
-        JsonObject boundsSettings = new JsonParser().parse(config.get("region-bounds-settings",
-            "{}")).getAsJsonObject();
+        JsonObject boundsSettings =
+            new JsonParser().parse(config.get("region-bounds-settings", "{}")).getAsJsonObject();
         try {
             bounds = boundsClazz.newInstance();
             bounds.initialize(boundsSettings);
@@ -137,11 +141,16 @@ public class TownshipsRegion implements Region {
         for (String key : meta.getKeys(false)) {
             metadata.put(key, meta.<ConfigurationSection>getBackingImplementation().get(key));
         }
-        StoredDataSection effectSection = config.getSection("effects");
-        for (String eName : effectSection.getKeys(false)) {
-            Effect e = Townships.getEffectManager()
-                .loadEffect(eName, this, effectSection.getSection(eName));
-            effects.put(eName.toLowerCase(), e);
+        StoredDataSection regionalMeta = config.getSection("regional-metadata");
+        for (String key : regionalMeta.getKeys(false)) {
+            UUID regionUID = UUID.fromString(key);
+            StoredDataSection regionMeta = regionalMeta.getSection(key);
+            Map<String, Object> regionMetaEntry = new HashMap<>();
+            for (String mKey : regionMeta.getKeys(false)) {
+                regionMetaEntry.put(mKey,
+                    regionalMeta.<ConfigurationSection>getBackingImplementation().get(mKey));
+            }
+            regionMetadata.put(regionUID, regionMetaEntry);
         }
         StoredDataSection requirements = config.getSection("requirements");
         StoredDataSection maxRegionReqSection = requirements.getSection("region-types-max");
@@ -156,19 +165,6 @@ public class TownshipsRegion implements Region {
             int tier = Integer.parseInt(tierNum);
             int arg = maxTierReqSection.get(tierNum, intSerializer, 0);
             maxTierInRegion.put(tier, arg);
-        }
-        economyProviders = new HashMap<>();
-        itemProviders = new HashMap<>();
-        if (((ConfigurationSection) requirements.getBackingImplementation())
-            .contains("block-requirements")) {
-            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
-                new RegionBlockCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
-        }
-        if (((ConfigurationSection) requirements.getBackingImplementation())
-            .contains("region-types-min") || ((ConfigurationSection) requirements
-            .getBackingImplementation()).contains("region-tiers-min")) {
-            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
-                new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
         }
         relations = new HashMap<>();
         externRelations = new HashMap<>();
@@ -193,7 +189,31 @@ public class TownshipsRegion implements Region {
             }
             externRelations.put(r, state);
         }
-        // TODO citizens, regional metadata
+        citizens = new HashSet<>();
+        config.getList("citizens").stream().forEach(s -> citizens.add(UUID.fromString(s)));
+        for (String entry : config.getList("standings")) {
+            String[] parsed = entry.split(" ");
+            UUID relUid = UUID.fromString(parsed[0]);
+            double rel = Double.valueOf(parsed[1]);
+            standings.put(relUid, rel);
+        }
+        StoredDataSection effectSection = config.getSection("effects");
+        for (String eName : effectSection.getKeys(false)) {
+            Effect e = Townships.getEffectManager()
+                .loadEffect(eName, this, effectSection.getSection(eName));
+            effects.put(eName.toLowerCase(), e);
+        }
+        if (((ConfigurationSection) requirements.getBackingImplementation())
+            .contains("block-requirements")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
+                new RegionBlockCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        }
+        if (((ConfigurationSection) requirements.getBackingImplementation())
+            .contains("region-types-min") || ((ConfigurationSection) requirements
+            .getBackingImplementation()).contains("region-tiers-min")) {
+            metadata.put(MetaKeys.REQUIREMENT_BLOCK,
+                new RegionSubregionCheckTask(this, (TownshipsPlugin) Townships.getInstance()));
+        }
     }
 
     @Override public int getTier() {
@@ -262,8 +282,9 @@ public class TownshipsRegion implements Region {
         data.set("name", name);
         data.set("type", type);
         data.set("tier", tier);
-        data.set("position-1", pos1, new LocationSerializer());
-        data.set("position-2", pos2, new LocationSerializer());
+        data.set("uid", regionUid.toString());
+        data.set("regions-bound-class", getBounds().getClass().getName());
+        data.set("regions-bound-settings", getBounds().save().toString());
         StoredDataSection roleSection = data.getSection("roles");
         for (RoleGroup group : citizenUidsByRole.keySet()) {
             List<String> toAdd = citizenUidsByRole.get(group).stream().map(UUID::toString)
@@ -374,7 +395,7 @@ public class TownshipsRegion implements Region {
     }
 
     @Override public void removeItemProvider(ItemProvider provider) {
-itemProviders.remove(provider.getIdentifier());
+        itemProviders.remove(provider.getIdentifier());
     }
 
     @Override public Map<String, EconomyProvider> getEconomyProviders() {
@@ -423,6 +444,13 @@ itemProviders.remove(provider.getIdentifier());
         return metadata;
     }
 
+    @Override public Map<UUID, Object> getCompositeMetaValue(String key) {
+        Map<UUID, Object> results = new HashMap<>();
+        regionMetadata.entrySet().stream().filter(e -> e.getValue().containsKey(key))
+            .forEach(e -> results.put(e.getKey(), e.getValue().get(key)));
+        return results;
+    }
+
     @Override public Map<String, Object> getRegionalMetadata(Region region) {
         return regionMetadata.getOrDefault(region.getUid(), new HashMap<>());
     }
@@ -444,11 +472,11 @@ itemProviders.remove(provider.getIdentifier());
     }
 
     @Override public boolean isCitizen(Citizen citizen) {
-        return citizens.contains(citizen);
+        return citizens.contains(citizen.getUid());
     }
 
-    @Override public Collection<Citizen> getCitizens() {
-        return null; // TODO
+    @Override public Collection<UUID> getCitizens() {
+        return citizens;
     }
 
     @Override public int hashCode() {

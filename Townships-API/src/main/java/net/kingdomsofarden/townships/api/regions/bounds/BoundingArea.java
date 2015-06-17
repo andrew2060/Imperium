@@ -87,4 +87,11 @@ public interface BoundingArea {
      */
     void initialize(JsonObject json);
 
+    /**
+     * Creates a Json Object rpepresenting the settings
+     * @return
+     */
+    JsonObject save();
+
+
 }

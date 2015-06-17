@@ -22,9 +22,9 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
     protected int minY;
     protected int minZ;
     protected World world;
-    private BoundingArea flatten = null;
-    private HashMap<Integer, BoundingArea> growths;
-    private Geometry geometry;
+    protected BoundingArea flatten = null;
+    protected HashMap<Integer, BoundingArea> growths;
+    protected Geometry geometry;
 
 
     @Override public int getMinX() {
@@ -101,7 +101,7 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
         return (maxZ - minZ) * (maxX - minX) * (maxY - minY);
     }
 
-    @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
+    @SuppressWarnings("unchecked") @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
         if (!CuboidBoundingBox.class.isAssignableFrom(clazz)) {
             throw new IllegalArgumentException("A " + clazz.getSimpleName() + " cannot be made from "
                 + "a cuboid bounding box!");
@@ -136,39 +136,43 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
         world = Bukkit.getWorld(UUID.fromString(json.get("world").getAsString()));
         JsonObject point1Info = json.get("point1").getAsJsonObject();
         JsonObject point2Info = json.get("point2").getAsJsonObject();
-        Point3I point1 = new Point3I(point1Info.get("x").getAsInt(), point1Info.get("y").getAsInt
-            (), point1Info.get("z").getAsInt());
-        Point3I point2 = new Point3I(point2Info.get("x").getAsInt(), point2Info.get("y").getAsInt
-            (), point2Info.get("z").getAsInt());
+        Point3I point1 = Point3I.fromJsonObject(point1Info);
+        Point3I point2 = Point3I.fromJsonObject(point2Info);
         minX = Math.min(point1.getX(), point2.getX());
         maxX = Math.max(point1.getX(), point2.getX());
         minY = Math.min(point1.getY(), point2.getY());
         maxY = Math.max(point1.getY(), point2.getY());
         minZ = Math.min(point1.getZ(), point2.getZ());
         maxZ = Math.max(point1.getZ(), point2.getZ());
-        ArrayList<Point3I> vertices = new ArrayList<>(8);
-        vertices.add(new Point3I(minX, minY, minZ));
-        vertices.add(new Point3I(minX, maxY, minZ));
-        vertices.add(new Point3I(minX, minY, maxZ));
-        vertices.add(new Point3I(minX, maxY, maxZ));
-        vertices.add(new Point3I(maxX, minY, minZ));
-        vertices.add(new Point3I(maxX, maxY, minZ));
-        vertices.add(new Point3I(maxX, minY, maxZ));
-        vertices.add(new Point3I(maxX, maxY, maxZ));
         growths = new HashMap<>();
-        geometry = new CuboidGeometry(vertices);
+        geometry = new CuboidGeometry();
     }
 
-    private class CuboidGeometry implements Geometry {
+    public JsonObject save() {
+        JsonObject ret = new JsonObject();
+        ret.addProperty("world", world.getUID().toString());
+        ret.add("point1", new Point3I(minX, minY, minZ).asJsonObject());
+        ret.add("point2", new Point3I(maxX, maxY, maxZ).asJsonObject());
+        return ret;
+    }
 
+    protected class CuboidGeometry implements Geometry {
         private ArrayList<Point3I> vertices;
         private HashMap<Point3I, Collection<Line3I>> edges;
         private HashSet<Line3I> edgesUnique;
         private HashSet<Face> faces;
         private ArrayList<Rectangle> rectangle;
 
-        private CuboidGeometry(ArrayList<Point3I> vertices) {
-            this.vertices = vertices; // 0 and 7 indexes are beginning and end points respectively
+        protected CuboidGeometry() {
+            this.vertices = new ArrayList<>(8);
+            this.vertices.add(new Point3I(minX, minY, minZ));
+            this.vertices.add(new Point3I(minX, maxY, minZ));
+            this.vertices.add(new Point3I(minX, minY, maxZ));
+            this.vertices.add(new Point3I(minX, maxY, maxZ));
+            this.vertices.add(new Point3I(maxX, minY, minZ));
+            this.vertices.add(new Point3I(maxX, maxY, minZ));
+            this.vertices.add(new Point3I(maxX, minY, maxZ));
+            this.vertices.add(new Point3I(maxX, maxY, maxZ));
             Rectangle rect = new Rectangle(new Point3I(minX, minY, minZ), new Point3I(maxX, minY,
                 maxZ));
             this.rectangle = new ArrayList<>(1);
@@ -236,16 +240,6 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
                             if ((intersect.equals(edge.getPoint1()) || intersect.equals(edge
                                 .getPoint2())) && (intersect.equals(edge2.getPoint1()) ||
                                 intersect.equals(edge2.getPoint2()))) {
-                                int val = edge.getAxisOfTravel().asIntValue() + edge2
-                                    .getAxisOfTravel()
-                                    .asIntValue();
-                                Axis remainder = Axis.fromIntValue(6 - val);
-                                Axis axis1 = edge.getAxisOfTravel();
-                                int value1 = axis1 == Axis.X ? edge2.getPoint1().getX() : axis1
-                                    == Axis.Z ? edge2.getPoint1().getZ() : edge2.getPoint1().getY();
-                                Axis axis2 = edge2.getAxisOfTravel();
-                                int value2 = axis2 == Axis.X ? edge.getPoint1().getX() : axis2
-                                    == Axis.Z ? edge.getPoint1().getZ() : edge.getPoint1().getY();
                                 Face f = new Face(edge, edge2);
                                 faces.add(f);
                             }

@@ -8,11 +8,9 @@ import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.Material;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public abstract class EffectPeriodicCost extends EffectPeriodic {
 
@@ -21,7 +19,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
     private Map<Material, Integer> resources;
 
     @Override public long onTick(Region region, long time) {
-        EconomyProvider[] econProviders = region.getEconomyProviders();
+        Collection<EconomyProvider> econProviders = region.getEconomyProviders().values();
         if (cost > 0) {
             double amt = cost;
             for (EconomyProvider provider : econProviders) {
@@ -54,7 +52,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
                 }
             }
         }
-        ItemProvider[] itemProviders = region.getItemProviders();
+        Collection<ItemProvider> itemProviders = region.getItemProviders().values();
         if (!resources.isEmpty()) {
             boolean hasAll = true;
             for (Entry<Material, Integer> entry : resources.entrySet()) {
@@ -115,7 +113,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
     @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         StoredDataSection subSection = data.getSection("cost");
-        resources = new HashMap<Material, Integer>();
+        resources = new HashMap<>();
         for (String entry : subSection.getList("resources")) {
             String[] parse = entry.split(" ");
             try {
@@ -144,10 +142,9 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
             subSection.set("money", cost);
         }
         if (!resources.isEmpty()) {
-            List<String> save = new LinkedList<String>();
-            for (Entry<Material, Integer> e : resources.entrySet()) {
-                save.add(e.getKey().name() + " " + e.getValue());
-            }
+            List<String> save =
+                resources.entrySet().stream().map(e -> e.getKey().name() + " " + e.getValue())
+                    .collect(Collectors.toCollection(LinkedList::new));
             subSection.set("resources", save);
         }
     }

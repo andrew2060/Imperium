@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class YAMLDataSection implements StoredDataSection {
     protected ConfigurationSection backing;
@@ -15,8 +16,8 @@ public class YAMLDataSection implements StoredDataSection {
         this.backing = section;
     }
 
-    @Override public Object getBackingImplementation() {
-        return backing;
+    @SuppressWarnings("unchecked") @Override public <T> T getBackingImplementation() {
+        return (T) backing;
     }
 
     @Override public String getCurrentPath() {
@@ -41,19 +42,13 @@ public class YAMLDataSection implements StoredDataSection {
     }
 
     @Override public List<String> getList(String path) {
-        List<String> ret = new LinkedList<String>();
-        for (Object o : backing.getList(path)) {
-            ret.add((String) o);
-        }
-        return ret;
+        return backing.getList(path).stream().map(o -> (String) o)
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override public <T> List<T> getList(String path, Serializer<T> deserializer) {
-        List<T> ret = new LinkedList<T>();
-        for (String o : backing.getStringList(path)) {
-            ret.add(deserializer.deserialize(o));
-        }
-        return ret;
+        return backing.getStringList(path).stream().map(deserializer::deserialize)
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Override public Set<String> getKeys(boolean deep) {
@@ -64,7 +59,7 @@ public class YAMLDataSection implements StoredDataSection {
         backing.set(path, object);
     }
 
-    @Override public void set(String path, Object obj, Serializer serializer) {
+    @Override public <T> void set(String path, T obj, Serializer<T> serializer) {
         backing.set(path, serializer.serialize(obj));
     }
 }

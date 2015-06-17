@@ -184,6 +184,12 @@ public interface Region {
     Map<String, Object> getMetadata();
 
     /**
+     * @param key The metadata key to look for
+     * @return A mapping of region uids->values for the specified key across all regional metadata
+     */
+    Map<UUID, Object> getCompositeMetaValue(String key);
+
+    /**
      * Retrieves a metadata mapping for this region that is associated with the supplied region
      * @param region The region to check for
      * @return A mapping of metadata values currently associated with the region by the supplied
@@ -206,6 +212,6 @@ public interface Region {
      */
     boolean isCitizen(Citizen citizen);
 
-    Collection<Citizen> getCitizens();
+    Collection<UUID> getCitizens();
 
 }

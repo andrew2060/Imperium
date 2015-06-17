@@ -189,7 +189,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     @Override
-    public Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea bounds) {
+    public Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds) {
         return null;
     }
 

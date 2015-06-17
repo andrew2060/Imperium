@@ -223,8 +223,8 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return null; // TODO
     }
 
-    @Override public Collection<RegionBoundingArea> getIntersectingBounds(RegionBoundingArea b) {
-        HashSet<RegionBoundingArea> coll = new HashSet<RegionBoundingArea>();
+    @Override public Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea b) {
+        HashSet<RegionBoundingArea> coll = new HashSet<>();
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -271,9 +271,8 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    private void getIntersections(RegionBoundingArea b, int i, boolean negative,
-        Set<RegionBoundingArea>
-        add) {
+    private void getIntersections(BoundingArea b, int i, boolean negative,
+        Set<RegionBoundingArea> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         if (coll[i] != null) {
             add.addAll(coll[i].getIntersectingBounds(b));
@@ -476,7 +475,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
                 positiveAxis[i] = null;
             }
         }
-            for (int i = 0; i < negativeAxis.length; i++) {
+        for (int i = 0; i < negativeAxis.length; i++) {
             if (negativeAxis[i] != null) {
                 negativeAxis[i].clear();
                 negativeAxis[i] = null;

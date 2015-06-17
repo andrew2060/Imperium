@@ -1,9 +1,11 @@
 package net.kingdomsofarden.townships.listeners;
 
 import com.google.common.base.Optional;
+import com.google.gson.JsonObject;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.characters.CitizenManager;
+import net.kingdomsofarden.townships.api.math.Point3I;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
@@ -66,11 +68,20 @@ public class RegionalUpdateListenerTest {
                     int modifyZ = rand.nextInt(10) + 1;
                     Location pos1 = genCenter.clone().add(modifyX, 5, modifyZ);
                     Location pos2 = genCenter.clone().subtract(modifyX, 5, modifyZ);
-                    RegionAxisAlignedBoundingBox bounds =
-                        new RegionAxisAlignedBoundingBox(r, pos1, pos2);
-                    when(r.getBounds()).thenReturn(bounds);
+                    Point3I point1 =
+                        new Point3I(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ());
+                    Point3I point2 =
+                        new Point3I(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ());
                     when(r.getName()).thenReturn(Optional.<String>absent());
                     when(r.getUid()).thenReturn(UUID.randomUUID());
+                    RegionAxisAlignedBoundingBox bounds = new RegionAxisAlignedBoundingBox();
+                    JsonObject init = new JsonObject();
+                    init.add("point1", point1.asJsonObject());
+                    init.add("point2", point2.asJsonObject());
+                    init.addProperty("region", r.getUid().toString());
+                    init.addProperty("world",wId.toString());
+                    bounds.initialize(init);
+                    when(r.getBounds()).thenReturn(bounds);
                     rMan.add(r);
                 }
             }
