@@ -158,8 +158,8 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
 
     protected class CuboidGeometry implements Geometry {
         private ArrayList<Point3I> vertices;
-        private HashMap<Point3I, Collection<Line3I>> edges;
-        private HashSet<Line3I> edgesUnique;
+        private HashMap<Point3I, Collection<Segment3I>> edges;
+        private HashSet<Segment3I> edgesUnique;
         private HashSet<Face> faces;
         private ArrayList<Rectangle> rectangle;
 
@@ -185,14 +185,14 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
             return vertices;
         }
 
-        @Override public Collection<Line3I> getEdges(Point3I vertex) {
+        @Override public Collection<Segment3I> getEdges(Point3I vertex) {
             if (edges == null) {
                 getAllEdges();
             }
-            return edges.containsKey(vertex) ? edges.get(vertex) : Collections.<Line3I>emptyList();
+            return edges.containsKey(vertex) ? edges.get(vertex) : Collections.<Segment3I>emptyList();
         }
 
-        @Override public Collection<Line3I> getAllEdges() {
+        @Override public Collection<Segment3I> getAllEdges() {
             if (edgesUnique == null) {
                 edges = new HashMap<>();
                 edgesUnique = new LinkedHashSet<>();
@@ -216,7 +216,7 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
                             shared++;
                         }
                         if (shared == 1) { // Single axis: is a line
-                            Line3I line = new Line3I(v, v2);
+                            Segment3I line = new Segment3I(v, v2);
                             edges.get(v).add(line);
                             edgesUnique.add(line);
                         }
@@ -233,8 +233,8 @@ public abstract class AbstractCuboidBoundingBox implements CuboidBoundingBox {
                     getAllEdges(); // Generate unique edges
                 }
                 // TODO: Also needs something not O(n^2), also relatively small (n=12)
-                for (Line3I edge : edgesUnique) {
-                    for (Line3I edge2 : edgesUnique) {
+                for (Segment3I edge : edgesUnique) {
+                    for (Segment3I edge2 : edgesUnique) {
                         Point3I intersect = edge.getIntersection(edge2);
                         if (intersect != null) {
                             if ((intersect.equals(edge.getPoint1()) || intersect.equals(edge

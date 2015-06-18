@@ -12,14 +12,14 @@ public interface Geometry {
     Collection<Point3I> getVertices();
 
     /**
-     * @return The edges associated with a given vertex, represented as {@link Line3I}
+     * @return The edges associated with a given vertex, represented as {@link Segment3I}
      */
-    Collection<Line3I> getEdges(Point3I vertex);
+    Collection<Segment3I> getEdges(Point3I vertex);
 
     /**
-     * @return All the edges within this geometry, represented as {@link Line3I}
+     * @return All the edges within this geometry, represented as {@link Segment3I}
      */
-    Collection<Line3I> getAllEdges();
+    Collection<Segment3I> getAllEdges();
 
     /**
      * @return The faces associated with this geometry

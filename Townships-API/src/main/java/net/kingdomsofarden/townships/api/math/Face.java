@@ -10,10 +10,10 @@ import java.util.LinkedHashSet;
  */
 public class Face {
     private Plane plane;
-    private Collection<Line3I> edges;
+    private Collection<Segment3I> edges;
     private Collection<Point3I> vertices;
 
-    public Face(Line3I edge1, Line3I edge2) {
+    public Face(Segment3I edge1, Segment3I edge2) {
         Axis a1 = edge1.getAxisOfTravel();
         Axis a2 = edge2.getAxisOfTravel();
         plane = new Plane(Axis.fromIntValue(6 - (a1.asIntValue() + a2.asIntValue())));
@@ -24,12 +24,12 @@ public class Face {
         if (a1 == a2) {
             if (isAxisAligned(edge1.getPoint1(), edge2.getPoint1()) && isAxisAligned(
                 edge1.getPoint2(), edge2.getPoint2())) {
-                edges.add(new Line3I(edge1.getPoint1(), edge2.getPoint1()));
-                edges.add(new Line3I(edge1.getPoint2(), edge2.getPoint2()));
+                edges.add(new Segment3I(edge1.getPoint1(), edge2.getPoint1()));
+                edges.add(new Segment3I(edge1.getPoint2(), edge2.getPoint2()));
             } else if (isAxisAligned(edge1.getPoint1(), edge2.getPoint2()) && isAxisAligned(
                 edge1.getPoint2(), edge2.getPoint1())) {
-                edges.add(new Line3I(edge1.getPoint1(), edge2.getPoint2()));
-                edges.add(new Line3I(edge1.getPoint2(), edge2.getPoint1()));
+                edges.add(new Segment3I(edge1.getPoint1(), edge2.getPoint2()));
+                edges.add(new Segment3I(edge1.getPoint2(), edge2.getPoint1()));
             } else {
                 throw new IllegalArgumentException(
                     "Supplied edges are parallel and not " + "axis-aligned to each other!");
@@ -60,8 +60,8 @@ public class Face {
             vertices.add(lastVertex);
             Point3I line1Other =
                 edge1.getPoint1().equals(common) ? edge1.getPoint2() : edge1.getPoint1();
-            edges.add(new Line3I(line1Other, lastVertex));
-            edges.add(new Line3I(other, lastVertex));
+            edges.add(new Segment3I(line1Other, lastVertex));
+            edges.add(new Segment3I(other, lastVertex));
         }
     }
 
@@ -87,7 +87,7 @@ public class Face {
         return vertices;
     }
 
-    public Collection<Line3I> getEdges() {
+    public Collection<Segment3I> getEdges() {
         return edges;
     }
 

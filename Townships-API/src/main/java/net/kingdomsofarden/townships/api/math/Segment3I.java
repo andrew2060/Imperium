@@ -6,11 +6,11 @@ import org.bukkit.util.Vector;
  * Represents a line segment between two {@link Point3I}, commonly used for bounding region edges.
  * Note that lines are limited to traveling on only one axis (axis-aligned)
  */
-public class Line3I {
-    private final Point3I point1;
-    private final Point3I point2;
+public class Segment3I {
+    protected Point3I point1;
+    protected Point3I point2;
 
-    public Line3I(Point3I point1, Point3I point2) { // Normalize by x > z > y
+    public Segment3I(Point3I point1, Point3I point2) { // Normalize by x > z > y
         if (point1.equals(point2)) {
             throw new IllegalArgumentException("Cannot create line between two same points!");
         }
@@ -50,7 +50,7 @@ public class Line3I {
      * @return A {@link Point3I} representing the intersection point between this line and other, or null if no such
      * intersection exists
      */
-    public Point3I getIntersection(Line3I other) {
+    public Point3I getIntersection(Segment3I other) {
         // Determine which coordinates are static since this specific case of lines only operates on 1 dimension
         Point3I other1 = other.getPoint1();
         Point3I other2 = other.getPoint2();
@@ -121,9 +121,8 @@ public class Line3I {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        Line3I line3I = (Line3I) o;
-
-        return point1.equals(line3I.point1) && point2.equals(line3I.point2);
+        Segment3I segment3I = (Segment3I) o;
+        return point1.equals(segment3I.point1) && point2.equals(segment3I.point2);
 
     }
 

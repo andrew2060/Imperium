@@ -9,4 +9,6 @@ public class MetaKeys {
 
     public static final String REQUIREMENT_BLOCK = "BLOCK_REQUIREMENT";
     public static final String REQUIREMENT_REGION = "REGION_REQUIREMENT";
+
+    public static final String OWNING_COMPOSITE_REGION = "OWNING_REGION";
 }

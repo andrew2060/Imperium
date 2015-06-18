@@ -6,9 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.kingdomsofarden.townships.ThreadManager;
 import net.kingdomsofarden.townships.api.Townships;
-import net.kingdomsofarden.townships.api.math.Geometry;
-import net.kingdomsofarden.townships.api.math.Line3I;
-import net.kingdomsofarden.townships.api.math.Point3I;
+import net.kingdomsofarden.townships.api.math.*;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CompositeBoundingArea;
@@ -24,7 +22,6 @@ import org.bukkit.World;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea {
 
@@ -38,9 +35,13 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     private Region center;
     private Collection<Region> extensors;
     private Collection<Point3I> vertices;
+    private Collection<Point3I> flattenedVertices;
+    private Map<Point3I, Segment3I> vertexToEdgeMap;
 
     private Map<String, Collection<Region>> contents;
     private RegionBoundingArea flattenedBounds;
+    private Geometry geometry;
+    private Geometry flattenedGeometry;
 
 
 
@@ -48,36 +49,77 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         RegionBoundingArea grow = region.getBounds().grow(RegionBoundingArea.class, buffer);
         boundsMap.add(grow);
         flattened.add((RegionBoundingArea) grow.flatten());
-        // Remove existing vertices that intersect with what we are adding
-        Iterator<Point3I> it = vertices.iterator();
-        while (it.hasNext()) {
-            Point3I next = it.next();
-            if (grow.isInBounds(next.getX(), next.getY(), next.getZ())) {
-                it.remove();
-            }
-        }
-        // Get vertices from our new addition that do not intersect with
-        // what we have already and add to our current vertices
-        vertices.addAll(grow.getBoundGeometry().getVertices().stream().filter(
-            vec -> boundsMap.getBoundingRegions(vec.getX(), vec.getY(), vec.getZ()).isEmpty())
-            .collect(Collectors.toList()));
-        // Readd intersections
-        for (RegionBoundingArea intersect : boundsMap.getIntersectingBounds(grow)) {
-            for (Line3I edge : intersect.getBoundGeometry().getAllEdges()) {
-                for (Line3I edge2 : grow.getBoundGeometry().getAllEdges()) {
-                    Point3I add;
-                    if ((add = edge.getIntersection(edge2)) != null) {
-                        vertices.add(add);
-                    }
-                }
-            }
-        }
-
+        vertices.addAll(grow.getBoundGeometry().getVertices());
+        flattenedVertices.addAll(grow.flatten().getBoundGeometry().getVertices());
+        // TODO edges, faces
     }
 
-    public void remove(Region region) {
-        boundsMap.remove(region.getBounds().grow(RegionBoundingArea.class, buffer));
-        // TODO: recalculate geometries
+    @SuppressWarnings("SuspiciousMethodCalls") public void remove(Region region) {
+        RegionBoundingArea grown = region.getBounds().grow(RegionBoundingArea.class, buffer);
+        boundsMap.remove(grown);
+        grown.getBoundGeometry().getVertices().stream().forEach(vertices::remove);
+        grown.flatten().getBoundGeometry().getVertices().stream()
+            .forEach(flattenedVertices::remove);
+        recalculatePower(boundsMap.getIntersectingBounds(grown));
+    }
+
+
+    // Check neighboring bounds, determine if power changed
+    private void recalculatePower(Collection<RegionBoundingArea> boundingAreas) {
+        LinkedList<RegionBoundingArea> processing = new LinkedList<>(boundingAreas);
+        Collections.sort(processing, (o1, o2) -> (int) (
+            (double) o2.getRegion().getRegionalMetadata(region)
+                .getOrDefault(MetaKeys.MAX_POWER, 0.00) - (double) o1.getRegion()
+                .getRegionalMetadata(region).getOrDefault(MetaKeys.MAX_POWER, 0.00)));
+        RegionBoundingArea bounds;
+        while ((bounds = processing.poll()) != null) {
+            recalculatePower(bounds, processing);
+        }
+    }
+
+    private void recalculatePower(RegionBoundingArea rb, LinkedList<RegionBoundingArea> process) {
+        double maxPow = 0.00;
+        for (RegionBoundingArea bound : boundsMap.getIntersectingBounds(rb)) {
+            double pow =
+                (double) bound.getRegion().getRegionalMetadata(getRegion()).get(MetaKeys.MAX_POWER);
+            if (pow > maxPow) {
+                maxPow = pow;
+            }
+        }
+        double currPower =
+            (double) rb.getRegion().getRegionalMetadata(region).get(MetaKeys.MAX_POWER);
+        double newMax = maxPow - decay;
+        if (newMax != currPower) {
+            // No path to this node anymore
+            if (newMax <= 0.00) {
+                rb.getRegion().getRegionalMetadata(region).remove(MetaKeys.MAX_POWER);
+                boundsMap.remove(rb.getRegion());
+            } else {
+                // Shorter route to this node (should never happen(?))
+                // or longer route to this node
+                rb.getRegion().getRegionalMetadata(region).put(MetaKeys.MAX_POWER, newMax);
+            }
+            // Either way, recalculate children
+            final boolean[] changed = new boolean[] {false};
+            double comp = Math.max(newMax, currPower);
+            boundsMap.getIntersectingBounds(rb).stream().forEach(b -> {
+                if (!process.contains(b)
+                    && (double) b.getRegion().getRegionalMetadata(region).get(MetaKeys.MAX_POWER)
+                    < comp) { // Is a child that isn't already being
+                    // processed
+                    changed[0] = true;
+                    process.add(b);
+                }
+            });
+            if (changed[0]) { // Backing processing list is changed, resort by max power descending
+                Collections.sort(process, (o1, o2) -> (int) (
+                    (double) o2.getRegion().getRegionalMetadata(region)
+                        .getOrDefault(MetaKeys.MAX_POWER, 0.00) - (double) o1.getRegion()
+                        .getRegionalMetadata(region).getOrDefault(MetaKeys.MAX_POWER, 0.00)));
+            }
+        }
+        // Otherwise, short circuit as we just found a new route that doesn't change our max
+        // power to this node
     }
 
     @Override public boolean isInBounds(Location loc) {
@@ -102,51 +144,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     }
 
     @Override public Geometry getBoundGeometry() {
-        // TODO
-        return null;
+        return geometry;
     }
-    //
-    //    @Override public Collection<Point3I> getVertices() {
-    //        if (!vectorCacheValid) {
-    //            HashMap<Region, Collection<Point3I>> vertexConstruction =
-    //                new HashMap<Region, Collection<Point3I>>();
-    //            for (RegionBoundingArea b : boundsMap.getContainedBounds()) {
-    //                vertexConstruction.put(b.getRegion(), b.getVertices());
-    //            }
-    //            // Remove intersections
-    //            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
-    //                Iterator<Point3I> i = e.getValue().iterator();
-    //                while (i.hasNext()) {
-    //                    Point3I vertex = i.next();
-    //                    TreeSet<Region> bounds =
-    //                        boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
-    //                    bounds.remove(e.getKey());
-    //                    if (!bounds.isEmpty()) { // Intersects with something else, can't be a vertex
-    //                        i.remove();
-    //                    }
-    //                }
-    //            }
-    //            Collection<Point3I> intersections = buildIntersections();
-    //            Iterator<Point3I> i = intersections.iterator();
-    //            while (i.hasNext()) {
-    //                Point3I vertex = i.next();
-    //                TreeSet<Region> bounds =
-    //                    boundsMap.getBoundingRegions(vertex.getX(), vertex.getY(), vertex.getZ());
-    //                if (bounds.size() != 1) { // Intersects with something else, can't be a vertex
-    //                    i.remove();
-    //                }
-    //            }
-    //            // Create composite vertex collection
-    //            Collection<Point3I> ret = new LinkedList<Point3I>();
-    //            for (Entry<Region, Collection<Point3I>> e : vertexConstruction.entrySet()) {
-    //                ret.addAll(e.getValue());
-    //            }
-    //            ret.addAll(intersections);
-    //            vectorCacheValid = true;
-    //            vertices = ret;
-    //        }
-    //        return vertices;
-    //    }
 
     @Override public World getWorld() {
         return world;
@@ -173,27 +172,6 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
                 + " performance reasons");
     }
 
-    //    public Collection<Point3I> buildIntersections() {
-    //        Set<Point3I> intersections = new HashSet<Point3I>();
-    //        for (Entry<Region, Map<Collection<Line3I>, Collection<Region>>> entry : vectors
-    //            .entrySet()) {
-    //            for (Entry<Collection<Line3I>, Collection<Region>> e : entry.getValue().entrySet()) {
-    //                for (Line3I line : e.getKey()) {
-    //                    for (Region region : e.getValue()) {
-    //                        for (Line3I line2 : region.getBounds().grow(BoundingArea.class,
-    //                            buffer).getBoundGeometry().getEdges()) {
-    //                            Point3I intersect = line.getIntersection(line2);
-    //                            if (intersect != null) {
-    //                                intersections.add(intersect);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        return intersections;
-    //    }
-
     @Override public int size2d() {
         return boundsMap.getContentSurfaceArea();
     }
@@ -202,7 +180,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         return boundsMap.getContentVolume();
     }
 
-    @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
+    @SuppressWarnings("unchecked") @Override
+    public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
         T ret = (T) new RegionDynamicCompositeBoundingArea();
         JsonObject init = new JsonObject();
         init.add("buffer", new JsonPrimitive(buffer + size));
@@ -231,7 +210,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         world = Bukkit.getWorld(UUID.fromString(json.get("world").getAsString()));
         boundsMap = new AxisBoundCollection(world, true);
         flattened = new AxisBoundCollection(world, true);
-        vertices = null;
+        vertices = new ArrayList<>();
+        flattenedVertices = new ArrayList<>();
         contents = new HashMap<>();
         region =
             Townships.getRegions().get(UUID.fromString(json.get("region").getAsString())).orNull();
@@ -249,6 +229,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         power = json.get("power").getAsDouble();
         new CompositionAggregationThread().run();
         flattenedBounds = new WrappedDynamicBoundingArea();
+        geometry = new DynamicCompositeBoundingAreaGeometry();
+        flattenedGeometry = new DynamicCompositeBoundingAreaGeometry(true);
     }
 
     @Override public JsonObject save() {
@@ -417,8 +399,7 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         }
 
         @Override public Geometry getBoundGeometry() {
-            // TODO
-            return null;
+            return flattenedGeometry;
         }
 
         @Override public World getWorld() {
@@ -452,7 +433,8 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
             return flattened.getContentVolume();
         }
 
-        @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
+        @SuppressWarnings("unchecked") @Override
+        public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
             return (T) RegionDynamicCompositeBoundingArea.this.grow(clazz, size).flatten();
         }
 
@@ -467,6 +449,41 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         @Override public JsonObject save() {
             // Do nothing
             return null;
+        }
+    }
+
+
+    // TODO this is going to be a nightmare once it actually becomes necessary
+    public class DynamicCompositeBoundingAreaGeometry implements Geometry {
+
+        boolean flag;
+
+        public DynamicCompositeBoundingAreaGeometry() {
+            this(false);
+        }
+
+        public DynamicCompositeBoundingAreaGeometry(boolean flag) {
+            this.flag = flag;
+        }
+
+        @Override public Collection<Point3I> getVertices() {
+            return flag ? flattenedVertices : vertices;
+        }
+
+        @Override public Collection<Segment3I> getEdges(Point3I vertex) {
+            throw new UnsupportedOperationException("Not implemented yet!");
+        }
+
+        @Override public Collection<Segment3I> getAllEdges() {
+            throw new UnsupportedOperationException("Not implemented yet!");
+        }
+
+        @Override public Collection<Face> getFaces() {
+            throw new UnsupportedOperationException("Not implemented yet!");
+        }
+
+        @Override public Collection<Rectangle> getBaseRectangles() {
+            throw new UnsupportedOperationException("Not implemented yet!");
         }
     }
 }
