@@ -229,7 +229,7 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
         power = json.get("power").getAsDouble();
         new CompositionAggregationThread().run();
         flattenedBounds = new WrappedDynamicBoundingArea();
-        geometry = new DynamicCompositeBoundingAreaGeometry();
+        geometry = new DynamicCompositeBoundingAreaGeometry(false);
         flattenedGeometry = new DynamicCompositeBoundingAreaGeometry(true);
     }
 
@@ -453,7 +453,6 @@ public class RegionDynamicCompositeBoundingArea implements CompositeBoundingArea
     }
 
 
-    // TODO this is going to be a nightmare once it actually becomes necessary
     public class DynamicCompositeBoundingAreaGeometry implements Geometry {
 
         boolean flag;

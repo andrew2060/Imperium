@@ -212,6 +212,21 @@ public interface Region {
      */
     boolean isCitizen(Citizen citizen);
 
+    /**
+     * @return A collection of all citizens of this region, only has effect if this region is
+     * governable
+     */
     Collection<UUID> getCitizens();
+
+    /**
+     * @param amount The amount to update the regional power by
+     * @return Regional power after modification
+     */
+    double updatePower(double amount);
+
+    /**
+     * @return The maximal power that can be exerted by this region
+     */
+    double getMaxPower();
 
 }

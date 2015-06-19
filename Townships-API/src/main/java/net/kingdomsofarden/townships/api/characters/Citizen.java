@@ -7,6 +7,7 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 public interface Citizen {
@@ -37,4 +38,20 @@ public interface Citizen {
      * @return True if the citizen has access to and is currently in ROOT role/mode, which grants global access rights
      */
     boolean isRoot();
+
+    /**
+     * @return The region/government that citizen is a member of, or null
+     */
+    Region getCitizenRegion();
+
+    /**
+     * @return Regions that the citizen is currently in (used for region entrance/exit events)
+     */
+    Set<Region> getActiveRegions();
+
+    /**
+     * Set the regions that the citizen is currently in
+     * @param currActive
+     */
+    void setActiveRegions(Set<Region> currActive);
 }

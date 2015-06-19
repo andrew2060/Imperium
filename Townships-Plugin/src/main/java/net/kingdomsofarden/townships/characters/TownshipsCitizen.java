@@ -8,6 +8,8 @@ import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class TownshipsCitizen implements Citizen {
@@ -17,6 +19,12 @@ public class TownshipsCitizen implements Citizen {
     private UUID uuid;
     private Area currTerminalArea;
     private StoredDataSection effectSettings;
+    private Region region;
+    private Set<Region> activeRegions;
+
+    public TownshipsCitizen() {
+        this.activeRegions = new HashSet<>();
+    }
 
     @Override public StoredDataSection getStoredEffectSettings(Effect effect) {
         return effectSettings;
@@ -46,5 +54,17 @@ public class TownshipsCitizen implements Citizen {
 
     @Override public boolean isRoot() {
         return false; //TODO
+    }
+
+    @Override public Region getCitizenRegion() {
+        return region;
+    }
+
+    @Override public Set<Region> getActiveRegions() {
+        return activeRegions;
+    }
+
+    @Override public void setActiveRegions(Set<Region> currActive) {
+        this.activeRegions = currActive;
     }
 }

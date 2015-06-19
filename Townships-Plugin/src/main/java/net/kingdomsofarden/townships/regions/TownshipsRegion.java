@@ -67,6 +67,9 @@ public class TownshipsRegion implements Region {
     private Map<Region, RelationState> externRelations;
     private Set<UUID> citizens;
 
+    private double maxPower;
+    private double currPower;
+
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
         valid = true;
@@ -477,6 +480,20 @@ public class TownshipsRegion implements Region {
 
     @Override public Collection<UUID> getCitizens() {
         return citizens;
+    }
+
+    @Override public double updatePower(double amount) {
+        currPower += amount; // TODO throw events
+        if (currPower < 0.00) {
+            currPower = 0.00;
+        } else if (currPower > maxPower) {
+            currPower = maxPower;
+        }
+        return currPower;
+    }
+
+    @Override public double getMaxPower() {
+        return maxPower;
     }
 
     @Override public int hashCode() {
