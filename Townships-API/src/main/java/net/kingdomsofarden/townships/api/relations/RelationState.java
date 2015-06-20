@@ -10,7 +10,8 @@ public enum RelationState {
     ALLIANCE(true),
     ALLIANCE_OFFERED(false, RelationState.ALLIANCE),
     ALLIANCE_PENDING(false, RelationState.ALLIANCE),
-    ALLIANCE_PENDING_PEACE(false, RelationState.PEACE);
+    ALLIANCE_PENDING_PEACE(false, RelationState.PEACE),
+    SELF(false, RelationState.ALLIANCE);
 
     private final RelationState baseType;
     private boolean declarable;

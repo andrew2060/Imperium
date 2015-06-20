@@ -75,6 +75,25 @@ public interface Region {
     boolean hasEffect(String name);
 
     /**
+     * Adds the given effect to active region effects
+     *
+     * @param e          The effect to add
+     * @param persistent Whether said effect is persistent (is saved)
+     */
+    void addEffect(Effect e, boolean persistent);
+
+
+    /**
+     * Removes the given effect from the region
+     * <b>Note:</b> This will only be persistent if the effect is not set within the
+     * configuration itself
+     *
+     * @param name The name of the effect
+     * @return The removed effect, or null if effect not present
+     */
+    Effect removeEffect(String name);
+
+    /**
      * @param <T>  The explicit class type of the effect to retrieve
      * @param name The name of the effect non-case sensitive
      * @return The effect retrieved
@@ -191,6 +210,7 @@ public interface Region {
 
     /**
      * Retrieves a metadata mapping for this region that is associated with the supplied region
+     *
      * @param region The region to check for
      * @return A mapping of metadata values currently associated with the region by the supplied
      * region
@@ -228,5 +248,11 @@ public interface Region {
      * @return The maximal power that can be exerted by this region
      */
     double getMaxPower();
+
+    /**
+     * @param citizen The citizen to check
+     * @return The relation this region holds toward the given citizen
+     */
+    RelationState getEffectiveRelation(Citizen citizen);
 
 }
