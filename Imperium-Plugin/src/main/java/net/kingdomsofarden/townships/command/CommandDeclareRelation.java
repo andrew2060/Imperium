@@ -1,18 +1,19 @@
 package net.kingdomsofarden.townships.command;
 
+import com.google.gson.JsonObject;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.events.RegionRelationChangeEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
+import net.kingdomsofarden.townships.util.JSONDataSection;
 import net.kingdomsofarden.townships.util.Messaging;
-import net.kingdomsofarden.townships.util.YAMLDataSection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class CommandDeclareRelation implements Command {
@@ -153,18 +154,22 @@ public class CommandDeclareRelation implements Command {
             declarer.getExternRelations().put(declaree, state);
         }
         // TODO remove fees/requirements
-        YAMLDataSection section = new YAMLDataSection(new YamlConfiguration());
+        JSONDataSection section = new JSONDataSection(new JsonObject(), "");
         long time = System.currentTimeMillis() + Constants.RELATION_DELAY;
         section.set("start-time", time);
         section.set("relation", state.getBaseType().name());
         section.set("region", declaree.getUid());
-        Townships.getEffectManager().loadEffect("pending-relation-change", declarer, section);
+        Effect e = Townships.getEffectManager().loadEffect("pending-relation-change", declarer,
+            section);
+        declarer.addEffect(e, true);
         if (reciprocal) {
-            YAMLDataSection section2 = new YAMLDataSection(new YamlConfiguration());
+            JSONDataSection section2 = new JSONDataSection(new JsonObject(), "");
             section2.set("start-time", time);
             section2.set("relation", state.getBaseType().name());
             section2.set("region", declarer.getUid());
-            Townships.getEffectManager().loadEffect("pending-relation-change", declaree, section2);
+            e = Townships.getEffectManager().loadEffect("pending-relation-change", declaree,
+                section2);
+            declaree.addEffect(e, true);
         }
         return true;
     }

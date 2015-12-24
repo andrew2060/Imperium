@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.kingdomsofarden</groupId>
-    <artifactId>Townships-Parent</artifactId>
+    <artifactId>Imperium-Parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -21,9 +21,9 @@
     </repositories>
 
     <modules>
-        <module>Townships-API</module>
-        <module>Townships-Plugin</module>
-        <module>Townships-Effects</module>
+        <module>Imperium-API</module>
+        <module>Imperium-Plugin</module>
+        <module>Imperium-Effects</module>
     </modules>
     <build>
         <plugins>

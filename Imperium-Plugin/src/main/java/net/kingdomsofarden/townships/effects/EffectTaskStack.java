@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class EffectTaskStack extends LinkedList<EffectTask> {
 
     int position;
-    long load; // Load - the sum of the individual tick times of the various components
+    double load; // Load - the sum of the individual tick times of the various components
 
     public EffectTaskStack(int position) {
         load = 0;
@@ -24,7 +24,7 @@ public class EffectTaskStack extends LinkedList<EffectTask> {
         return ret;
     }
 
-    public long getLoad() {
+    public double getLoad() {
         return load;
     }
 

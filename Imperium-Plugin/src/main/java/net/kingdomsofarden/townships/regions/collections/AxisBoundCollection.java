@@ -251,7 +251,6 @@ public class AxisBoundCollection extends RegionBoundCollection {
                                 getIntersections(b, 0, false, coll);
                             } else {
                                 getIntersections(b, 0, true, coll);
-
                             }
                         }
                         break;

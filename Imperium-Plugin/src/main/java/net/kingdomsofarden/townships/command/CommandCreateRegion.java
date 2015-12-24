@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class CommandCreateRegion implements Command {
 
@@ -106,7 +107,7 @@ public class CommandCreateRegion implements Command {
         }
         // Requirements checking
         StoredDataSection requirements = data.getSection("requirements");
-        final Map<Material, Integer> blockReq = new HashMap<Material, Integer>();
+        final Map<Material, Integer> blockReq = new HashMap<>();
         StoredDataSection blockReqSection = requirements.getSection("block-requirements");
         for (String matName : blockReqSection.getKeys(false)) {
             Material mat = Material.valueOf(matName.toUpperCase());
@@ -122,8 +123,7 @@ public class CommandCreateRegion implements Command {
             }
         }
         if (!blockReq.isEmpty()) { // Scan selection
-            World world =
-                selection.getWorld();          // TODO find better way to do this, or async it
+            World world = selection.getWorld(); // TODO find better way to do this, or async it
             locationLoop:
             for (int x = selection.getMinX(); x <= selection.getMaxX(); x++) {
                 for (int z = selection.getMinZ(); z <= selection.getMaxZ(); z++) {
@@ -157,9 +157,9 @@ public class CommandCreateRegion implements Command {
         Set<String> excludeTypes;
         boolean excludeAll;
         try {
-            regionTypeMinReq = new HashMap<String, Integer>();
-            regionTierMinReq = new HashMap<Integer, Integer>();
-            regionTypeMaxReq = new HashMap<String, Integer>();
+            regionTypeMinReq = new HashMap<>();
+            regionTierMinReq = new HashMap<>();
+            regionTypeMaxReq = new HashMap<>();
             regionTierMaxReq = new HashMap<Integer, Integer>();
             excludeTiers = new HashSet<Integer>();
             excludeTypes = new HashSet<String>();
@@ -196,9 +196,9 @@ public class CommandCreateRegion implements Command {
                     int tier = Integer.parseInt(tierNum);
                     excludeTiers.add(tier);
                 }
-                for (String type : excludeSection.getList("types")) {
-                    excludeTypes.add(type.toLowerCase());
-                }
+                excludeTypes.addAll(
+                    excludeSection.getList("types").stream().map(String::toLowerCase)
+                        .collect(Collectors.toList()));
             }
         } catch (Exception e) {
             Messaging.sendFormattedMessage(sender, I18N.INVALID_REGION_CONFIGURATION,
@@ -226,7 +226,7 @@ public class CommandCreateRegion implements Command {
                 }
             }
             if (regionTypeMaxReq.containsKey(type)) {
-                int amt = regionTypeMinReq.get(type) - 1;
+                int amt = regionTypeMaxReq.get(type) - 1;
                 if (amt < 0) {
                     Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TYPE);
                     return true;
@@ -236,6 +236,15 @@ public class CommandCreateRegion implements Command {
             }
             if (regionTierMinReq.containsKey(tier)) {
                 int amt = regionTierMinReq.get(tier) - 1;
+                if (amt < 0) {
+                    Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TIER);
+                    return true;
+                } else {
+                    regionTierMinReq.put(tier, amt);
+                }
+            }
+            if (regionTierMaxReq.containsKey(tier)) {
+                int amt = regionTierMaxReq.get(tier) - 1;
                 if (amt < 0) {
                     Messaging.sendFormattedMessage(sender, I18N.MAX_REGION_TIER);
                     return true;

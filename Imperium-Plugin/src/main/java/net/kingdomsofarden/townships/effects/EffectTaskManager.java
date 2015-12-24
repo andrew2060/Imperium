@@ -117,8 +117,8 @@ public class EffectTaskManager implements Runnable {
             return;
         }
         int parent = (idx - 1) / 2;
-        long parentLoad = taskStacks[minSizeHeap[parent]].getLoad();
-        long currLoad = taskStacks[minSizeHeap[idx]].getLoad();
+        double parentLoad = taskStacks[minSizeHeap[parent]].getLoad();
+        double currLoad = taskStacks[minSizeHeap[idx]].getLoad();
         if (currLoad < parentLoad) {
             swap(parent, idx);
             percolateUp(parent);
@@ -129,7 +129,7 @@ public class EffectTaskManager implements Runnable {
         boolean isHeaped = false;
         int rootIdx = minSizeHeap[idx];
         int childIdx;
-        long rootLoad = taskStacks[rootIdx] == null ? -1 : taskStacks[rootIdx].getLoad();
+        double rootLoad = taskStacks[rootIdx] == null ? -1 : taskStacks[rootIdx].getLoad();
         while (!isHeaped && (childIdx = 2 * rootIdx + 1) < minSizeHeap.length) {
             int leftIdx = minSizeHeap[childIdx];
             double childLoad = taskStacks[leftIdx] == null ? -1 : taskStacks[leftIdx].getLoad();

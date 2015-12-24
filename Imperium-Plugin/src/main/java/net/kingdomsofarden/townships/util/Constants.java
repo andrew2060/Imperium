@@ -29,4 +29,6 @@ public class Constants {
     public static double POWER_LOSS_PER_TICK_OCCUPATION;
     public static double POWER_GAIN_PER_TICK_OCCUPATION;
     public static long PERIOD_OCCUPATION_UPDATE;
+    public static double TAX_PER_MEMBER_NONCONS_WAR_TICK;
+    public static double TAX_FLAT_NONCONS_WAR_TICK;
 }

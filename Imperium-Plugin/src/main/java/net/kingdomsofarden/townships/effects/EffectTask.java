@@ -4,18 +4,25 @@ import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Region;
 
 public class EffectTask {
+
     private Region region;
     private TickableEffect effect;
-    private long load;
+    private double load;
     private long nextTick;
     private long scheduledTime;
     private boolean reschedule;
+    private int sampleTolerance;
+    private double[] enqueuedAverages;
+    private int queueHead;
 
     public EffectTask(Region region, TickableEffect effect) {
         this.region = region;
         this.effect = effect;
         this.nextTick = effect.startTime();
         this.reschedule = true;
+        this.sampleTolerance = 10; // TODO something a bit more personalized for effects perhaps?
+        this.enqueuedAverages = new double[sampleTolerance];
+        this.queueHead = 0;
     }
 
     public void tick() {
@@ -23,7 +30,17 @@ public class EffectTask {
             long startTime = System.currentTimeMillis();
             nextTick = effect.onTick(this.region, scheduledTime);
             long endTime = System.currentTimeMillis();
-            load = (load + (endTime - startTime)) / 2;
+            // Profile for effect balancing
+            double duration = endTime - startTime;
+            double loadval = duration/sampleTolerance;
+            load -= enqueuedAverages[queueHead];
+            enqueuedAverages[queueHead] = loadval;
+            load += loadval;
+            queueHead++;
+            if (queueHead >= sampleTolerance) {
+                queueHead = 0;
+            }
+            // Reschedule
             if (nextTick == Long.MAX_VALUE) {
                 reschedule = false;
             }
@@ -33,7 +50,7 @@ public class EffectTask {
         }
     }
 
-    public long getLoad() {
+    public double getLoad() {
         return load;
     }
 

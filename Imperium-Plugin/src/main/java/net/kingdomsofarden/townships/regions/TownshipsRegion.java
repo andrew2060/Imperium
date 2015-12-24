@@ -268,6 +268,14 @@ public class TownshipsRegion implements Region {
         return effects.containsKey(name.toLowerCase());
     }
 
+    @Override public void addEffect(Effect e, boolean persistent) {
+        // TODO
+    }
+
+    @Override public Effect removeEffect(String name) {
+        return null; // TODO
+    }
+
     @Override public <T extends Effect> T getEffect(String name) throws IllegalStateException {
         T ret = (T) effects.get(name.toLowerCase());
         if (ret == null) {
@@ -294,7 +302,7 @@ public class TownshipsRegion implements Region {
                 .collect(Collectors.toCollection(LinkedList::new));
             roleSection.set(group.toString(), toAdd);
         }
-        StoredDataSection meta = data.getSection("metadata");
+        StoredDataSection meta = data.getSection("metadata ");
         for (String key : metadata.keySet()) {
             meta.set(key, metadata.get(key));
         }
@@ -494,6 +502,10 @@ public class TownshipsRegion implements Region {
 
     @Override public double getMaxPower() {
         return maxPower;
+    }
+
+    @Override public RelationState getEffectiveRelation(Citizen citizen) {
+        return null;
     }
 
     @Override public int hashCode() {

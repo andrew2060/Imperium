@@ -6,9 +6,11 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.effects.core.EffectGovernable;
 import net.kingdomsofarden.townships.effects.core.EffectIncomeTax;
+import net.kingdomsofarden.townships.effects.core.PendingRelationChangeEffect;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import net.md_5.bungee.api.ChatColor;
@@ -18,6 +20,9 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class CommandGovernGUI implements Command {
     @Override public String[] getIdentifiers() {
@@ -37,8 +42,7 @@ public class CommandGovernGUI implements Command {
     }
 
     @Override public boolean execute(CommandSender sender, String[] args) {
-        Region region = null;
-        region =
+        Region region =
             Townships.getRegions().get(args[0]).orNull(); // Only allow management for named regions
         if (region == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[0]);
@@ -55,8 +59,7 @@ public class CommandGovernGUI implements Command {
         switch (args.length) {
             case 1:
                 return displayGeneral(sender, args, region);
-            case 2:
-            case 3: {
+            default: {
                 GovernActions action = GovernActions.valueOf(args[1].toUpperCase());
                 if (action == null) {
                     Messaging.sendFormattedMessage(sender, I18N.COMMAND_NOT_FOUND);
@@ -66,19 +69,141 @@ public class CommandGovernGUI implements Command {
                     case DEMOGRAPHICS:
                         return processDemographics(sender, args, region);
                     case ACCESS:
-                        break;
+                        return processPermissions(sender, args, region);
                     case IMMIGRATION:
-                        break;
+                        return processInvitations(sender, args, region);
                     case DIPLOMACY:
-                        break;
+                        return processDiplomacy(sender, args, region);
                     case FISCAL:
-                        break;
+                        return processEconomics(sender, args, region);
                 }
                 return true;
             }
         }
+    }
 
-        return true;
+    private boolean processEconomics(CommandSender sender, String[] args, Region region) {
+        return false; // TODO
+    }
+
+    private boolean processDiplomacy(CommandSender sender, String[] args, Region region) {
+        Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
+        if (!region.hasAccess(c, AccessType.DIPLOMAT)) {
+            Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_DIPLOMACY);
+            return true;
+        }
+        int pagination = 1;
+        if (args.length >= 3) { // has a page number
+            try {
+                pagination = Integer.valueOf(args[2]);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        if (args.length == 4) { // has a sort function
+            String sortBy = args[3];
+
+        }
+
+        class RelationStateEntry {
+
+            RelationState actualRelation;
+            long start;
+            // out of
+            Region r;
+
+            RelationStateEntry(Region region, RelationState state) {
+                this(region, state, 0);
+            }
+
+            RelationStateEntry(Region region, RelationState state, long begin) {
+                actualRelation = state;
+                start = begin;
+                r = region;
+            }
+        }
+
+        Collection<RelationStateEntry> warringRelation = new ArrayList<>();
+        Collection<RelationStateEntry> alliedRelation = new ArrayList<>();
+
+        region.getRelations().entrySet().stream().forEach(e -> {
+            switch (e.getValue()) {
+                case PEACE:
+                    break;
+                case PEACE_OFFERED:
+                    break;
+                case WAR:
+                    warringRelation.add(new RelationStateEntry(region, RelationState.WAR));
+                    break;
+                case WAR_DECLARED: {
+                    // Find start time TODO might need to be a better method of doing this
+                    PendingRelationChangeEffect eff =
+                        e.getKey().getEffect("pending-relation-change");
+                    long start = eff.startTime();
+                    if (eff.startTime() > 0) {
+                        warringRelation
+                            .add(new RelationStateEntry(region, RelationState.WAR_DECLARED, start));
+                    } else {
+                        warringRelation.add(new RelationStateEntry(region, RelationState.WAR));
+                        // War's started, just not ticked yet
+                    }
+                    break;
+                }
+                case WAR_MUTUAL:
+                    warringRelation.add(new RelationStateEntry(region, RelationState.WAR));
+                    break;
+                case WAR_PENDING_PEACE: {
+                    // Find start time TODO might need to be a better method of doing this
+                    PendingRelationChangeEffect eff =
+                        e.getKey().getEffect("pending-relation-change");
+                    long start = eff.startTime();
+                    if (eff.startTime() > 0) {
+                        warringRelation.add(
+                            new RelationStateEntry(region, RelationState.WAR_PENDING_PEACE, start));
+                    } // Otherwise war has ended already and not ticked, don't do anything
+                    break;
+                } case ALLIANCE:
+                    alliedRelation.add(new RelationStateEntry(region, RelationState.ALLIANCE));
+                    break;
+                case ALLIANCE_OFFERED:
+                    break;
+                case ALLIANCE_PENDING: {
+                    // Find start time TODO might need to be a better method of doing this
+                    PendingRelationChangeEffect eff =
+                        e.getKey().getEffect("pending-relation-change");
+                    long start = eff.startTime();
+                    if (eff.startTime() > 0) {
+                        alliedRelation.add(new RelationStateEntry(region, RelationState.ALLIANCE_PENDING, start));
+                    } // Otherwise war has ended already and not ticked, don't do anything
+                    break;
+                }
+                case ALLIANCE_PENDING_PEACE: {
+                    // Find start time TODO might need to be a better method of doing this
+                    PendingRelationChangeEffect eff =
+                        e.getKey().getEffect("pending-relation-change");
+                    long start = eff.startTime();
+                    if (eff.startTime() > 0) {
+                        alliedRelation.add(new RelationStateEntry(region, RelationState
+                            .ALLIANCE_PENDING_PEACE, start));
+                    } // Otherwise war has ended already and not ticked, don't do anything
+                    break;
+                }
+                case SELF:
+                    break;
+            }
+        });
+
+        return true; // TODO
+    }
+
+
+
+    private boolean processInvitations(CommandSender sender, String[] args, Region region) {
+        return false; // TODO
+    }
+
+    private boolean processPermissions(CommandSender sender, String[] args, Region region) {
+        return false; // TODO
     }
 
     private boolean processDemographics(CommandSender sender, String[] args, Region region) {
@@ -86,7 +211,7 @@ public class CommandGovernGUI implements Command {
         if (args.length == 3) {
             try {
                 num = Integer.valueOf(args[2]);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
             }
         }
         String title = "======= " + region.getType() + "Demographics: " + region.getName().get()

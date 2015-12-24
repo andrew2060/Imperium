@@ -6,30 +6,17 @@
 
     <parent>
         <groupId>net.kingdomsofarden</groupId>
-        <artifactId>Townships-Parent</artifactId>
+        <artifactId>Imperium-Parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>net.kingdomsofarden</groupId>
-    <artifactId>Townships-Effects</artifactId>
+    <artifactId>Imperium-API</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.kingdomsofarden</groupId>
-            <artifactId>Townships-API</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.kingdomsofarden</groupId>
-            <artifactId>Townships-Plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
     <build>
-        <defaultGoal>ant</defaultGoal>
-        <finalName>Townships-Plugins</finalName>
+        <defaultGoal>clean install</defaultGoal>
+        <finalName>Imperium-API</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -40,6 +27,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
