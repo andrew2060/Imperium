@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.command;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
-import net.kingdomsofarden.townships.api.command.Command;
+import net.kingdomsofarden.townships.api.command.CommandInteractive;
 import net.kingdomsofarden.townships.api.events.RegionCreateEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class CommandCreateRegion implements Command {
+public class CommandCreateRegion extends CommandInteractive {
 
     @Override public String[] getIdentifiers() {
         return new String[] {"region create", "town create"};
@@ -160,9 +160,9 @@ public class CommandCreateRegion implements Command {
             regionTypeMinReq = new HashMap<>();
             regionTierMinReq = new HashMap<>();
             regionTypeMaxReq = new HashMap<>();
-            regionTierMaxReq = new HashMap<Integer, Integer>();
-            excludeTiers = new HashSet<Integer>();
-            excludeTypes = new HashSet<String>();
+            regionTierMaxReq = new HashMap<>();
+            excludeTiers = new HashSet<>();
+            excludeTypes = new HashSet<>();
             StoredDataSection regionReqSection = requirements.getSection("region-types-min");
             for (String type : regionReqSection.getKeys(false)) {
                 int amt = regionReqSection.get(type, intSerializer, 0);
@@ -294,5 +294,9 @@ public class CommandCreateRegion implements Command {
 
     @Override public String getUsage() {
         return "/region create <type> [name]";
+    }
+
+    @Override public void finish(CommandSender sender, Map<String, Object> commandData) {
+
     }
 }

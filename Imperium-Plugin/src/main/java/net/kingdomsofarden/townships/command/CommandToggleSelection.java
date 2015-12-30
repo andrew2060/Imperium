@@ -26,7 +26,7 @@ public class CommandToggleSelection implements Command, Listener {
     private Map<UUID, Boolean> cache;
 
     public CommandToggleSelection(TownshipsPlugin plugin) {
-        cache = new HashMap<UUID, Boolean>();
+        cache = new HashMap<>();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -62,41 +62,41 @@ public class CommandToggleSelection implements Command, Listener {
         return "region select toggle";
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        cache.put(event.getPlayer().getUniqueId(), false);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        cache.remove(event.getPlayer().getUniqueId());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerKick(PlayerKickEvent event) {
-        cache.remove(event.getPlayer().getUniqueId());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        UUID pid = event.getPlayer().getUniqueId();
-        if (cache.getOrDefault(pid, false)) {
-            Action a = event.getAction();
-            if (a == Action.RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK) {
-                event.setCancelled(true);
-                Location loc = event.getClickedBlock().getLocation();
-                int type = 0;
-                if (a == Action.RIGHT_CLICK_BLOCK) {
-                    SelectionManager.selections.getUnchecked(pid).setLoc2(loc);
-                    type = 2;
-                } else {
-                    SelectionManager.selections.getUnchecked(pid).setLoc1(loc);
-                    type = 1;
-                }
-                Messaging.sendFormattedMessage(event.getPlayer(), I18N.SELECTION_SET, type,
-                    loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-            }
-
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            cache.put(event.getPlayer().getUniqueId(), false);
         }
-    }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onPlayerQuit(PlayerQuitEvent event) {
+            cache.remove(event.getPlayer().getUniqueId());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onPlayerKick(PlayerKickEvent event) {
+            cache.remove(event.getPlayer().getUniqueId());
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onPlayerInteract(PlayerInteractEvent event) {
+            UUID pid = event.getPlayer().getUniqueId();
+            if (cache.getOrDefault(pid, false)) {
+                Action a = event.getAction();
+                if (a == Action.RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK) {
+                    event.setCancelled(true);
+                    Location loc = event.getClickedBlock().getLocation();
+                    int type = 0;
+                    if (a == Action.RIGHT_CLICK_BLOCK) {
+                        SelectionManager.selections.getUnchecked(pid).setLoc2(loc);
+                        type = 2;
+                    } else {
+                        SelectionManager.selections.getUnchecked(pid).setLoc1(loc);
+                        type = 1;
+                    }
+                    Messaging.sendFormattedMessage(event.getPlayer(), I18N.SELECTION_SET, type,
+                        loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+                }
+
+            }
+        }
 }

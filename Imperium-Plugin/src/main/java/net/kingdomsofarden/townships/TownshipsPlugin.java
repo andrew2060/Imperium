@@ -12,6 +12,7 @@ import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
 import net.kingdomsofarden.townships.effects.TownshipsEffectManager;
 import net.kingdomsofarden.townships.instrumentation.InstrumentationManager;
 import net.kingdomsofarden.townships.instrumentation.agents.VaultTransactionAgent;
+import net.kingdomsofarden.townships.listeners.ChatBasedInteractiveCommandListener;
 import net.kingdomsofarden.townships.listeners.RegionalConsistancyListener;
 import net.kingdomsofarden.townships.listeners.RegionalUpdateListener;
 import net.kingdomsofarden.townships.regions.TownshipsRegionManager;
@@ -62,6 +63,7 @@ public class TownshipsPlugin extends JavaPlugin implements ITownshipsPlugin {
         regionalUpdateListener = new RegionalUpdateListener(this);
         Bukkit.getPluginManager().registerEvents(regionalUpdateListener, this);
         Bukkit.getPluginManager().registerEvents(new RegionalConsistancyListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ChatBasedInteractiveCommandListener(), this);
 
         // Start tasks
         Bukkit.getScheduler().runTaskTimer(this, effectManager.getEffectTaskManager(), 0, 1);

@@ -93,4 +93,7 @@ public class I18N {
     public static final String DEMOGRAPHICS = "Show population and fiscal statistics for $0";
     public static final String DIPLOMACY = "Manage $0's relations with other entities";
     public static final String SUPER_REGION_REQUIRED = "This region is not governable!";
+    public static final String SELECT_CUBOID_PROMPT_CREATION = "Please select the boundaries of "
+        + "this region: left click for point 1, right click for point 2, !finish to finalize, or "
+        + "!cancel to cancel";
 }
