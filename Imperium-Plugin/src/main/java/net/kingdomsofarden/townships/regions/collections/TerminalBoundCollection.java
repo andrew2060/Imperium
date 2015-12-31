@@ -202,7 +202,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         //            Geometry geometry = bounds.getBoundGeometry();
         //            for (Point3I vertex : geometry.getVertices()) {
         //                LinkedList<HalfFace> faces = new LinkedList<HalfFace>();
-        //                ArrayList<Segment3I> localEdges = new ArrayList<Segment3I>(geometry.getEdges(vertex));
+        //                ArrayList<Segment> localEdges = new ArrayList<Segment>(geometry.getEdges(vertex));
         //                // Get all pairs of two and find faces
         //                for (int i = 0; i < localEdges.size(); i++) {
         //                    for (int j = 1; j < localEdges.size(); j++) {
