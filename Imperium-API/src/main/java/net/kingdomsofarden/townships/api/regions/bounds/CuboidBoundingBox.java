@@ -1,5 +1,7 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
+import com.sk89q.worldedit.regions.CuboidRegion;
+
 public interface CuboidBoundingBox extends BoundingArea {
     // Bounding Methods TODO Javadocs
     int getMinX();
@@ -13,4 +15,6 @@ public interface CuboidBoundingBox extends BoundingArea {
     int getMinZ();
 
     int getMaxZ();
+
+    CuboidRegion getBackingBounds();
 }

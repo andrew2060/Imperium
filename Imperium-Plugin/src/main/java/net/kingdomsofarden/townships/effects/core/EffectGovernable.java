@@ -116,7 +116,7 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
 
     public void updateImmed() {
         curr.pop = region.getCitizens().size();
-        curr.land = region.getBounds().size2d();
+        curr.land = region.getBounds().area();
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

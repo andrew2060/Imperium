@@ -1,18 +1,19 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import com.google.gson.JsonObject;
-import net.kingdomsofarden.townships.api.math.Geometry;
+import com.sk89q.worldedit.Vector;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import java.util.Collection;
 import java.util.Map;
 
 public interface BoundingArea {
 
     /**
      * @param loc The location to check
-     * @return Whether a given location is within the bounds of this bounding box
+     * @return Whether a given location is within the bounds of this bounding geometry
      */
     boolean isInBounds(Location loc);
 
@@ -22,30 +23,24 @@ public interface BoundingArea {
      * @param x The x coordinate to check
      * @param y The y coordinate to check
      * @param z The z coordinate to check
-     * @return Whether a given location is within the bounds of this bounding box
+     * @return Whether a given location is within the bounds of this bounding geometry
      */
     boolean isInBounds(double x, double y, double z);
 
     /**
-     * @param box The other bounding box to check
-     * @return True if this bounding box interacts with the parameter bounding box at some point
+     * @param box The other bounding geometry to check
+     * @return True if this bounding geometry interacts with the parameter bounding geometry at some point
      */
     boolean intersects(BoundingArea box);
 
     /**
-     * @return The geometry associated with this bounding area (post intersections being processed
-     * out)
-     */
-    Geometry getBoundGeometry();
-
-    /**
-     * @return The world containing this bounding box
+     * @return The world containing this bounding geometry
      */
     World getWorld();
 
     /**
-     * @param other The other bounding box to check
-     * @return True if this bounding box completely encapsulates the other
+     * @param other The other bounding geometry to check
+     * @return True if this bounding geometry completely encapsulates the other
      */
     boolean encapsulates(BoundingArea other);
 
@@ -58,15 +53,20 @@ public interface BoundingArea {
     Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks);
 
     /**
-     * @return The 2-dimensional area of this bounding box
+     * @return The 2-dimensional area of this bounding geometry
      */
-    int size2d();
+    int area();
 
     /**
-     * @return The block volume of this bounding box
+     * @return The block volume of this bounding geometry
      */
     int volume();
 
+    /**
+     * @return A collection of vertices for this bounding geometry
+     */
+    Collection<Vector> getVertices();
+    
     /**
      * @param clazz The class of the resulting bounding area to obtain
      * @param size The size to grow by
@@ -76,20 +76,13 @@ public interface BoundingArea {
      */
     <T extends BoundingArea> T grow(Class<T> clazz, int size);
 
-
-    /**
-     * @return A flattened (2D) representation of this bounding area, at y=0
-     */
-    BoundingArea flatten();
-
     /**
      * Initializes the bounds with the given settings as provided as a JSON object
      */
     void initialize(JsonObject json);
 
     /**
-     * Creates a Json Object rpepresenting the settings
-     * @return
+     * @return a Json object serialization of this bounding geometry
      */
     JsonObject save();
 

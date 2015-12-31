@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>net.kingdomsofarden</groupId>
-            <artifactId>Townships-API</artifactId>
+            <artifactId>Imperium-API</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

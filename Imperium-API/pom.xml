@@ -10,7 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.kingdomsofarden</groupId>
     <artifactId>Imperium-API</artifactId>
     <version>1.0-SNAPSHOT</version>
 
