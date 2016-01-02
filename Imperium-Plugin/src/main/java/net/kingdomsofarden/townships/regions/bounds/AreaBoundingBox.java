@@ -2,6 +2,7 @@ package net.kingdomsofarden.townships.regions.bounds;
 
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -101,6 +102,10 @@ public class AreaBoundingBox implements BoundingArea {
     }
 
     @Override public JsonObject save() {
+        return null;
+    }
+
+    @Override public Region getBacking() {
         return null;
     }
 }

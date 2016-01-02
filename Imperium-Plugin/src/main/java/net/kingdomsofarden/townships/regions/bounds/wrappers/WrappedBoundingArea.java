@@ -16,9 +16,9 @@ import java.util.Map;
 
 public abstract class WrappedBoundingArea implements BoundingArea {
 
-    protected final Region bounds;
-    protected final World world;
-    protected final ArrayList<Vector> vertices;
+    protected Region bounds;
+    protected World world;
+    protected ArrayList<Vector> vertices;
 
     public WrappedBoundingArea(Region region) {
         this.bounds = region;
@@ -51,6 +51,10 @@ public abstract class WrappedBoundingArea implements BoundingArea {
 
     @Override public int volume() {
         return bounds.getArea() * bounds.getHeight();
+    }
+
+    @Override public Region getBacking() {
+        return bounds;
     }
 
 

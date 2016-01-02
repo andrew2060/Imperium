@@ -86,5 +86,9 @@ public interface BoundingArea {
      */
     JsonObject save();
 
+    /**
+     * @return The backing WorldEdit region reprresenting this bounding area
+     */
+    com.sk89q.worldedit.regions.Region getBacking();
 
 }
