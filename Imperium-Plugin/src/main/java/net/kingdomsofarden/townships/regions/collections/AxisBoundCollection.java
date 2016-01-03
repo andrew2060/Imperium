@@ -48,7 +48,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override public boolean add(RegionBoundingArea b) {
+    @Override public boolean add(BoundingArea b) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -103,7 +103,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     }
 
-    private boolean add(RegionBoundingArea bound, int i, boolean negative) {
+    private boolean add(BoundingArea bound, int i, boolean negative) {
         RegionBoundCollection[] coll = ensureCapacity(i, negative);
         if (coll[i] == null) {
             if (axis == AxisType.X) {

@@ -93,7 +93,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return sum;
     }
 
-    @Override public boolean add(RegionBoundingArea b) {
+    @Override public boolean add(BoundingArea b) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;

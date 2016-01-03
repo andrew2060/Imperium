@@ -10,20 +10,24 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
 public abstract class WrappedBoundingArea implements BoundingArea {
 
+    protected net.kingdomsofarden.townships.api.regions.Region tRegion;
     protected Region bounds;
     protected World world;
     protected ArrayList<Vector> vertices;
 
-    public WrappedBoundingArea(Region region) {
+    public WrappedBoundingArea(Region region,
+        net.kingdomsofarden.townships.api.regions.Region tRegion) {
         this.bounds = region;
         this.world = Bukkit.getWorld(region.getWorld().getName());
         this.vertices = new ArrayList<>();
+        this.tRegion = tRegion;
         computeVertices();
     }
 
@@ -64,19 +68,29 @@ public abstract class WrappedBoundingArea implements BoundingArea {
     }
 
     @Override public boolean isInBounds(double x, double y, double z) {
-        return bounds.contains(new Vector(x,y,z));
+        return bounds.contains(new Vector(x, y, z));
     }
 
-    @Override public boolean intersects(BoundingArea box) {
-        if (!box.getWorld().getUID().equals(world.getUID())) {
+    @Override public boolean intersects(BoundingArea other) {
+        // Simplify to a box for some quick filtering
+        // - Check one side
+        BlockVector oMax = other.getBacking().getMaximumPoint().toBlockVector();
+        BlockVector min = getBacking().getMinimumPoint().toBlockVector();
+        if (oMax.getBlockX() < min.getBlockX() || oMax.getBlockY() < min.getBlockY()
+            || oMax.getBlockZ() < min.getBlockZ()) {
             return false;
         }
-        for (Vector v : box.getVertices()) {
-            if (isInBounds(v.getX(), v.getY(), v.getZ())) {
-                return true;
-            }
+        // - And the other
+        BlockVector oMin = other.getBacking().getMinimumPoint().toBlockVector();
+        BlockVector max = getBacking().getMaximumPoint().toBlockVector();
+        if (oMin.getBlockX() > max.getBlockX() || oMin.getBlockY() > max.getBlockY()
+            || oMin.getBlockZ() > max.getBlockZ()) {
+            return false;
         }
-        return box.encapsulates(this);
+        // Box's can intersect, do a more thorough check
+        Area oArea = other.asAWTArea();
+        oArea.intersect(asAWTArea());
+        return !oArea.isEmpty();
     }
 
     @Override public World getWorld() {
@@ -84,15 +98,20 @@ public abstract class WrappedBoundingArea implements BoundingArea {
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        if (!other.getWorld().getUID().equals(world.getUID())) {
+        if (!intersects(other)) {
             return false;
         }
-        for (Vector v : other.getVertices()) {
-            if (!isInBounds(v.getX(), v.getY(), v.getZ())) {
-                return false;
-            }
-        }
-        return true;
+        Area awtThis = asAWTArea();
+        Area awtOther = other.asAWTArea();
+        awtOther.subtract(awtThis);
+        return awtOther.isEmpty() && other.getBacking().getMinimumPoint().getBlockY() > bounds
+            .getMinimumPoint().getBlockY()
+            && other.getBacking().getMaximumPoint().getBlockY() < bounds.getMaximumPoint()
+            .getBlockY();
+    }
+
+    public net.kingdomsofarden.townships.api.regions.Region getRegion() {
+        return tRegion;
     }
 
     @Override public Collection<Vector> getVertices() {

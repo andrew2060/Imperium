@@ -2,7 +2,6 @@ package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
-import net.kingdomsofarden.townships.api.math.Point3I;
 import net.kingdomsofarden.townships.api.math.Rectangle;
 import net.kingdomsofarden.townships.api.regions.Area;
 import net.kingdomsofarden.townships.api.regions.Region;
@@ -14,34 +13,29 @@ import net.kingdomsofarden.townships.regions.bounds.AreaBoundingBox;
 import org.bukkit.World;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A terminal (i.e. no longer divisive) subset of the bound collection
  */
 public class TerminalBoundCollection extends RegionBoundCollection {
 
-    private Map<Region, RegionBoundingArea> contents;
+    private Map<Region, BoundingArea> contents;
     // TODO: use heap/binary tree instead for most efficient searching for a specific region?
     private Collection<Citizen> currCitizens;
-    private Collection<Point3I> vertices;
-    private Map<Region, BoundingArea> flattenedBounds;
-    private Collection<Point3I> verticesFlattened;
 
     private boolean geometryCacheValid;
     private int area;
 
     public TerminalBoundCollection(World world, int xLeft, int xRight, int zLower, int zUpper) {
-        this.contents = new HashMap<Region, RegionBoundingArea>();
-        this.flattenedBounds = new HashMap<Region, BoundingArea>();
+        this.contents = new HashMap<>();
         this.minX = xLeft;
         this.maxX = xRight;
         this.minZ = zLower;
         this.maxZ = zUpper;
-        this.currCitizens = new HashSet<Citizen>();
+        this.currCitizens = new HashSet<>();
         this.world = world;
         this.bounds = new AreaBoundingBox(world, minX, maxX, minZ, maxZ);
-        this.vertices = new HashSet<Point3I>();
-        this.verticesFlattened = new HashSet<Point3I>();
         this.geometryCacheValid = false;
         this.area = 0;
     }
@@ -71,10 +65,9 @@ public class TerminalBoundCollection extends RegionBoundCollection {
 
     // Inherited Stuff
 
-    @Override public boolean add(RegionBoundingArea bound) {
+    @Override public boolean add(BoundingArea bound) {
         TownshipsRegion r = (TownshipsRegion) bound.getRegion();
         r.getBoundingAreas().add(this);
-        flattenedBounds.put(r, bound.flatten());
         // Add vertices to what we are tracking
         //        for (Point3I vertex : bound.getVertices()) {
         //            if (bounds.isInBounds(vertex.getX(), vertex.getY(), vertex.getZ())) {
@@ -120,14 +113,12 @@ public class TerminalBoundCollection extends RegionBoundCollection {
             if (contents.remove(o) != null) {
                 TownshipsRegion r = (TownshipsRegion) o;
                 r.getBoundingAreas().remove(this);
-                flattenedBounds.remove(r);
                 return true;
             }
         } else if (o instanceof RegionBoundingArea) {
             if (contents.remove(((RegionBoundingArea) o).getRegion()) != null) {
                 TownshipsRegion r = (TownshipsRegion) ((RegionBoundingArea) o).getRegion();
                 r.getBoundingAreas().remove(this);
-                flattenedBounds.remove(r);
                 return true;
             }
         }
@@ -151,11 +142,8 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override public void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col) {
-        for (RegionBoundingArea r : contents.values()) {
-            if (bounds.intersects(r) && !bounds.equals(r)) {
-                col.add(r.getRegion());
-            }
-        }
+        col.addAll(contents.values().stream().filter(r -> bounds.intersects(r) && !bounds.equals(r))
+            .map(RegionBoundingArea::getRegion).collect(Collectors.toList()));
     }
 
     @Override public Collection<RegionBoundingArea> getContainedBounds() {

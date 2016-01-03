@@ -6,11 +6,14 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
+import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
+import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.awt.geom.Area;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,16 +21,19 @@ import java.util.Map;
 public class CompositeBoundingArea implements BoundingArea {
 
     private final World world;
+    private final net.kingdomsofarden.townships.api.regions.Region region;
     private Collection<BlockVector> blockVectors;
     private Collection<BlockVector2D> flattened;
 
-    private Collection<BoundingArea> regions;
+    private RegionBoundCollection regions;
 
-    public CompositeBoundingArea(World world) {
+    public CompositeBoundingArea(World world,
+        net.kingdomsofarden.townships.api.regions.Region region) {
         this.blockVectors = new HashSet<>();
         this.flattened = new HashSet<>();
         this.world = world;
-        this.regions = new HashSet<>();
+        this.regions = new AxisBoundCollection(world, true);
+        this.region = region;
     }
 
     public void add(BoundingArea bounds) {
@@ -41,13 +47,30 @@ public class CompositeBoundingArea implements BoundingArea {
         }
     }
 
+    public void remove(BoundingArea bounds) {
+        if (!bounds.getWorld().equals(world)) {
+            throw new IllegalArgumentException("Worlds don't match on bounding area removal");
+        }
+        regions.remove(bounds.getRegion());
+
+        for (BlockVector v : bounds.getBacking()) {
+            if (regions.getBoundingRegions(v.getBlockX(), v.getBlockY(), v.getBlockZ()).isEmpty()) {
+                blockVectors.remove(v);
+                BlockVector2D fV = v.toVector2D().toBlockVector2D();
+                if (regions.getFlattenedBoundingRegions(fV.getBlockX(), fV.getBlockZ()).isEmpty()) {
+                    flattened.remove(fV);
+                }
+            }
+        }
+    }
+
 
     @Override public boolean isInBounds(Location loc) {
         return world.equals(loc.getWorld()) && isInBounds(loc.getX(), loc.getY(), loc.getZ());
     }
 
     @Override public boolean isInBounds(double x, double y, double z) {
-        return false;
+        return blockVectors.contains(new Vector(x,y,z).toBlockVector());
     }
 
     @Override public boolean intersects(BoundingArea box) {
@@ -86,11 +109,11 @@ public class CompositeBoundingArea implements BoundingArea {
         return blockVectors.size();
     }
 
-    @Override public Collection<Vector> getVertices() {
+    @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
         return null;
     }
 
-    @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
+    @Override public net.kingdomsofarden.townships.api.regions.Region getRegion() {
         return null;
     }
 
@@ -103,6 +126,10 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public Region getBacking() {
+        return null;
+    }
+
+    @Override public Area asAWTArea() {
         return null;
     }
 

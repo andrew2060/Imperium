@@ -43,7 +43,7 @@ public abstract class RegionBoundCollection implements Area {
         return add(region.getBounds());
     }
 
-    public abstract boolean add(RegionBoundingArea bound);
+    public abstract boolean add(BoundingArea bound);
 
     @Override public boolean addAll(Collection<? extends Region> c) {
         boolean ret = false;
@@ -92,4 +92,6 @@ public abstract class RegionBoundCollection implements Area {
     public abstract Collection<RegionBoundingArea> getContainedBounds();
 
     public abstract Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds);
+
+    public abstract Collection<Region> getFlattenedBoundingRegions(int x, int z);
 }
