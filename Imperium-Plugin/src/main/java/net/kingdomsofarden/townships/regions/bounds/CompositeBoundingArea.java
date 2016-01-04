@@ -17,6 +17,7 @@ import java.awt.geom.Area;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class CompositeBoundingArea implements BoundingArea {
 
@@ -73,8 +74,10 @@ public class CompositeBoundingArea implements BoundingArea {
         return blockVectors.contains(new Vector(x,y,z).toBlockVector());
     }
 
-    @Override public boolean intersects(BoundingArea box) {
-        return false;
+    @Override public boolean intersects(BoundingArea bounds) {
+        TreeSet<net.kingdomsofarden.townships.api.regions.Region> regionColl = new TreeSet<>();
+        regions.getIntersectingRegions(bounds, regionColl);
+        return !regionColl.isEmpty();
     }
 
     @Override public World getWorld() {
@@ -114,7 +117,7 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public net.kingdomsofarden.townships.api.regions.Region getRegion() {
-        return null;
+        return region;
     }
 
     @Override public void initialize(JsonObject json) {

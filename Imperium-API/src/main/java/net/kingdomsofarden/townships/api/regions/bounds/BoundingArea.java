@@ -1,12 +1,12 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import com.google.gson.JsonObject;
-import com.sk89q.worldedit.Vector;
+import net.kingdomsofarden.townships.api.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.util.Collection;
+import java.awt.geom.Area;
 import java.util.Map;
 
 public interface BoundingArea {
@@ -61,11 +61,6 @@ public interface BoundingArea {
      * @return The block volume of this bounding geometry
      */
     int volume();
-
-    /**
-     * @return A collection of vertices for this bounding geometry
-     */
-    Collection<Vector> getVertices();
     
     /**
      * @param clazz The class of the resulting bounding area to obtain
@@ -75,6 +70,11 @@ public interface BoundingArea {
      * from this bounding area
      */
     <T extends BoundingArea> T grow(Class<T> clazz, int size);
+
+    /**
+     * @return The {@link Region} represented by this bounding box
+     */
+    Region getRegion();
 
     /**
      * Initializes the bounds with the given settings as provided as a JSON object
@@ -90,5 +90,10 @@ public interface BoundingArea {
      * @return The backing WorldEdit region reprresenting this bounding area
      */
     com.sk89q.worldedit.regions.Region getBacking();
+
+    /**
+     * @return A AWT representation of this area
+     */
+    Area asAWTArea();
 
 }
