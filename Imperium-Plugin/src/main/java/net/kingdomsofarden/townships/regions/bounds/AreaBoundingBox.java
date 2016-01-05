@@ -12,8 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import java.awt.*;
 import java.awt.geom.Area;
-import java.util.Collection;
 import java.util.Map;
 
 public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundingBox {
@@ -57,13 +57,6 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    @Override public Collection<Vector> getVertices() {
-        return vertices;
-    }
-
-    @Override public void computeVertices() {
-
-    }
 
     @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
         throw new UnsupportedOperationException("Not implemented");
@@ -86,7 +79,8 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
     }
 
     @Override public Area asAWTArea() {
-        return null;
+        return new Area(
+            new Rectangle(getMinX(), getMinZ(), getMaxX() - getMinX(), getMaxZ() - getMinZ()));
     }
 
     @Override public int getMinX() {

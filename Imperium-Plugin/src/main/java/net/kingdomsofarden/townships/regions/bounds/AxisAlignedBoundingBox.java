@@ -68,15 +68,4 @@ public class AxisAlignedBoundingBox extends WrappedBoundingArea implements Cuboi
         return new Area(
             new Rectangle(getMinX(), getMinZ(), getMaxX() - getMinX(), getMaxZ() - getMinZ()));
     }
-
-    @Override public void computeVertices() {
-        this.vertices.add(new Vector(getMinX(), getMinY(), getMinZ()));
-        this.vertices.add(new Vector(getMinX(), getMaxY(), getMinZ()));
-        this.vertices.add(new Vector(getMinX(), getMinY(), getMaxZ()));
-        this.vertices.add(new Vector(getMinX(), getMaxY(), getMaxZ()));
-        this.vertices.add(new Vector(getMaxX(), getMinY(), getMinZ()));
-        this.vertices.add(new Vector(getMaxX(), getMaxY(), getMinZ()));
-        this.vertices.add(new Vector(getMaxX(), getMinY(), getMaxZ()));
-        this.vertices.add(new Vector(getMaxX(), getMaxY(), getMaxZ()));
-    }
 }

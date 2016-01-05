@@ -11,8 +11,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.awt.geom.Area;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 public abstract class WrappedBoundingArea implements BoundingArea {
@@ -20,15 +18,12 @@ public abstract class WrappedBoundingArea implements BoundingArea {
     protected net.kingdomsofarden.townships.api.regions.Region tRegion;
     protected Region bounds;
     protected World world;
-    protected ArrayList<Vector> vertices;
 
     public WrappedBoundingArea(Region region,
         net.kingdomsofarden.townships.api.regions.Region tRegion) {
         this.bounds = region;
         this.world = Bukkit.getWorld(region.getWorld().getName());
-        this.vertices = new ArrayList<>();
         this.tRegion = tRegion;
-        computeVertices();
     }
 
     @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
@@ -114,9 +109,4 @@ public abstract class WrappedBoundingArea implements BoundingArea {
         return tRegion;
     }
 
-    @Override public Collection<Vector> getVertices() {
-        return vertices;
-    }
-
-    public abstract void computeVertices();
 }
