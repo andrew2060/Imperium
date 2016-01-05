@@ -93,7 +93,23 @@ public abstract class WrappedBoundingArea implements BoundingArea {
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        if (!intersects(other)) {
+        // Simplify to a box for some quick filtering
+        // - Check one side
+        BlockVector oMax = other.getBacking().getMaximumPoint().toBlockVector();
+        BlockVector min = getBacking().getMinimumPoint().toBlockVector();
+        if (oMax.getBlockX() < min.getBlockX() || oMax.getBlockY() < min.getBlockY()
+            || oMax.getBlockZ() < min.getBlockZ()) {
+            return false;
+        }
+        // - And the other
+        BlockVector oMin = other.getBacking().getMinimumPoint().toBlockVector();
+        BlockVector max = getBacking().getMaximumPoint().toBlockVector();
+        if (oMin.getBlockX() > max.getBlockX() || oMin.getBlockY() > max.getBlockY()
+            || oMin.getBlockZ() > max.getBlockZ()) {
+            return false;
+        }
+        // Check Y encapsulates
+        if (min.getBlockY() > oMin.getBlockY() || max.getBlockY() < oMax.getBlockY()) {
             return false;
         }
         Area awtThis = asAWTArea();
