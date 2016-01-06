@@ -85,7 +85,9 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        return false;
+        TreeSet<net.kingdomsofarden.townships.api.regions.Region> regionColl = new TreeSet<>();
+        regions.getIntersectingRegions(other, regionColl);
+
     }
 
     @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
@@ -113,7 +115,11 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
-        return null;
+        CompositeBoundingArea ret = new CompositeBoundingArea(world, region);
+        for (BoundingArea b : regions.getContainedBounds()) {
+            ret.add(b.grow(BoundingArea.class, size));
+        }
+        return (T) ret;
     }
 
     @Override public net.kingdomsofarden.townships.api.regions.Region getRegion() {
