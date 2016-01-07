@@ -14,10 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.awt.geom.Area;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 public class CompositeBoundingArea implements BoundingArea {
 
@@ -71,7 +68,7 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public boolean isInBounds(double x, double y, double z) {
-        return blockVectors.contains(new Vector(x,y,z).toBlockVector());
+        return blockVectors.contains(new Vector(x, y, z).toBlockVector());
     }
 
     @Override public boolean intersects(BoundingArea bounds) {
@@ -85,9 +82,11 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public boolean encapsulates(BoundingArea other) {
-        TreeSet<net.kingdomsofarden.townships.api.regions.Region> regionColl = new TreeSet<>();
-        regions.getIntersectingRegions(other, regionColl);
-
+        Set<BlockVector> blocks = new HashSet<>(blockVectors);
+        for (BoundingArea b : regions.getIntersectingBounds(other)) {
+            b.getBacking().forEach(v -> blocks.remove(v));
+        }
+        return blocks.isEmpty();
     }
 
     @Override public Map<Material, Integer> checkForBlocks(Map<Material, Integer> blocks) {
