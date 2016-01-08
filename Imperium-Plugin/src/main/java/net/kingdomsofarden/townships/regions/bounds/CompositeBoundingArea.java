@@ -5,6 +5,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionIntersection;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
@@ -134,7 +135,9 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public Region getBacking() {
-        return null;
+        List<Region> ret = new LinkedList<>();
+        regions.getContainedBounds().forEach(b -> ret.add(b.getBacking()));
+        return new RegionIntersection(ret);
     }
 
     @Override public Area asAWTArea() {
