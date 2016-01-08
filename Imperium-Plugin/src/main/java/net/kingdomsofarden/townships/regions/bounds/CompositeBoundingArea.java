@@ -84,7 +84,7 @@ public class CompositeBoundingArea implements BoundingArea {
     @Override public boolean encapsulates(BoundingArea other) {
         Set<BlockVector> blocks = new HashSet<>(blockVectors);
         for (BoundingArea b : regions.getIntersectingBounds(other)) {
-            b.getBacking().forEach(v -> blocks.remove(v));
+            b.getBacking().forEach(blocks::remove);
         }
         return blocks.isEmpty();
     }
@@ -138,7 +138,11 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public Area asAWTArea() {
-        return null;
+        Area area = new Area();
+        for (BoundingArea bounds : regions.getContainedBounds()) {
+            area.add(bounds.asAWTArea());
+        }
+        return area;
     }
 
 }
