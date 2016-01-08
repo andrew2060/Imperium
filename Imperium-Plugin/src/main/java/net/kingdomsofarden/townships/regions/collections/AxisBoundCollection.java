@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.regions.collections;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
@@ -139,7 +139,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     }
 
-    @Override protected void constructContainedRegions(Set<Region> regions) {
+    @Override protected void constructContainedRegions(Set<FunctionalRegion> regions) {
         for (RegionBoundCollection col : positiveAxis) {
             col.constructContainedRegions(regions);
         }
@@ -178,7 +178,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<Region> coll) {
+    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<FunctionalRegion> coll) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             int leftBound;
@@ -263,7 +263,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return coll;
     }
 
-    private void getIntersections(BoundingArea b, int i, boolean negative, TreeSet<Region> add) {
+    private void getIntersections(BoundingArea b, int i, boolean negative, TreeSet<FunctionalRegion> add) {
         RegionBoundCollection[] coll = negative ? negativeAxis : positiveAxis;
         if (coll[i] != null) {
             coll[i].getIntersectingRegions(b, add);
@@ -278,10 +278,10 @@ public class AxisBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
+    @Override public TreeSet<FunctionalRegion> getBoundingRegions(int x, int y, int z) {
         RegionBoundCollection ret = get(x, z);
         if (ret == null) {
-            return new TreeSet<Region>();
+            return new TreeSet<FunctionalRegion>();
         } else {
             return ret.getBoundingRegions(x, y, z);
         }
@@ -359,7 +359,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
         return false;
     }
 
-    @Override public Iterator<Region> iterator() {
+    @Override public Iterator<FunctionalRegion> iterator() {
         return getContents().iterator();
     }
 
@@ -373,8 +373,8 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     @Override public boolean remove(Object o) {
         BoundingArea b;
-        if (o instanceof Region) {
-            b = ((Region) o).getBounds();
+        if (o instanceof FunctionalRegion) {
+            b = ((FunctionalRegion) o).getBounds();
         } else if (o instanceof BoundingArea) {
             b = (BoundingArea) o;
         } else {
@@ -459,7 +459,7 @@ public class AxisBoundCollection extends RegionBoundCollection {
 
     @Override public boolean retainAll(Collection<?> c) {
         boolean ret = false;
-        for (Region r : getContents()) {
+        for (FunctionalRegion r : getContents()) {
             if (!c.contains(r) && remove(r)) {
                 ret = true;
             }

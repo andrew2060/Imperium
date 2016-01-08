@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.math.Rectangle;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class TerminalBoundCollection extends RegionBoundCollection {
 
-    private Map<Region, BoundingArea> contents;
+    private Map<FunctionalRegion, BoundingArea> contents;
     // TODO: use heap/binary tree instead for most efficient searching for a specific region?
     private Collection<Citizen> currCitizens;
 
@@ -44,9 +44,9 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         return bounds;
     }
 
-    @Override public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
-        TreeSet<Region> ret = new TreeSet<Region>(new Comparator<Region>() {
-            @Override public int compare(Region o1, Region o2) {
+    @Override public TreeSet<FunctionalRegion> getBoundingRegions(int x, int y, int z) {
+        TreeSet<FunctionalRegion> ret = new TreeSet<FunctionalRegion>(new Comparator<FunctionalRegion>() {
+            @Override public int compare(FunctionalRegion o1, FunctionalRegion o2) {
                 int ret = o2.getTier() - o1.getTier();
                 if (ret == 0) {
                     return o1.getUid().compareTo(o2.getUid());
@@ -87,7 +87,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override public boolean contains(Object o) {
-        if (o instanceof Region) {
+        if (o instanceof FunctionalRegion) {
             return contents.containsKey(o);
         } else if (o instanceof RegionBoundingArea) {
             return contents.containsValue(o);
@@ -96,7 +96,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override public Iterator<Region> iterator() {
+    @Override public Iterator<FunctionalRegion> iterator() {
         return contents.keySet().iterator();
     }
 
@@ -109,7 +109,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
     }
 
     @Override public boolean remove(Object o) {
-        if (o instanceof Region) {
+        if (o instanceof FunctionalRegion) {
             if (contents.remove(o) != null) {
                 TownshipsRegion r = (TownshipsRegion) o;
                 r.getBoundingAreas().remove(this);
@@ -129,11 +129,11 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         return contents.keySet().containsAll(c);
     }
 
-    @Override public boolean addAll(Collection<? extends Region> c) {
+    @Override public boolean addAll(Collection<? extends FunctionalRegion> c) {
         return contents.keySet().addAll(c);
     }
 
-    @Override protected void constructContainedRegions(Set<Region> regions) {
+    @Override protected void constructContainedRegions(Set<FunctionalRegion> regions) {
         regions.addAll(contents.keySet());
     }
 
@@ -141,7 +141,7 @@ public class TerminalBoundCollection extends RegionBoundCollection {
         return Optional.of((Area) this); // Not sure why this cast is needed but compiler complains
     }
 
-    @Override public void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col) {
+    @Override public void getIntersectingRegions(BoundingArea bounds, TreeSet<FunctionalRegion> col) {
         col.addAll(contents.values().stream().filter(r -> bounds.intersects(r) && !bounds.equals(r))
             .map(RegionBoundingArea::getRegion).collect(Collectors.toList()));
     }

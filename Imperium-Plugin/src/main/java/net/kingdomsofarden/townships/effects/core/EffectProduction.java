@@ -2,7 +2,7 @@ package net.kingdomsofarden.townships.effects.core;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.events.ProductionEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
@@ -22,7 +22,7 @@ public class EffectProduction extends EffectPeriodicCost {
     private HashMap<String, Integer> production;
     private double econProduction;
 
-    @Override protected boolean onSuccessfulTick(Region region) {
+    @Override protected boolean onSuccessfulTick(FunctionalRegion region) {
         HashMap<String, Integer> toEvent = new HashMap<>(production);
         ProductionEvent e = new ProductionEvent(toEvent, econProduction);
         Bukkit.getPluginManager().callEvent(e);
@@ -53,7 +53,7 @@ public class EffectProduction extends EffectPeriodicCost {
         return true;
     }
 
-    @Override protected boolean onInsufficientResources(Region region) {
+    @Override protected boolean onInsufficientResources(FunctionalRegion region) {
         return true;
     }
 
@@ -64,7 +64,7 @@ public class EffectProduction extends EffectPeriodicCost {
     @Override public void onInit(ITownshipsPlugin plugin) {
     }
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         production = new HashMap<>();
         StoredDataSection produce = data.getSection("produce");
@@ -77,7 +77,7 @@ public class EffectProduction extends EffectPeriodicCost {
         econProduction = Double.valueOf(produce.get("money", "0"));
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         StoredDataSection subSection = data.getSection("produce");
         subSection.set("money", econProduction);

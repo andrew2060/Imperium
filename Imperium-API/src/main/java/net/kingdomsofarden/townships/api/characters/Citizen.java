@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.api.characters;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ public interface Citizen {
      * @param region The region to get roles for
      * @return The roles held by the given citizen within a region
      */
-    Collection<RoleGroup> getRoles(Region region);
+    Collection<RoleGroup> getRoles(FunctionalRegion region);
 
     /**
      * @return The smallest bounded area within which the Citizen currently is located
@@ -42,16 +42,16 @@ public interface Citizen {
     /**
      * @return The region/government that citizen is a member of, or null
      */
-    Region getCitizenRegion();
+    FunctionalRegion getCitizenRegion();
 
     /**
      * @return Regions that the citizen is currently in (used for region entrance/exit events)
      */
-    Set<Region> getActiveRegions();
+    Set<FunctionalRegion> getActiveRegions();
 
     /**
      * Set the regions that the citizen is currently in
      * @param currActive
      */
-    void setActiveRegions(Set<Region> currActive);
+    void setActiveRegions(Set<FunctionalRegion> currActive);
 }

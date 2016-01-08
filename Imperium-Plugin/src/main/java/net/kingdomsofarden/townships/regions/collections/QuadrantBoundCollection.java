@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.regions.collections;
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
@@ -41,28 +41,28 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return bounds;
     }
 
-    @Override public TreeSet<Region> getBoundingRegions(int x, int y, int z) {
+    @Override public TreeSet<FunctionalRegion> getBoundingRegions(int x, int y, int z) {
         boolean upperHalf = z > zDivisor;
         boolean leftHalf = x <= xDivisor;
         if (leftHalf) {
             if (upperHalf) {
                 return subRegions[0] != null ?
                     subRegions[0].getBoundingRegions(x, y, z) :
-                    new TreeSet<Region>();
+                    new TreeSet<FunctionalRegion>();
             } else {
                 return subRegions[2] != null ?
                     subRegions[2].getBoundingRegions(x, y, z) :
-                    new TreeSet<Region>();
+                    new TreeSet<FunctionalRegion>();
             }
         } else {
             if (upperHalf) {
                 return subRegions[1] != null ?
                     subRegions[1].getBoundingRegions(x, y, z) :
-                    new TreeSet<Region>();
+                    new TreeSet<FunctionalRegion>();
             } else {
                 return subRegions[3] != null ?
                     subRegions[3].getBoundingRegions(x, y, z) :
-                    new TreeSet<Region>();
+                    new TreeSet<FunctionalRegion>();
             }
         }
     }
@@ -123,7 +123,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
     }
 
     // TODO: Alternative algorithms?
-    @Override protected void constructContainedRegions(Set<Region> regions) {
+    @Override protected void constructContainedRegions(Set<FunctionalRegion> regions) {
         for (RegionBoundCollection c : subRegions) {
             c.constructContainedRegions(regions);
         }
@@ -156,7 +156,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         }
     }
 
-    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<Region> col) {
+    @Override public void getIntersectingRegions(BoundingArea b, TreeSet<FunctionalRegion> col) {
         if (b instanceof CuboidBoundingBox) {
             CuboidBoundingBox bound = (CuboidBoundingBox) b;
             boolean upperLeft = bound.getMaxZ() > zDivisor && bound.getMinX() <= xDivisor;
@@ -269,7 +269,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
         return true;
     }
 
-    @Override public Iterator<Region> iterator() {
+    @Override public Iterator<FunctionalRegion> iterator() {
         return getContents().iterator();
     }
 
@@ -283,8 +283,8 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override public boolean remove(Object o) {
         BoundingArea b;
-        if (o instanceof Region) {
-            b = ((Region) o).getBounds();
+        if (o instanceof FunctionalRegion) {
+            b = ((FunctionalRegion) o).getBounds();
         } else if (o instanceof BoundingArea) {
             b = (BoundingArea) o;
         } else {
@@ -335,7 +335,7 @@ public class QuadrantBoundCollection extends RegionBoundCollection {
 
     @Override public boolean retainAll(Collection<?> c) {
         boolean ret = false;
-        for (Region r : getContents()) {
+        for (FunctionalRegion r : getContents()) {
             if (!c.contains(r) && remove(r)) {
                 ret = true;
             }

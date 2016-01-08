@@ -5,6 +5,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.regions.bounds.wrappers.WrappedBoundingArea;
@@ -62,7 +63,7 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    @Override public net.kingdomsofarden.townships.api.regions.Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return null;
     }
 

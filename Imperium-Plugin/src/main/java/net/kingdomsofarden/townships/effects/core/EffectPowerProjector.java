@@ -2,7 +2,7 @@ package net.kingdomsofarden.townships.effects.core;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.effects.Effect;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 public class EffectPowerProjector implements Effect {
@@ -17,15 +17,15 @@ public class EffectPowerProjector implements Effect {
 
     }
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
 
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
 
     }
 
-    @Override public Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return null;
     }
 }

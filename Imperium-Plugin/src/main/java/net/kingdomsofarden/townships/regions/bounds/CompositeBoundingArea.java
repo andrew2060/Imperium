@@ -6,6 +6,7 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.regions.collections.AxisBoundCollection;
 import net.kingdomsofarden.townships.regions.collections.RegionBoundCollection;
@@ -20,14 +21,13 @@ import java.util.*;
 public class CompositeBoundingArea implements BoundingArea {
 
     private final World world;
-    private final net.kingdomsofarden.townships.api.regions.Region region;
+    private final FunctionalRegion region;
     private Collection<BlockVector> blockVectors;
     private Collection<BlockVector2D> flattened;
 
     private RegionBoundCollection regions;
 
-    public CompositeBoundingArea(World world,
-        net.kingdomsofarden.townships.api.regions.Region region) {
+    public CompositeBoundingArea(World world, FunctionalRegion region) {
         this.blockVectors = new HashSet<>();
         this.flattened = new HashSet<>();
         this.world = world;
@@ -73,7 +73,7 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public boolean intersects(BoundingArea bounds) {
-        TreeSet<net.kingdomsofarden.townships.api.regions.Region> regionColl = new TreeSet<>();
+        TreeSet<FunctionalRegion> regionColl = new TreeSet<>();
         regions.getIntersectingRegions(bounds, regionColl);
         return !regionColl.isEmpty();
     }
@@ -122,7 +122,7 @@ public class CompositeBoundingArea implements BoundingArea {
         return (T) ret;
     }
 
-    @Override public net.kingdomsofarden.townships.api.regions.Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return region;
     }
 

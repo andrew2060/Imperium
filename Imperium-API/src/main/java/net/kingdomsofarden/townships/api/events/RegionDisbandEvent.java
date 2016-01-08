@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.events;
 
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -13,10 +13,10 @@ public class RegionDisbandEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final DisbandCause cause;
     private boolean cancelled;
-    private Region region;
+    private FunctionalRegion region;
 
 
-    public RegionDisbandEvent(Region region, DisbandCause cause) {
+    public RegionDisbandEvent(FunctionalRegion region, DisbandCause cause) {
         this.region = region;
         this.cancelled = false;
         this.cause = cause;
@@ -33,7 +33,7 @@ public class RegionDisbandEvent extends Event implements Cancellable {
     /**
      * @return The region being disbanded
      */
-    public Region getRegion() {
+    public FunctionalRegion getRegion() {
         return region;
     }
 

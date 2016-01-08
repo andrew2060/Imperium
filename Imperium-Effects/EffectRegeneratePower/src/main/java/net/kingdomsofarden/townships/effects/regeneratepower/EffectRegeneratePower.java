@@ -1,7 +1,7 @@
 package net.kingdomsofarden.townships.effects.regeneratepower;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodicCost;
 import net.kingdomsofarden.townships.util.MetaKeys;
@@ -13,7 +13,7 @@ public class EffectRegeneratePower extends EffectPeriodicCost {
     private int regenAmount;
     private int max;
 
-    @Override protected boolean onSuccessfulTick(Region region) {
+    @Override protected boolean onSuccessfulTick(FunctionalRegion region) {
         Map<String, Object> meta = region.getMetadata();
         if (!meta.containsKey(MetaKeys.POWER)) { // Doesn't have power meta, don't reschedule
             return false;
@@ -27,7 +27,7 @@ public class EffectRegeneratePower extends EffectPeriodicCost {
         return true;
     }
 
-    @Override protected boolean onInsufficientResources(Region region) {
+    @Override protected boolean onInsufficientResources(FunctionalRegion region) {
         return true;
     }
 
@@ -39,13 +39,13 @@ public class EffectRegeneratePower extends EffectPeriodicCost {
     }
 
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         super.onLoad(plugin, region, data);
         regenAmount = Integer.valueOf(data.get("amount", "0"));
         max = (Integer) region.getMetadata().getOrDefault(MetaKeys.MAX_POWER, -1);
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         data.set("amount", regenAmount);
         data.set("max-amount", max);

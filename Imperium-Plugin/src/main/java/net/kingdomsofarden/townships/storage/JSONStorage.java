@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.storage;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
 import net.kingdomsofarden.townships.util.JSONDataSection;
@@ -21,11 +21,11 @@ public class JSONStorage implements Storage {
 
     private File regionsDir;
 
-    @Override public Region loadRegion(UUID id) {
+    @Override public FunctionalRegion loadRegion(UUID id) {
         return null;
     }
 
-    @Override public void saveRegion(Region r, boolean async) {
+    @Override public void saveRegion(FunctionalRegion r, boolean async) {
 
     }
 
@@ -33,7 +33,7 @@ public class JSONStorage implements Storage {
 
     }
 
-    @Override public void loadAllRegions(Collection<Region> regions) {
+    @Override public void loadAllRegions(Collection<FunctionalRegion> regions) {
         File[] files = regionsDir.listFiles();
         if (files == null) {
             return;
@@ -59,7 +59,7 @@ public class JSONStorage implements Storage {
         // large numbers of regions
         ExecutorService loadThreadPool = Executors.newWorkStealingPool(4);
         for (int tier : tiers) {
-            List<Future<Region>> regionCreation = new LinkedList<>();
+            List<Future<FunctionalRegion>> regionCreation = new LinkedList<>();
             for (JsonObject region : loadedObjectsByTier.get(tier)) {
                 regionCreation.add(loadThreadPool.submit(() -> new TownshipsRegion(UUID.fromString(region.get("uid").getAsString()),
                     new JSONDataSection(region, null))));

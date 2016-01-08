@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
@@ -22,7 +22,7 @@ public class TownshipsRegionManager implements RegionManager {
 
     private TownshipsPlugin plugin;
     private Map<UUID, RegionBoundCollection> maps; // One per world
-    private Map<UUID, Region> uidToRegion;
+    private Map<UUID, FunctionalRegion> uidToRegion;
     private Map<String, UUID> nameToUid;
 
     public TownshipsRegionManager(TownshipsPlugin plugin) {
@@ -47,15 +47,15 @@ public class TownshipsRegionManager implements RegionManager {
         } else if (o instanceof UUID) {
             return uidToRegion.containsKey(o);
         } else {
-            return o instanceof Region && uidToRegion.containsValue(o);
+            return o instanceof FunctionalRegion && uidToRegion.containsValue(o);
         }
     }
 
-    @Override public Iterator<Region> iterator() {
+    @Override public Iterator<FunctionalRegion> iterator() {
         return uidToRegion.values().iterator();
     }
 
-    @Override public void forEach(Consumer<? super Region> action) {
+    @Override public void forEach(Consumer<? super FunctionalRegion> action) {
 
     }
 
@@ -67,7 +67,7 @@ public class TownshipsRegionManager implements RegionManager {
         return uidToRegion.values().toArray(a);
     }
 
-    @Override public boolean add(Region region) {
+    @Override public boolean add(FunctionalRegion region) {
         region.getEffects().stream().filter(effect -> effect instanceof TickableEffect).forEach(
             effect -> plugin.getEffectManager().getEffectTaskManager()
                 .schedule((TickableEffect) effect, region));
@@ -83,7 +83,7 @@ public class TownshipsRegionManager implements RegionManager {
             maps.put(wUid, new AxisBoundCollection(world, true));
         }
         ret = maps.get(wUid).add(region);
-        for (Region r : getIntersectingRegions(region.getBounds())) {
+        for (FunctionalRegion r : getIntersectingRegions(region.getBounds())) {
             if (r.getTier() > region.getTier()) {
                 r.getChildren().add(region);
             } else if (r.getTier() < region.getTier()) {
@@ -94,15 +94,15 @@ public class TownshipsRegionManager implements RegionManager {
     }
 
     @Override public boolean remove(Object o) {
-        Region r;
+        FunctionalRegion r;
         if (o instanceof String) {
             r = nameToUid.containsKey(((String) o).toLowerCase()) ?
                 uidToRegion.get(nameToUid.get(((String) o).toLowerCase())) :
                 null;
         } else if (o instanceof UUID) {
             r = uidToRegion.get(o);
-        } else if (o instanceof Region) {
-            r = (Region) o;
+        } else if (o instanceof FunctionalRegion) {
+            r = (FunctionalRegion) o;
         } else {
             return false;
         }
@@ -124,7 +124,7 @@ public class TownshipsRegionManager implements RegionManager {
         r.setValid(false);
         boolean ret = maps.containsKey(world) && maps.get(world).remove(r);
         if (ret) {
-            for (Region region : getIntersectingRegions(r.getBounds())) {
+            for (FunctionalRegion region : getIntersectingRegions(r.getBounds())) {
                 if (region.getTier() > r.getTier()) {
                     region.getChildren().remove(r);
                 } else if (region.getTier() < r.getTier()) {
@@ -139,9 +139,9 @@ public class TownshipsRegionManager implements RegionManager {
         return uidToRegion.keySet().containsAll(c);
     }
 
-    @Override public boolean addAll(Collection<? extends Region> c) {
+    @Override public boolean addAll(Collection<? extends FunctionalRegion> c) {
         boolean modify = false;
-        for (Region r : c) {
+        for (FunctionalRegion r : c) {
             if (add(r)) {
                 modify = true;
             }
@@ -159,7 +159,7 @@ public class TownshipsRegionManager implements RegionManager {
         return modify;
     }
 
-    @Override public boolean removeIf(Predicate<? super Region> filter) {
+    @Override public boolean removeIf(Predicate<? super FunctionalRegion> filter) {
         final boolean[] modified = {false};
         new ArrayList<>(uidToRegion.values()).stream().filter(filter::test).forEach(region -> {
             uidToRegion.remove(region.getUid());
@@ -185,19 +185,19 @@ public class TownshipsRegionManager implements RegionManager {
             "Flushing the Region Manager is not a permitted operation");
     }
 
-    @Override public Spliterator<Region> spliterator() {
+    @Override public Spliterator<FunctionalRegion> spliterator() {
         return uidToRegion.values().spliterator();
     }
 
-    @Override public Stream<Region> stream() {
+    @Override public Stream<FunctionalRegion> stream() {
         return uidToRegion.values().stream();
     }
 
-    @Override public Stream<Region> parallelStream() {
+    @Override public Stream<FunctionalRegion> parallelStream() {
         return uidToRegion.values().parallelStream();
     }
 
-    @Override public TreeSet<Region> getBoundingRegions(Location loc) {
+    @Override public TreeSet<FunctionalRegion> getBoundingRegions(Location loc) {
         UUID world = loc.getWorld().getUID();
         if (maps.containsKey(world)) {
             return maps.get(world)
@@ -214,10 +214,10 @@ public class TownshipsRegionManager implements RegionManager {
             Optional.<Area>absent();
     }
 
-    @Override public TreeSet<Region> getIntersectingRegions(BoundingArea bounds) {
+    @Override public TreeSet<FunctionalRegion> getIntersectingRegions(BoundingArea bounds) {
         UUID world = bounds.getWorld().getUID();
         if (maps.containsKey(world)) {
-            TreeSet<Region> ret = new TreeSet<>((o1, o2) -> {
+            TreeSet<FunctionalRegion> ret = new TreeSet<>((o1, o2) -> {
                 int ret1 = o2.getTier() - o1.getTier();
                 if (ret1 == 0) {
                     return o1.getUid().compareTo(o2.getUid());
@@ -238,7 +238,7 @@ public class TownshipsRegionManager implements RegionManager {
             boundsTree.getIntersectingBounds(bounds);
     }
 
-    @Override public Optional<Region> get(String name) {
+    @Override public Optional<FunctionalRegion> get(String name) {
         UUID id = nameToUid.get(name.toLowerCase());
         if (id != null)
             return Optional.fromNullable(uidToRegion.get(id));
@@ -246,7 +246,7 @@ public class TownshipsRegionManager implements RegionManager {
             return Optional.absent();
     }
 
-    @Override public Optional<Region> get(UUID uuid) {
+    @Override public Optional<FunctionalRegion> get(UUID uuid) {
         return Optional.fromNullable(uidToRegion.get(uuid));
     }
 

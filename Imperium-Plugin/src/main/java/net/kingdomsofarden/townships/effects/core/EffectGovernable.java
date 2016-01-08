@@ -7,7 +7,7 @@ import net.kingdomsofarden.townships.api.events.BankEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
 import net.kingdomsofarden.townships.api.events.ProductionEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
@@ -68,7 +68,7 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin.getBackingImplementation());
     }
 
-    @Override public long onTick(Region region, long time) {
+    @Override public long onTick(FunctionalRegion region, long time) {
         updateImmed();
         last = curr;
         curr = new Stats();
@@ -77,7 +77,7 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         return super.onTick(region, time);
     }
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         if (startTime == -1) {
             startTime = System.currentTimeMillis() / Constants.YEAR_LENGTH + Constants.YEAR_LENGTH;
@@ -101,7 +101,7 @@ public class EffectGovernable extends EffectPeriodic implements Listener {
         }
     }
 
-    public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         data.set("last.pop", last.pop);
         data.set("last.land", last.land);
         data.set("last.prod", last.prod);

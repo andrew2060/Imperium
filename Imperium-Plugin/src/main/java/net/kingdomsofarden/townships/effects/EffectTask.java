@@ -1,11 +1,11 @@
 package net.kingdomsofarden.townships.effects;
 
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 
 public class EffectTask {
 
-    private Region region;
+    private FunctionalRegion region;
     private TickableEffect effect;
     private double load;
     private long nextTick;
@@ -15,7 +15,7 @@ public class EffectTask {
     private double[] enqueuedAverages;
     private int queueHead;
 
-    public EffectTask(Region region, TickableEffect effect) {
+    public EffectTask(FunctionalRegion region, TickableEffect effect) {
         this.region = region;
         this.effect = effect;
         this.nextTick = effect.startTime();

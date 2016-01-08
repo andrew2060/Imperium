@@ -7,7 +7,7 @@ import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Bukkit;
@@ -34,14 +34,14 @@ public class CommandRegionDisband implements Command {
     }
 
     @Override public boolean execute(CommandSender sender, String[] args) {
-        Optional<Region> toRemove;
+        Optional<FunctionalRegion> toRemove;
         try {
             toRemove = Townships.getRegions().get(UUID.fromString(args[0]));
         } catch (IllegalArgumentException e) {
             toRemove = Townships.getRegions().get(args[0]);
         }
         if (toRemove.isPresent()) {
-            Region r = toRemove.get();
+            FunctionalRegion r = toRemove.get();
             // Check permission
             if (sender instanceof Player) {
                 Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());

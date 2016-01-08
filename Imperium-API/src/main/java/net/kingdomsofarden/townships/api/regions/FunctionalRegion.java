@@ -18,7 +18,7 @@ import java.util.UUID;
 /**
  * Represents a region
  */
-public interface Region {
+public interface FunctionalRegion {
 
     /**
      * @return The tier of the region, in general lower tiers refers to smaller regions while higher tiers refer to
@@ -37,14 +37,14 @@ public interface Region {
     Optional<String> getName();
 
     /**
-     * @return A map of Region, Relation value pairs matching a region to the relation this region currently holds with it
+     * @return A map of FunctionalRegion, Relation value pairs matching a region to the relation this region currently holds with it
      */
-    Map<Region, RelationState> getRelations();
+    Map<FunctionalRegion, RelationState> getRelations();
 
     /**
-     * @return A map of Region to Relation States held by other relationable regions toward this region
+     * @return A map of FunctionalRegion to Relation States held by other relationable regions toward this region
      */
-    Map<Region, RelationState> getExternRelations();
+    Map<FunctionalRegion, RelationState> getExternRelations();
 
     /**
      * @param group The group to get
@@ -120,7 +120,7 @@ public interface Region {
     String getType();
 
     /**
-     * Adds the given {@link RoleGroup} to the given {@link Citizen} for this Region
+     * Adds the given {@link RoleGroup} to the given {@link Citizen} for this FunctionalRegion
      *
      * @param citizen The citizen
      * @param group   The rolegroup to add
@@ -128,7 +128,7 @@ public interface Region {
     void addRole(Citizen citizen, RoleGroup group);
 
     /**
-     * Removes the given {@link RoleGroup} from the given {@link Citizen} for this Region
+     * Removes the given {@link RoleGroup} from the given {@link Citizen} for this FunctionalRegion
      *
      * @param citizen The citizen
      * @param group   The role group to remove
@@ -180,25 +180,25 @@ public interface Region {
     /**
      * @return A collection of parent regions that encompass this region
      */
-    Collection<Region> getParents();
+    Collection<FunctionalRegion> getParents();
 
     /**
      * @return A collection of child regions that are encompassed by this region
      */
-    Collection<Region> getChildren();
+    Collection<FunctionalRegion> getChildren();
 
     /**
      * @param region The region to check
      * @return Whether the given region is compatible (i.e. satisfies tier/type restrictions, amongst others) as a
      * parent/child of this region
      */
-    boolean isCompatible(Region region);
+    boolean isCompatible(FunctionalRegion region);
 
     /**
      * Retrieves a metadata mapping for keys that are not associated with any regions (global)
      *
      * @return A mapping of metadata values currently associated with the region
-     * @see {@link #getRegionalMetadata(Region)}
+     * @see {@link #getRegionalMetadata(FunctionalRegion)}
      */
     Map<String, Object> getMetadata();
 
@@ -216,7 +216,7 @@ public interface Region {
      * region
      * @see {@link #getMetadata()}
      */
-    Map<String, Object> getRegionalMetadata(Region region);
+    Map<String, Object> getRegionalMetadata(FunctionalRegion region);
 
     boolean addAccess(RoleGroup group, AccessType access);
 

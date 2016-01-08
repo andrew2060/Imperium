@@ -6,7 +6,7 @@ import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.events.RegionRelationChangeEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.util.Constants;
 import net.kingdomsofarden.townships.util.I18N;
@@ -45,12 +45,12 @@ public class CommandDeclareRelation implements Command {
                 args[0].toUpperCase());
             return true;
         }
-        Region declarer = Townships.getRegions().get(args[1]).orNull();
+        FunctionalRegion declarer = Townships.getRegions().get(args[1]).orNull();
         if (declarer == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1]);
             return true;
         }
-        Region declaree = Townships.getRegions().get(args[2]).orNull();
+        FunctionalRegion declaree = Townships.getRegions().get(args[2]).orNull();
         if (declaree == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[2]);
             return true;

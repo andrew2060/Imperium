@@ -5,7 +5,7 @@ import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.events.CitizenEnterRegionEvent;
 import net.kingdomsofarden.townships.api.events.CitizenExitRegionEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.common.EffectPeriodic;
@@ -21,7 +21,7 @@ public class WarListener implements Listener {
     // TODO 2.0 Dynamically bound regions
     @EventHandler(priority = EventPriority.LOWEST) public void onWarDeath(PlayerDeathEvent event) {
         Citizen dead = Townships.getCitizens().getCitizen(event.getEntity().getUniqueId());
-        Region defendingRegion = dead.getCitizenRegion();
+        FunctionalRegion defendingRegion = dead.getCitizenRegion();
         if (event.getEntity().getKiller() != null) {
             defendingRegion.updatePower(-1 * Constants.POWER_LOSS_PER_DEATH_PVP);
         }
@@ -29,7 +29,7 @@ public class WarListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEnterRegion(CitizenEnterRegionEvent event) {
-        Region r = event.getRegion();
+        FunctionalRegion r = event.getRegion();
         Citizen c = event.getCitizen();
         RelationState rel = r.getEffectiveRelation(c);
         if (rel.equals(RelationState.ALLIANCE) || rel.equals(RelationState.SELF)) {
@@ -41,7 +41,7 @@ public class WarListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onExitRegion(CitizenExitRegionEvent event) {
-        Region r = event.getRegion();
+        FunctionalRegion r = event.getRegion();
         Citizen c = event.getCitizen();
         if (r.hasEffect(c.getUid() + "_occupation")) {
             r.removeEffect(c.getUid() + "_occupation");
@@ -50,11 +50,11 @@ public class WarListener implements Listener {
 
     private static class OccupationEffect extends EffectPeriodic {
 
-        private final Region region;
+        private final FunctionalRegion region;
         private final boolean flag;
         private String name;
 
-        public OccupationEffect(UUID uid, Region region, boolean friendly) {
+        public OccupationEffect(UUID uid, FunctionalRegion region, boolean friendly) {
             this.name = uid + "_occupation";
             this.region = region;
             this.flag = friendly;
@@ -66,7 +66,7 @@ public class WarListener implements Listener {
             return name;
         }
 
-        @Override public long onTick(Region r, long time) {
+        @Override public long onTick(FunctionalRegion r, long time) {
             r.updatePower(flag ?
                 Constants.POWER_GAIN_PER_TICK_OCCUPATION :
                 Constants.POWER_LOSS_PER_TICK_OCCUPATION * -1);
@@ -77,16 +77,16 @@ public class WarListener implements Listener {
         }
 
         @Override
-        public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+        public void onLoad(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
             // Don't store any information
         }
 
         @Override
-        public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+        public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
             // Don't store any information
         }
 
-        @Override public Region getRegion() {
+        @Override public FunctionalRegion getRegion() {
             return region;
         }
     }

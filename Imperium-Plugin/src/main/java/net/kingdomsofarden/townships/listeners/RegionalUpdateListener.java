@@ -9,7 +9,7 @@ import net.kingdomsofarden.townships.api.events.CitizenExitRegionEvent;
 import net.kingdomsofarden.townships.api.events.CitizenPreEnterRegionEvent;
 import net.kingdomsofarden.townships.api.events.CitizenPreExitRegionEvent;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -82,11 +82,11 @@ public class RegionalUpdateListener implements Listener {
         Citizen c = plugin.getCitizens().getCitizen(event.getPlayer().getUniqueId());
         if (to.getWorld().getSpawnLocation().equals(to)) { // Spawned to default
             c.setCurrentArea(plugin.getRegions().getBoundingArea(to).orNull());
-            Set<Region> oldActive = c.getActiveRegions();
-            Set<Region> currActive = c.getCurrentArea()
+            Set<FunctionalRegion> oldActive = c.getActiveRegions();
+            Set<FunctionalRegion> currActive = c.getCurrentArea()
                 .getBoundingRegions(to.getBlockX(), to.getBlockY(), to.getBlockZ());
-            Set<Region> entered = Sets.difference(currActive, oldActive);
-            Set<Region> exited = Sets.difference(oldActive, currActive);
+            Set<FunctionalRegion> entered = Sets.difference(currActive, oldActive);
+            Set<FunctionalRegion> exited = Sets.difference(oldActive, currActive);
             PluginManager pm = Bukkit.getPluginManager();
             entered.stream().forEach(r -> {
                 pm.callEvent(new CitizenPreEnterRegionEvent(c, r));
@@ -148,19 +148,19 @@ public class RegionalUpdateListener implements Listener {
 
     private boolean runMovementEvents(Cancellable event, Citizen c, Location to) {
         // TODO use current area instead of whole tree
-        Set<Region> oldActive = c.getActiveRegions();
-        Set<Region> currActive = Townships.getRegions().getBoundingRegions(to);
-        Set<Region> entered = Sets.difference(currActive, oldActive);
-        Set<Region> exited = Sets.difference(oldActive, currActive);
+        Set<FunctionalRegion> oldActive = c.getActiveRegions();
+        Set<FunctionalRegion> currActive = Townships.getRegions().getBoundingRegions(to);
+        Set<FunctionalRegion> entered = Sets.difference(currActive, oldActive);
+        Set<FunctionalRegion> exited = Sets.difference(oldActive, currActive);
         PluginManager pm = Bukkit.getPluginManager();
-        for (Region r : entered) {
+        for (FunctionalRegion r : entered) {
             CitizenPreEnterRegionEvent e = new CitizenPreEnterRegionEvent(c, r);
             pm.callEvent(e);
             if (e.isCancelled()) {
                 event.setCancelled(true);
             }
         }
-        for (Region r : exited) {
+        for (FunctionalRegion r : exited) {
             CitizenPreExitRegionEvent e = new CitizenPreExitRegionEvent(c, r);
             pm.callEvent(e);
             if (e.isCancelled()) {

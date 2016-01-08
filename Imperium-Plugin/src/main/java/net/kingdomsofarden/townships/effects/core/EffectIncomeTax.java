@@ -6,7 +6,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.events.EconomyTransactionEvent.TransactionType;
 import net.kingdomsofarden.townships.api.events.PlayerEconomyTransactionEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.resources.VaultEconomyProvider;
@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class EffectIncomeTax implements Effect, Listener {
-    private Region region;
+    private FunctionalRegion region;
     private double tax;
 
     @Override public String getName() {
@@ -28,7 +28,7 @@ public class EffectIncomeTax implements Effect, Listener {
 
     }
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         this.region = region;
         tax = 0;
         try {
@@ -43,12 +43,12 @@ public class EffectIncomeTax implements Effect, Listener {
         Bukkit.getPluginManager().registerEvents(this, (Plugin) plugin.getBackingImplementation());
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         data.set("rate", tax);
         PlayerEconomyTransactionEvent.getHandlerList().unregister(this);
     }
 
-    @Override public Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return region;
     }
 

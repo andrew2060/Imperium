@@ -1,7 +1,7 @@
 package net.kingdomsofarden.townships.storage;
 
 import net.kingdomsofarden.townships.TownshipsPlugin;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.storage.Storage;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.regions.TownshipsRegion;
@@ -25,16 +25,16 @@ public class YAMLStorage implements Storage {
         this.regionSaves.mkdir();
     }
 
-    @Override public Region loadRegion(UUID id) {
+    @Override public FunctionalRegion loadRegion(UUID id) {
         File f = new File(regionSaves,
             id + ".yml"); // An exist check is not necessary as a blank configuration is retrieved
         StoredDataSection section = new YAMLDataSection(YamlConfiguration.loadConfiguration(f));
-        Region r = new TownshipsRegion(id, section);
+        FunctionalRegion r = new TownshipsRegion(id, section);
         plugin.getRegions().add(r);
         return r;
     }
 
-    @Override public void saveRegion(Region r, boolean async) {
+    @Override public void saveRegion(FunctionalRegion r, boolean async) {
         File f = new File(regionSaves, r.getUid() + ".yml");
         FileConfiguration save = new YamlConfiguration();
         r.saveConfigs(new YAMLDataSection(save));
@@ -52,7 +52,7 @@ public class YAMLStorage implements Storage {
         }
     }
 
-    @Override public void loadAllRegions(Collection<Region> regions) {
+    @Override public void loadAllRegions(Collection<FunctionalRegion> regions) {
         for (String name : regionSaves.list()) {
             try {
                 if (name.toLowerCase().endsWith(".yml")) {

@@ -1,7 +1,7 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import com.google.gson.JsonObject;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -72,9 +72,9 @@ public interface BoundingArea {
     <T extends BoundingArea> T grow(Class<T> clazz, int size);
 
     /**
-     * @return The {@link Region} represented by this bounding box
+     * @return The {@link FunctionalRegion} represented by this bounding box
      */
-    Region getRegion();
+    FunctionalRegion getRegion();
 
     /**
      * Initializes the bounds with the given settings as provided as a JSON object

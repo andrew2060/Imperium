@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.effects;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.effects.EffectManager;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.effects.core.PendingRelationChangeEffect;
 import net.kingdomsofarden.townships.util.Constants;
@@ -55,7 +55,7 @@ public class TownshipsEffectManager implements EffectManager {
     }
 
 
-    @Override public Effect loadEffect(String name, Region loader, StoredDataSection config) {
+    @Override public Effect loadEffect(String name, FunctionalRegion loader, StoredDataSection config) {
         if (effects.containsKey(name.toLowerCase())) {
             try {
                 Class<? extends Effect> clazz = effects.get(name.toLowerCase());

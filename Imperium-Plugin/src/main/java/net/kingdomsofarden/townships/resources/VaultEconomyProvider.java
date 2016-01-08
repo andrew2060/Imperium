@@ -2,7 +2,7 @@ package net.kingdomsofarden.townships.resources;
 
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ public class VaultEconomyProvider implements EconomyProvider {
     private UUID accountUid;
     private String identifier;
 
-    public VaultEconomyProvider(UUID accountUid, Region region, String identifier) {
+    public VaultEconomyProvider(UUID accountUid, FunctionalRegion region, String identifier) {
         this.accountUid = accountUid;
         this.identifier = identifier;
         if (!TownshipsPlugin.economy.getBanks().contains(accountUid.toString())) {

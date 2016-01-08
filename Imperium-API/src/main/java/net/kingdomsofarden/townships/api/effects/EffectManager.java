@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.effects;
 
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 /**
@@ -16,5 +16,5 @@ public interface EffectManager {
      *               itself, or a newly created one containing default values for dynamically loaded effects
      * @return The loaded effect
      */
-    Effect loadEffect(String name, Region region, StoredDataSection config);
+    Effect loadEffect(String name, FunctionalRegion region, StoredDataSection config);
 }

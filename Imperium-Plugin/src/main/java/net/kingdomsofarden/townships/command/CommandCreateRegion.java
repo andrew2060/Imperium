@@ -6,7 +6,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.events.RegionCreateEvent;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.Serializer;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.command.selection.SelectionManager;
@@ -98,7 +98,7 @@ public class CommandCreateRegion implements Command {
             return true;
         }
         // Check region permissions
-        TreeSet<Region> intersections = Townships.getRegions().getIntersectingRegions(selection);
+        TreeSet<FunctionalRegion> intersections = Townships.getRegions().getIntersectingRegions(selection);
         Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
         int regionTier = data.get("tier", intSerializer, Integer.MIN_VALUE);
         if (!intersections.last().hasAccess(c, AccessType.ZONING)) {
@@ -210,7 +210,7 @@ public class CommandCreateRegion implements Command {
             Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_MUTEX_FAIL);
             return true;
         }
-        for (Region region : intersections) {
+        for (FunctionalRegion region : intersections) {
             int tier = region.getTier();
             String type = region.getType().toLowerCase();
             if (excludeTiers.contains(tier) || excludeTypes.contains(type) || tier == regionTier) {
@@ -275,8 +275,8 @@ public class CommandCreateRegion implements Command {
         }
         data.set("position-1", selection.getLoc1());
         data.set("position-2", selection.getLoc2());
-        Region created = new TownshipsRegion(createdId, data); // TODO grant administrative rights
-        for (Region intersect : intersections) {
+        FunctionalRegion created = new TownshipsRegion(createdId, data); // TODO grant administrative rights
+        for (FunctionalRegion intersect : intersections) {
             if (!intersect.isCompatible(created)) {
                 Messaging.sendFormattedMessage(sender, I18N.REGION_COLLISION_GENERAL);
                 return true;

@@ -15,7 +15,7 @@ import java.util.TreeSet;
  * collection of all contents with unique elements: the exception being if the Area involved is terminal (i.e. does not
  * contain other smaller Areas)</p>
  */
-public interface Area extends Collection<Region> {
+public interface Area extends Collection<FunctionalRegion> {
 
     /**
      * @return A BoundingBox representation of the area
@@ -28,7 +28,7 @@ public interface Area extends Collection<Region> {
      * @return A Collection representation of all the regions stored (that have part of their bounding box within)
      * this Area
      */
-    Collection<Region> getContents();
+    Collection<FunctionalRegion> getContents();
 
     /**
      * @param x The x coordinate to check
@@ -37,7 +37,7 @@ public interface Area extends Collection<Region> {
      * @return A collection of regions within this region bound collection that contain the parameter
      * x/y/z coordinates in their bounding box, sorted in descending tier order
      */
-    TreeSet<Region> getBoundingRegions(int x, int y, int z);
+    TreeSet<FunctionalRegion> getBoundingRegions(int x, int y, int z);
 
     /**
      * Utility method to check whether a given location is within the bounds tracked by this collection

@@ -10,12 +10,12 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 
-public interface RegionManager extends Collection<Region> {
+public interface RegionManager extends Collection<FunctionalRegion> {
     /**
      * @param loc The location to check
      * @return A Collection of Regions that bound (contain) the given location
      */
-    TreeSet<Region> getBoundingRegions(Location loc);
+    TreeSet<FunctionalRegion> getBoundingRegions(Location loc);
 
     /**
      * @param loc The location to check
@@ -27,7 +27,7 @@ public interface RegionManager extends Collection<Region> {
      * @param bounds The bounds to check
      * @return A collection of all regions that intersect this bounding box in some way
      */
-    TreeSet<Region> getIntersectingRegions(BoundingArea bounds);
+    TreeSet<FunctionalRegion> getIntersectingRegions(BoundingArea bounds);
 
     /**
      * @param bounds The bounds to check
@@ -39,12 +39,12 @@ public interface RegionManager extends Collection<Region> {
      * @param name The name of the region, non case-sensitive
      * @return The matching region, if present
      */
-    Optional<Region> get(String name);
+    Optional<FunctionalRegion> get(String name);
 
     /**
      * @param uuid The uid of the region
      * @return The matching region, if present
      */
-    Optional<Region> get(UUID uuid);
+    Optional<FunctionalRegion> get(UUID uuid);
 
 }

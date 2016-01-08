@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import org.bukkit.Bukkit;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class RegionSubregionCheckTask implements Runnable {
 
-    private Region region;
+    private FunctionalRegion region;
     private HashMap<Integer, Integer> regionTierMinReq;
     private HashMap<String, Integer> regionTypeMinReq;
     private Set<Integer> checkedTiers;
@@ -22,7 +22,7 @@ public class RegionSubregionCheckTask implements Runnable {
     private boolean scheduled;
     private TownshipsPlugin plugin;
 
-    public RegionSubregionCheckTask(Region region, TownshipsPlugin plugin) {
+    public RegionSubregionCheckTask(FunctionalRegion region, TownshipsPlugin plugin) {
         this.plugin = plugin;
         StoredDataSection data =
             Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();
@@ -65,7 +65,7 @@ public class RegionSubregionCheckTask implements Runnable {
                 typeReq.put(t, regionTypeMinReq.get(t));
             }
             checkedTypes.clear();
-            for (Region child : region.getChildren()) {
+            for (FunctionalRegion child : region.getChildren()) {
                 String type = child.getType().toLowerCase();
                 int tier = child.getTier();
                 if (typeReq.containsKey(type)) {

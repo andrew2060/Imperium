@@ -1,7 +1,7 @@
 package net.kingdomsofarden.townships.effects.common;
 
 import net.kingdomsofarden.townships.api.ITownshipsPlugin;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.api.resources.ItemProvider;
 import net.kingdomsofarden.townships.api.util.Serializer;
@@ -18,7 +18,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
     private Double cost;
     private Map<Material, Integer> resources;
 
-    @Override public long onTick(Region region, long time) {
+    @Override public long onTick(FunctionalRegion region, long time) {
         Collection<EconomyProvider> econProviders = region.getEconomyProviders().values();
         if (cost > 0) {
             double amt = cost;
@@ -100,7 +100,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
      * @param region The region to be ticked
      * @return Whether a repeat should be scheduled
      */
-    protected abstract boolean onSuccessfulTick(Region region);
+    protected abstract boolean onSuccessfulTick(FunctionalRegion region);
 
     /**
      * Runs when tick is run unsuccessfully (i.e. upkeep requirements not met)
@@ -108,9 +108,9 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
      * @param region The region being ticked
      * @return Whether the region should be ticked again
      */
-    protected abstract boolean onInsufficientResources(Region region);
+    protected abstract boolean onInsufficientResources(FunctionalRegion region);
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion r, StoredDataSection data) {
         super.onLoad(plugin, r, data);
         StoredDataSection subSection = data.getSection("cost");
         resources = new HashMap<>();
@@ -135,7 +135,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
         }, 0.00);
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         super.onUnload(plugin, region, data);
         StoredDataSection subSection = data.getSection("cost");
         if (cost != 0.00) {
@@ -149,7 +149,7 @@ public abstract class EffectPeriodicCost extends EffectPeriodic {
         }
     }
 
-    @Override public Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return region;
     }
 }

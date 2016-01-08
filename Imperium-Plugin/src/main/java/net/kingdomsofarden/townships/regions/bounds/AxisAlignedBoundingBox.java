@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.regions.bounds;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.regions.bounds.wrappers.WrappedBoundingArea;
@@ -16,7 +16,7 @@ public class AxisAlignedBoundingBox extends WrappedBoundingArea implements Cuboi
     private final Vector min;
     private final Vector max;
 
-    public AxisAlignedBoundingBox(CuboidRegion cube, Region region) {
+    public AxisAlignedBoundingBox(CuboidRegion cube, FunctionalRegion region) {
         super(cube, region);
         this.min = cube.getMinimumPoint();
         this.max = cube.getMaximumPoint();

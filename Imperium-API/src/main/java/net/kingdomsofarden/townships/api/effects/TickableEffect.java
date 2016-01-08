@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.effects;
 
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 
 /**
  * Denotes an Effect that is Tickable - i.e. performs a repeating set of actions every tick
@@ -19,6 +19,6 @@ public interface TickableEffect extends Effect {
      * @param time   The time in milliseconds the effect is being ticked
      * @return The time to schedule for the next tick, or LONG.MAX_VALUE to not schedule again
      */
-    long onTick(Region region, long time);
+    long onTick(FunctionalRegion region, long time);
 
 }

@@ -1,6 +1,6 @@
 package net.kingdomsofarden.townships.api.events;
 
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -9,12 +9,12 @@ import org.bukkit.event.HandlerList;
 public class RegionRelationChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
-    private Region origin;
-    private Region target;
+    private FunctionalRegion origin;
+    private FunctionalRegion target;
     private RelationState current;
     private RelationState relation;
 
-    public RegionRelationChangeEvent(Region declarer, Region declaree, RelationState current,
+    public RegionRelationChangeEvent(FunctionalRegion declarer, FunctionalRegion declaree, RelationState current,
         RelationState relation) {
         this.origin = declarer;
         this.target = declaree;
@@ -31,11 +31,11 @@ public class RegionRelationChangeEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    public Region getOrigin() {
+    public FunctionalRegion getOrigin() {
         return origin;
     }
 
-    public Region getTarget() {
+    public FunctionalRegion getTarget() {
         return target;
     }
 

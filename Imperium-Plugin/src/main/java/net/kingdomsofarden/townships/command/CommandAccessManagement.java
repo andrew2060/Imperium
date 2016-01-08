@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.util.I18N;
 import net.kingdomsofarden.townships.util.Messaging;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ public class CommandAccessManagement implements Command {
     }
 
     @Override public boolean execute(CommandSender sender, String[] args) {
-        Region r = Townships.getRegions().get(args[1]).orNull();
+        FunctionalRegion r = Townships.getRegions().get(args[1]).orNull();
         if (r == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[1].toLowerCase());
             return true;

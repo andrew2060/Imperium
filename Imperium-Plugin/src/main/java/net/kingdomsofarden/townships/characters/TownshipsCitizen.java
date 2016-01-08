@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 
 import java.util.Collection;
@@ -19,8 +19,8 @@ public class TownshipsCitizen implements Citizen {
     private UUID uuid;
     private Area currTerminalArea;
     private StoredDataSection effectSettings;
-    private Region region;
-    private Set<Region> activeRegions;
+    private FunctionalRegion region;
+    private Set<FunctionalRegion> activeRegions;
 
     public TownshipsCitizen() {
         this.activeRegions = new HashSet<>();
@@ -30,7 +30,7 @@ public class TownshipsCitizen implements Citizen {
         return effectSettings;
     }
 
-    @Override public Collection<RoleGroup> getRoles(Region region) {
+    @Override public Collection<RoleGroup> getRoles(FunctionalRegion region) {
         return region.getRoles(this);
     }
 
@@ -56,15 +56,15 @@ public class TownshipsCitizen implements Citizen {
         return false; //TODO
     }
 
-    @Override public Region getCitizenRegion() {
+    @Override public FunctionalRegion getCitizenRegion() {
         return region;
     }
 
-    @Override public Set<Region> getActiveRegions() {
+    @Override public Set<FunctionalRegion> getActiveRegions() {
         return activeRegions;
     }
 
-    @Override public void setActiveRegions(Set<Region> currActive) {
+    @Override public void setActiveRegions(Set<FunctionalRegion> currActive) {
         this.activeRegions = currActive;
     }
 }

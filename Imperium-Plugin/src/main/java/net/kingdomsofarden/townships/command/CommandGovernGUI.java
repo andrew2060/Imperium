@@ -5,7 +5,7 @@ import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.command.Command;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
 import net.kingdomsofarden.townships.effects.core.EffectGovernable;
@@ -42,7 +42,7 @@ public class CommandGovernGUI implements Command {
     }
 
     @Override public boolean execute(CommandSender sender, String[] args) {
-        Region region =
+        FunctionalRegion region =
             Townships.getRegions().get(args[0]).orNull(); // Only allow management for named regions
         if (region == null) {
             Messaging.sendFormattedMessage(sender, I18N.REGION_NOT_FOUND, args[0]);
@@ -82,11 +82,11 @@ public class CommandGovernGUI implements Command {
         }
     }
 
-    private boolean processEconomics(CommandSender sender, String[] args, Region region) {
+    private boolean processEconomics(CommandSender sender, String[] args, FunctionalRegion region) {
         return false; // TODO
     }
 
-    private boolean processDiplomacy(CommandSender sender, String[] args, Region region) {
+    private boolean processDiplomacy(CommandSender sender, String[] args, FunctionalRegion region) {
         Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
         if (!region.hasAccess(c, AccessType.DIPLOMAT)) {
             Messaging.sendFormattedMessage(sender, I18N.NO_PERMISSION_DIPLOMACY);
@@ -110,13 +110,13 @@ public class CommandGovernGUI implements Command {
             RelationState actualRelation;
             long start;
             // out of
-            Region r;
+            FunctionalRegion r;
 
-            RelationStateEntry(Region region, RelationState state) {
+            RelationStateEntry(FunctionalRegion region, RelationState state) {
                 this(region, state, 0);
             }
 
-            RelationStateEntry(Region region, RelationState state, long begin) {
+            RelationStateEntry(FunctionalRegion region, RelationState state, long begin) {
                 actualRelation = state;
                 start = begin;
                 r = region;
@@ -198,15 +198,15 @@ public class CommandGovernGUI implements Command {
 
 
 
-    private boolean processInvitations(CommandSender sender, String[] args, Region region) {
+    private boolean processInvitations(CommandSender sender, String[] args, FunctionalRegion region) {
         return false; // TODO
     }
 
-    private boolean processPermissions(CommandSender sender, String[] args, Region region) {
+    private boolean processPermissions(CommandSender sender, String[] args, FunctionalRegion region) {
         return false; // TODO
     }
 
-    private boolean processDemographics(CommandSender sender, String[] args, Region region) {
+    private boolean processDemographics(CommandSender sender, String[] args, FunctionalRegion region) {
         int num = 1;
         if (args.length == 3) {
             try {
@@ -264,7 +264,7 @@ public class CommandGovernGUI implements Command {
         return true;
     }
 
-    private boolean displayGeneral(CommandSender sender, String[] args, Region region) {
+    private boolean displayGeneral(CommandSender sender, String[] args, FunctionalRegion region) {
         Citizen c = Townships.getCitizens().getCitizen(((Player) sender).getUniqueId());
         String title =
             "======= " + region.getType() + "Government: " + region.getName().get() + " =======\n";

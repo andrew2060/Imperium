@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.api.ITownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
 import net.kingdomsofarden.townships.api.events.RegionRelationChangeEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.util.I18N;
@@ -17,13 +17,13 @@ public class PendingRelationChangeEffect implements TickableEffect {
 
     private long time;
     private RelationState change;
-    private Region target;
+    private FunctionalRegion target;
 
     @Override public long startTime() {
         return time < System.currentTimeMillis() ? -1 : time;
     }
 
-    @Override public long onTick(Region region, long time) {
+    @Override public long onTick(FunctionalRegion region, long time) {
         RegionRelationChangeEvent event =
             new RegionRelationChangeEvent(region, target, region.getRelations().get(target),
                 change);
@@ -72,19 +72,19 @@ public class PendingRelationChangeEffect implements TickableEffect {
     @Override public void onInit(ITownshipsPlugin plugin) {
     }
 
-    @Override public void onLoad(ITownshipsPlugin plugin, Region r, StoredDataSection data) {
+    @Override public void onLoad(ITownshipsPlugin plugin, FunctionalRegion r, StoredDataSection data) {
         time = Long.valueOf(data.get("start-time", "0"));
         change = RelationState.valueOf(data.get("relation", "PEACE"));
         target = Townships.getRegions().get(UUID.fromString(data.get("region", null))).orNull();
     }
 
-    @Override public void onUnload(ITownshipsPlugin plugin, Region region, StoredDataSection data) {
+    @Override public void onUnload(ITownshipsPlugin plugin, FunctionalRegion region, StoredDataSection data) {
         data.set("start-time", time);
         data.set("relation", change.name());
         data.set("region", target.getUid());
     }
 
-    @Override public Region getRegion() {
+    @Override public FunctionalRegion getRegion() {
         return target;
     }
 }

@@ -7,7 +7,7 @@ import net.kingdomsofarden.townships.api.characters.Citizen;
 import net.kingdomsofarden.townships.api.characters.CitizenManager;
 import net.kingdomsofarden.townships.api.math.Point3I;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.RegionManager;
 import net.kingdomsofarden.townships.characters.TownshipsCitizen;
 import net.kingdomsofarden.townships.characters.TownshipsCitizenManager;
@@ -60,7 +60,7 @@ public class RegionalUpdateListenerTest {
             for (int z = -9; z <= 9; z++) {
                 int regions = rand.nextInt(10) + 1;
                 for (int i = 0; i < regions; i++) {
-                    Region r = mock(TownshipsRegion.class);
+                    FunctionalRegion r = mock(TownshipsRegion.class);
                     Location genCenter =
                         new Location(mockWorld, x * Constants.MIN_DIV_X + rand.nextInt(180) - 89, 0,
                             z * Constants.MIN_DIV_Z + rand.nextInt(180) - 89);

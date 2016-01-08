@@ -2,7 +2,7 @@ package net.kingdomsofarden.townships.regions.collections;
 
 import com.google.common.base.Optional;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.api.regions.bounds.CuboidBoundingBox;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
@@ -39,16 +39,16 @@ public abstract class RegionBoundCollection implements Area {
         return bounds;
     }
 
-    @Override public boolean add(Region region) {
+    @Override public boolean add(FunctionalRegion region) {
         return add(region.getBounds());
     }
 
     public abstract boolean add(BoundingArea bound);
 
-    @Override public boolean addAll(Collection<? extends Region> c) {
+    @Override public boolean addAll(Collection<? extends FunctionalRegion> c) {
         boolean ret = false;
         // Check bounds
-        for (Region r : c) {
+        for (FunctionalRegion r : c) {
             if (!isInBounds(r.getBounds())) {
                 throw new IllegalArgumentException(
                     "A specified region " + r + " was not contained in some part of this " +
@@ -77,21 +77,21 @@ public abstract class RegionBoundCollection implements Area {
         return l <= x && x <= u;
     }
 
-    @Override public Collection<Region> getContents() {
-        Set<Region> ret = new HashSet<Region>();
+    @Override public Collection<FunctionalRegion> getContents() {
+        Set<FunctionalRegion> ret = new HashSet<FunctionalRegion>();
         constructContainedRegions(ret);
         return ret;
     }
 
-    protected abstract void constructContainedRegions(Set<Region> regions);
+    protected abstract void constructContainedRegions(Set<FunctionalRegion> regions);
 
     public abstract Optional<Area> getBoundingArea(int x, int z);
 
-    public abstract void getIntersectingRegions(BoundingArea bounds, TreeSet<Region> col);
+    public abstract void getIntersectingRegions(BoundingArea bounds, TreeSet<FunctionalRegion> col);
 
     public abstract Collection<RegionBoundingArea> getContainedBounds();
 
     public abstract Collection<RegionBoundingArea> getIntersectingBounds(BoundingArea bounds);
 
-    public abstract Collection<Region> getFlattenedBoundingRegions(int x, int z);
+    public abstract Collection<FunctionalRegion> getFlattenedBoundingRegions(int x, int z);
 }

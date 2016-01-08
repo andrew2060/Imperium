@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import net.kingdomsofarden.townships.regions.bounds.wrappers.WrappedBoundingArea;
 
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PolygonalBoundingArea extends WrappedBoundingArea {
 
-    public PolygonalBoundingArea(Polygonal2DRegion region, Region tRegion) {
+    public PolygonalBoundingArea(Polygonal2DRegion region, FunctionalRegion tRegion) {
         super(region, tRegion);
     }
 

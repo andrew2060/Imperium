@@ -4,7 +4,7 @@ import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent.DisbandCause;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.util.StoredDataSection;
 import net.kingdomsofarden.townships.util.Constants;
 import org.bukkit.Bukkit;
@@ -22,12 +22,12 @@ public class RegionBlockCheckTask implements Runnable {
     private TownshipsPlugin plugin;
     private boolean scheduled;
 
-    private Region region;
+    private FunctionalRegion region;
     private Map<Material, Integer> reqs;
 
     private Set<Material> processQueue;
 
-    public RegionBlockCheckTask(Region region, TownshipsPlugin plugin) {
+    public RegionBlockCheckTask(FunctionalRegion region, TownshipsPlugin plugin) {
         this.plugin = plugin;
         StoredDataSection data =
             Townships.getConfiguration().getRegionConfiguration(region.getType()).orNull();

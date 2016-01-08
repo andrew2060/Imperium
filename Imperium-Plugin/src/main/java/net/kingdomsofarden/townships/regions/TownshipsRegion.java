@@ -11,7 +11,7 @@ import net.kingdomsofarden.townships.api.effects.Effect;
 import net.kingdomsofarden.townships.api.permissions.AccessType;
 import net.kingdomsofarden.townships.api.permissions.RoleGroup;
 import net.kingdomsofarden.townships.api.regions.Area;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.api.relations.RelationState;
 import net.kingdomsofarden.townships.api.resources.EconomyProvider;
@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class TownshipsRegion implements Region {
+public class TownshipsRegion implements FunctionalRegion {
 
 
     private UUID regionUid;
@@ -54,8 +54,8 @@ public class TownshipsRegion implements Region {
     private Collection<Area> containingAreas;
     private String type;
 
-    private TreeSet<Region> parents;
-    private TreeSet<Region> children;
+    private TreeSet<FunctionalRegion> parents;
+    private TreeSet<FunctionalRegion> children;
 
     private Map<String, EconomyProvider> economyProviders;
     private Map<String, ItemProvider> itemProviders;
@@ -63,8 +63,8 @@ public class TownshipsRegion implements Region {
     private boolean valid;
     private Map<String, Object> metadata;
     private Map<UUID, Map<String, Object>> regionMetadata;
-    private Map<Region, RelationState> relations;
-    private Map<Region, RelationState> externRelations;
+    private Map<FunctionalRegion, RelationState> relations;
+    private Map<FunctionalRegion, RelationState> externRelations;
     private Set<UUID> citizens;
 
     private double maxPower;
@@ -84,7 +84,7 @@ public class TownshipsRegion implements Region {
         regionMetadata = new HashMap<>();
         economyProviders = new HashMap<>();
         itemProviders = new HashMap<>();
-        Comparator<Region> regionComparator = (o1, o2) -> {
+        Comparator<FunctionalRegion> regionComparator = (o1, o2) -> {
             int ret = o2.getTier() - o1.getTier();
             if (ret == 0) {
                 return o1.getUid().compareTo(o2.getUid());
@@ -177,7 +177,7 @@ public class TownshipsRegion implements Region {
         for (String regionUid : selfDiplomacy.getKeys(false)) {
             UUID uid = UUID.fromString(regionUid);
             RelationState state = RelationState.valueOf(diplomacy.get(regionUid, "PEACE"));
-            Region r = Townships.getRegions().get(uid).orNull();
+            FunctionalRegion r = Townships.getRegions().get(uid).orNull();
             if (r == null) {
                 continue; // TODO log
             }
@@ -186,7 +186,7 @@ public class TownshipsRegion implements Region {
         for (String regionUid : externDiplomacy.getKeys(false)) {
             UUID uid = UUID.fromString(regionUid);
             RelationState state = RelationState.valueOf(diplomacy.get(regionUid, "PEACE"));
-            Region r = Townships.getRegions().get(uid).orNull();
+            FunctionalRegion r = Townships.getRegions().get(uid).orNull();
             if (r == null) {
                 continue; // TODO log
             }
@@ -231,11 +231,11 @@ public class TownshipsRegion implements Region {
         return Optional.fromNullable(name);
     }
 
-    @Override public Map<Region, RelationState> getRelations() {
+    @Override public Map<FunctionalRegion, RelationState> getRelations() {
         return relations;
     }
 
-    @Override public Map<Region, RelationState> getExternRelations() {
+    @Override public Map<FunctionalRegion, RelationState> getExternRelations() {
         return externRelations;
     }
 
@@ -327,10 +327,10 @@ public class TownshipsRegion implements Region {
         StoredDataSection diplomacy = data.getSection("diplomacy");
         StoredDataSection selfDiplomacy = diplomacy.getSection("self");
         StoredDataSection externDiplomacy = diplomacy.getSection("others");
-        for (Entry<Region, RelationState> e : relations.entrySet()) {
+        for (Entry<FunctionalRegion, RelationState> e : relations.entrySet()) {
             selfDiplomacy.set(e.getKey().getUid().toString(), e.getValue().toString());
         }
-        for (Entry<Region, RelationState> e : externRelations.entrySet()) {
+        for (Entry<FunctionalRegion, RelationState> e : externRelations.entrySet()) {
             externDiplomacy.set(e.getKey().getUid().toString(), e.getValue().toString());
         }
     }
@@ -365,7 +365,7 @@ public class TownshipsRegion implements Region {
                 }
             }
             HashSet<RoleGroup> effective = new HashSet<RoleGroup>();
-            for (Region r : parents) {
+            for (FunctionalRegion r : parents) {
                 effective.addAll(r.getRoles(citizen));
                 for (RoleGroup group : effective) {
                     if (r.hasAccess(group, type)) {
@@ -425,22 +425,22 @@ public class TownshipsRegion implements Region {
         this.valid = valid;
     }
 
-    @Override public Collection<Region> getParents() {
+    @Override public Collection<FunctionalRegion> getParents() {
         return parents;
     }
 
-    @Override public Collection<Region> getChildren() {
+    @Override public Collection<FunctionalRegion> getChildren() {
         return children;
     }
 
-    @Override public boolean isCompatible(Region child) {
+    @Override public boolean isCompatible(FunctionalRegion child) {
         String type = child.getType().toLowerCase();
         int tier = child.getTier();
         boolean careType = maxTypeInRegion.containsKey(type);
         int amtType = maxTypeInRegion.get(type);
         boolean careTier = maxTierInRegion.containsKey(tier);
         int amtTier = maxTierInRegion.get(tier);
-        for (Region r : getChildren()) {
+        for (FunctionalRegion r : getChildren()) {
             if (careTier && r.getTier() == tier) {
                 amtTier--;
             }
@@ -462,7 +462,7 @@ public class TownshipsRegion implements Region {
         return results;
     }
 
-    @Override public Map<String, Object> getRegionalMetadata(Region region) {
+    @Override public Map<String, Object> getRegionalMetadata(FunctionalRegion region) {
         return regionMetadata.getOrDefault(region.getUid(), new HashMap<>());
     }
 
@@ -516,7 +516,7 @@ public class TownshipsRegion implements Region {
         if (o instanceof UUID) {
             return regionUid.equals(o);
         } else {
-            return o instanceof Region && ((Region) o).getUid().equals(regionUid);
+            return o instanceof FunctionalRegion && ((FunctionalRegion) o).getUid().equals(regionUid);
         }
     }
 

@@ -3,6 +3,7 @@ package net.kingdomsofarden.townships.regions.bounds.wrappers;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,12 +16,12 @@ import java.util.Map;
 
 public abstract class WrappedBoundingArea implements BoundingArea {
 
-    protected net.kingdomsofarden.townships.api.regions.Region tRegion;
+    protected FunctionalRegion tRegion;
     protected Region bounds;
     protected World world;
 
     public WrappedBoundingArea(Region region,
-        net.kingdomsofarden.townships.api.regions.Region tRegion) {
+        FunctionalRegion tRegion) {
         this.bounds = region;
         this.world = Bukkit.getWorld(region.getWorld().getName());
         this.tRegion = tRegion;
@@ -121,7 +122,7 @@ public abstract class WrappedBoundingArea implements BoundingArea {
             .getBlockY();
     }
 
-    public net.kingdomsofarden.townships.api.regions.Region getRegion() {
+    public FunctionalRegion getRegion() {
         return tRegion;
     }
 

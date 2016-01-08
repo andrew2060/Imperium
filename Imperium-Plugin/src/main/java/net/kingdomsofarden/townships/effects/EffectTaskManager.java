@@ -1,12 +1,12 @@
 package net.kingdomsofarden.townships.effects;
 
 import net.kingdomsofarden.townships.api.effects.TickableEffect;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 
 import java.util.*;
 
 /**
- * Handles scheduling and load balancing for Region ticking
+ * Handles scheduling and load balancing for FunctionalRegion ticking
  */
 public class EffectTaskManager implements Runnable {
     private EffectTaskStack[] taskStacks;
@@ -37,9 +37,9 @@ public class EffectTaskManager implements Runnable {
      * Schedules the effect for ticking
      *
      * @param tickableEffect The effect to tick
-     * @param scheduling     The Region that is scheduling this effect
+     * @param scheduling     The FunctionalRegion that is scheduling this effect
      */
-    public void schedule(TickableEffect tickableEffect, Region scheduling) {
+    public void schedule(TickableEffect tickableEffect, FunctionalRegion scheduling) {
         if (toRemove.contains(tickableEffect)) { // Cancel removal if we subsequently schedule again
             toRemove.remove(tickableEffect);
         }

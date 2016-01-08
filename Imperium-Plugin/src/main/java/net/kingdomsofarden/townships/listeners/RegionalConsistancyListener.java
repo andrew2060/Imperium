@@ -3,7 +3,7 @@ package net.kingdomsofarden.townships.listeners;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.events.RegionCreateEvent;
 import net.kingdomsofarden.townships.api.events.RegionDisbandEvent;
-import net.kingdomsofarden.townships.api.regions.Region;
+import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.RegionBoundingArea;
 import net.kingdomsofarden.townships.regions.bounds.RegionDynamicCompositeBoundingArea;
 import net.kingdomsofarden.townships.tasks.RegionBlockCheckTask;
@@ -33,7 +33,7 @@ public class RegionalConsistancyListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRegionDisband(RegionDisbandEvent event) {
         // Trigger region disbandents
-        TreeSet<Region> intersections =
+        TreeSet<FunctionalRegion> intersections =
             Townships.getRegions().getIntersectingRegions(event.getRegion().getBounds());
         intersections.stream().filter(r -> r.getMetadata().containsKey(MetaKeys.REQUIREMENT_REGION))
             .forEach(r -> {
