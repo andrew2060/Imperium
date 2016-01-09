@@ -1,6 +1,8 @@
 package net.kingdomsofarden.townships.regions.bounds;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -22,17 +24,19 @@ public class CompositeBoundingArea implements BoundingArea {
 
     private final World world;
     private final FunctionalRegion region;
+    private final double zocMultiplier;
     private Collection<BlockVector> blockVectors;
     private Collection<BlockVector2D> flattened;
 
     private RegionBoundCollection regions;
 
-    public CompositeBoundingArea(World world, FunctionalRegion region) {
+    public CompositeBoundingArea(World world, FunctionalRegion region, double zocMultiplier) {
         this.blockVectors = new HashSet<>();
         this.flattened = new HashSet<>();
         this.world = world;
         this.regions = new AxisBoundCollection(world, true);
         this.region = region;
+        this.zocMultiplier = zocMultiplier;
     }
 
     public void add(BoundingArea bounds) {
@@ -115,7 +119,7 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
-        CompositeBoundingArea ret = new CompositeBoundingArea(world, region);
+        CompositeBoundingArea ret = new CompositeBoundingArea(world, region, zocMultiplier);
         for (BoundingArea b : regions.getContainedBounds()) {
             ret.add(b.grow(BoundingArea.class, size));
         }
@@ -126,12 +130,15 @@ public class CompositeBoundingArea implements BoundingArea {
         return region;
     }
 
-    @Override public void initialize(JsonObject json) {
-
-    }
-
-    @Override public JsonObject save() {
-        return null;
+    @Override public JsonObject toJson() {
+        JsonObject ret = new JsonObject();
+        ret.addProperty("type", "COMPOSITE");
+        JsonArray regionArr = new JsonArray();
+        regions.getContainedBounds()
+            .forEach(r -> regionArr.add(new JsonPrimitive(r.getRegion().getUid().toString())));
+        ret.add("regions", regionArr);
+        ret.addProperty("multiplier", zocMultiplier);
+        return ret;
     }
 
     @Override public Region getBacking() {

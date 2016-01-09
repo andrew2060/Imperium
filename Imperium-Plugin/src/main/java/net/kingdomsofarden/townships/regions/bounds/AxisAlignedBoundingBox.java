@@ -56,12 +56,12 @@ public class AxisAlignedBoundingBox extends WrappedBoundingArea implements Cuboi
         return (T) new AxisAlignedBoundingBox(new CuboidRegion(newMin, newMax), tRegion);
     }
 
-    @Override public void initialize(JsonObject json) {
-
-    }
-
-    @Override public JsonObject save() {
-        return null;
+    @Override public JsonObject toJson() {
+        JsonObject ret = new JsonObject();
+        ret.addProperty("type", "AABB");
+        ret.add("min", VECTORSERIALIZER.serialize(min, true));
+        ret.add("max", VECTORSERIALIZER.serialize(max, true));
+        return ret;
     }
 
     @Override public Area asAWTArea() {

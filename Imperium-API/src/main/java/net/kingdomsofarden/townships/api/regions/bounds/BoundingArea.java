@@ -1,6 +1,7 @@
 package net.kingdomsofarden.townships.api.regions.bounds;
 
 import com.google.gson.JsonObject;
+import com.sk89q.worldedit.regions.Region;
 import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -77,19 +78,14 @@ public interface BoundingArea {
     FunctionalRegion getRegion();
 
     /**
-     * Initializes the bounds with the given settings as provided as a JSON object
-     */
-    void initialize(JsonObject json);
-
-    /**
      * @return a Json object serialization of this bounding geometry
      */
-    JsonObject save();
+    JsonObject toJson();
 
     /**
      * @return The backing WorldEdit region reprresenting this bounding area
      */
-    com.sk89q.worldedit.regions.Region getBacking();
+    Region getBacking();
 
     /**
      * @return A AWT representation of this area

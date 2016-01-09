@@ -64,19 +64,15 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
     }
 
     @Override public FunctionalRegion getRegion() {
-        return null;
+        return null; // Unused
     }
 
-    @Override public void initialize(JsonObject json) {
-
-    }
-
-    @Override public JsonObject save() {
-        return null;
+    @Override public JsonObject toJson() {
+        return null; // Unused
     }
 
     @Override public Region getBacking() {
-        return null;
+        return null; // Unused
     }
 
     @Override public Area asAWTArea() {

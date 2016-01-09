@@ -1,7 +1,10 @@
 package net.kingdomsofarden.townships.regions.bounds.wrappers;
 
+import com.google.gson.JsonObject;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.Region;
 import net.kingdomsofarden.townships.api.regions.FunctionalRegion;
 import net.kingdomsofarden.townships.api.regions.bounds.BoundingArea;
@@ -124,6 +127,31 @@ public abstract class WrappedBoundingArea implements BoundingArea {
 
     public FunctionalRegion getRegion() {
         return tRegion;
+    }
+
+    protected static VectorJsonSerializer VECTORSERIALIZER = new VectorJsonSerializer();
+
+    protected static class VectorJsonSerializer {
+        public JsonObject serialize(Vector v, boolean asBlocks) {
+            if (asBlocks && !(v instanceof BlockVector)) {
+                v = v.toBlockVector();
+            }
+            JsonObject ret = new JsonObject();
+            ret.addProperty("x", v.getX());
+            ret.addProperty("y", v.getY());
+            ret.addProperty("z", v.getZ());
+            return ret;
+        }
+
+        public JsonObject serialize2d(Vector2D v, boolean asBlocks) {
+            if (asBlocks && !(v instanceof BlockVector2D)) {
+                v = v.toBlockVector2D();
+            }
+            JsonObject ret = new JsonObject();
+            ret.addProperty("x", v.getX());
+            ret.addProperty("z", v.getZ());
+            return ret;
+        }
     }
 
 }
