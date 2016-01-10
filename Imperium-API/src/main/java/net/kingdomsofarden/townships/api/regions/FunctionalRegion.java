@@ -245,6 +245,12 @@ public interface FunctionalRegion {
     double updatePower(double amount);
 
     /**
+     * @return The effective ZOC exerted by this region (multiplied by various other composite
+     * regions)
+     */
+    int getZOC();
+
+    /**
      * @return The maximal power that can be exerted by this region
      */
     double getMaxPower();
