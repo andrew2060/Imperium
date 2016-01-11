@@ -39,12 +39,15 @@ public class CompositeBoundingArea implements BoundingArea {
         this.zocMultiplier = zocMultiplier;
     }
 
-    public void add(BoundingArea bounds) {
-        if (!bounds.getWorld().equals(world)) {
-            throw new IllegalArgumentException("Worlds don't match on bounding area addition");
+    public void add(FunctionalRegion region) {
+        if (!region.getBounds().getWorld().equals(world)) {
+            throw new IllegalArgumentException("Cannot add non-equivalent world regions to the "
+                + "same composite region");
         }
-        regions.add(bounds);
-        for (BlockVector b : bounds.getBacking()) {
+        BoundingArea add = region.getBounds()
+            .grow(BoundingArea.class, (int) Math.ceil(region.getZOC() * zocMultiplier));
+        regions.add(add);
+        for (BlockVector b : add.getBacking()) {
             blockVectors.add(b);
             flattened.add(b.toVector2D().toBlockVector2D());
         }
