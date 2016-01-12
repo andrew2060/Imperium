@@ -53,13 +53,15 @@ public class CompositeBoundingArea implements BoundingArea {
         }
     }
 
-    public void remove(BoundingArea bounds) {
-        if (!bounds.getWorld().equals(world)) {
-            throw new IllegalArgumentException("Worlds don't match on bounding area removal");
+    public void remove(FunctionalRegion region) {
+        if (!region.getBounds().getWorld().equals(world)) {
+            throw new IllegalArgumentException("Cannot add non-equivalent world regions to the "
+                + "same composite region");
         }
-        regions.remove(bounds.getRegion());
+        regions.remove(region);
 
-        for (BlockVector v : bounds.getBacking()) {
+        for (BlockVector v : region.getBounds().grow(BoundingArea.class, (int) Math.ceil(region
+            .getZOC() * zocMultiplier)).getBacking()) {
             if (regions.getBoundingRegions(v.getBlockX(), v.getBlockY(), v.getBlockZ()).isEmpty()) {
                 blockVectors.remove(v);
                 BlockVector2D fV = v.toVector2D().toBlockVector2D();
@@ -69,6 +71,7 @@ public class CompositeBoundingArea implements BoundingArea {
             }
         }
     }
+
 
 
     @Override public boolean isInBounds(Location loc) {
