@@ -125,9 +125,9 @@ public class CompositeBoundingArea implements BoundingArea {
     }
 
     @Override public <T extends BoundingArea> T grow(Class<T> clazz, int size) {
-        CompositeBoundingArea ret = new CompositeBoundingArea(world, region, zocMultiplier);
+        CompositeBoundingArea ret = new CompositeBoundingArea(world, region, zocMultiplier * size);
         for (BoundingArea b : regions.getContainedBounds()) {
-            ret.add(b.grow(BoundingArea.class, size));
+            ret.add(b.getRegion());
         }
         return (T) ret;
     }
