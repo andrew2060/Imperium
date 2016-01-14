@@ -2,8 +2,6 @@ package net.kingdomsofarden.townships.regions;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.kingdomsofarden.townships.TownshipsPlugin;
 import net.kingdomsofarden.townships.api.Townships;
 import net.kingdomsofarden.townships.api.characters.Citizen;
@@ -108,24 +106,7 @@ public class TownshipsRegion implements FunctionalRegion {
             }
         };
         tier = config.get("tier", intSerializer, -1);
-        Class<? extends RegionBoundingArea> boundsClazz;
-        try {
-            boundsClazz = (Class<? extends RegionBoundingArea>) Class.forName(config
-                .get("region-bounds-class", "net.kingdomsofarden.townships.regions.bounds"
-                    + ".RegionAxisAlignedBoundingBox"));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }
-        JsonObject boundsSettings =
-            new JsonParser().parse(config.get("region-bounds-settings", "{}")).getAsJsonObject();
-        try {
-            bounds = boundsClazz.newInstance();
-            bounds.initialize(boundsSettings);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            return;
-        }
+
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
             RoleGroup group = RoleGroup.valueOf(roleName);
