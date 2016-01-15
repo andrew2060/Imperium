@@ -67,6 +67,7 @@ public class TownshipsRegion implements FunctionalRegion {
 
     private double maxPower;
     private double currPower;
+    private int zoc;
 
     public TownshipsRegion(UUID rId, StoredDataSection config) {
         // Set up basic data structures
@@ -106,7 +107,7 @@ public class TownshipsRegion implements FunctionalRegion {
             }
         };
         tier = config.get("tier", intSerializer, -1);
-
+        zoc = config.get("zoc", intSerializer, 0);
         StoredDataSection roleSection = config.getSection("roles");
         for (String roleName : roleSection.getKeys(false)) {
             RoleGroup group = RoleGroup.valueOf(roleName);
@@ -276,7 +277,7 @@ public class TownshipsRegion implements FunctionalRegion {
         data.set("tier", tier);
         data.set("uid", regionUid.toString());
         data.set("regions-bound-class", getBounds().getClass().getName());
-        data.set("regions-bound-settings", getBounds().save().toString());
+        data.set("regions-bound-settings", getBounds().toJson().toString());
         StoredDataSection roleSection = data.getSection("roles");
         for (RoleGroup group : citizenUidsByRole.keySet()) {
             List<String> toAdd = citizenUidsByRole.get(group).stream().map(UUID::toString)
@@ -479,6 +480,10 @@ public class TownshipsRegion implements FunctionalRegion {
             currPower = maxPower;
         }
         return currPower;
+    }
+
+    @Override public int getZOC() {
+        return zoc;
     }
 
     @Override public double getMaxPower() {
