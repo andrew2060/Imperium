@@ -276,6 +276,7 @@ public class TownshipsRegion implements FunctionalRegion {
         data.set("type", type);
         data.set("tier", tier);
         data.set("uid", regionUid.toString());
+        data.set("zoc", zoc);
         data.set("regions-bound-class", getBounds().getClass().getName());
         data.set("regions-bound-settings", getBounds().toJson().toString());
         StoredDataSection roleSection = data.getSection("roles");
