@@ -105,6 +105,6 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
     }
 
     @Override public CuboidRegion getBackingBounds() {
-        return new CuboidRegion(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
+        return bounds;
     }
 }
