@@ -72,7 +72,7 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
     }
 
     @Override public Region getBacking() {
-        return null; // Unused
+        return bounds;
     }
 
     @Override public Area asAWTArea() {
@@ -105,6 +105,6 @@ public class AreaBoundingBox extends WrappedBoundingArea implements CuboidBoundi
     }
 
     @Override public CuboidRegion getBackingBounds() {
-        return bounds;
+        return (CuboidRegion) bounds;
     }
 }
